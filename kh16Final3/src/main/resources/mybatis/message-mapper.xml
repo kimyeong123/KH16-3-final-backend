@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="message">
+	
+	<!-- C -->
+	<select id="sequence" resultType="long">
+		select message_seq.nextval from dual
+	</select>
+	<insert id="insert">
+		insert into message(
+			message_no, message_type, message_room,
+			message_sender, message_content
+		)
+		values(
+			#{messageNo}, #{messageType}, #{messageRoom},
+			#{messageSender}, #{messageContent}
+		)
+	</insert>
+	
+	<select id="detail" resultType="MessageDto">
+		select * from message where message_no = #{messageNo}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+

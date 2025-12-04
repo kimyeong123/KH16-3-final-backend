@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="room">
+	
+	<!-- C -->
+	<select id="sequence" resultType="long">
+		select room_seq.nextval from dual
+	</select>
+	<insert id="insert">
+		insert into room(room_no, room_name)
+		values(#{roomNo}, #{roomName})
+	</insert>
+	
+	<!-- R -->
+	<select id="list" resultType="RoomDto">
+		select * from room order by room_no asc
+	</select>
+	<select id="detail" resultType="RoomDto">
+		select * from room where room_no = #{roomNo}
+	</select>
+	
+	<!-- U -->
+	<update id="update">
+		update room set room_name = #{roomName}
+		where room_no = #{roomNo}
+	</update>
+	
+	<!-- D -->
+	<delete id="delete">
+		delete room where room_no = #{roomNo}
+	</delete>
+	
+	<!-- 참여자 처리 -->
+	<insert id="enter">
+		insert into party(party_room, party_account) 
+		values(#{partyRoom}, #{partyAccount})
+	</insert>
+	
+	<delete id="leave">
+		delete party 
+		where party_room = #{partyRoom} and party_account = #{partyAccount}
+	</delete>
+	
+	<!-- 특정 회원의 참여 여부를 고려한 방 목록 -->
+	<select id="listByEnter" resultType="RoomEnterVO">
+		select 
+			R.*, 
+			nvl2(P.party_room, 'Y', 'N') room_enter 
+		from room R 
+    		left outer join (
+    			select * from party 
+    			where party_account = #{partyAccount}
+    		) P
+       		on R.room_no = P.party_room
+        order by R.room_no asc
+	</select>
+	
+	<select id="check" resultType="int">
+		select count(*) from party
+		where party_room = #{partyRoom} and party_account = #{partyAccount}
+	</select>
+	
+	<!-- 해당 방의 참여자를 불러오는 구문 -->
+	<select id="users" resultType="RoomUserVO">
+		select  
+			A.account_id, A.account_nickname, A.account_level
+		from party P left outer join account A on P.party_account = A.account_id
+		where party_room = #{roomNo}
+		order by A.account_id asc
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
