@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="product">
+  
+  <select id="sequence" resultType="int">
+  		select product_seq.nextval from dual
+  </select>
+  
+  <insert id="add">
+    insert into product(
+        product_no, product_seller, product_name, product_description,
+        product_start_price, product_current_price, product_instant_price,
+        product_final_price, product_start_date, product_end_date,
+        product_status, product_buyer_no
+    ) values(
+        #{productNo}, #{productSeller}, #{productName}, #{productDescription},
+        #{productStartPrice}, #{productCurrentPrice}, #{productInstantPrice},
+        #{productFinalPrice}, #{productStartDate}, #{productEndDate},
+        #{productStatus}, #{productBuyerNo}
+    )
+</insert>
+
+  
+  <select id="list" resultType="ProductDto">
+		select * 
+		from product 
+		order by product_no desc
+	</select>
+	
+	<select id="detail" resultType="ProductDto">
+		select * 
+		from product 
+		where product_no = #{productNo}
+	</select>
+	
+	<delete id="delete">
+		delete product 
+		where product_no = #{productNo}
+	</delete>
+	
+	<update id="update">
+    update product 
+    set 
+        product_name         = #{productName},
+        product_description  = #{productDescription},
+        product_instant_price= #{productInstantPrice},
+        product_end_date     = #{productEndDate},
+        product_status       = #{productStatus}
+    where product_no = #{productNo}
+</update>
+
+<update id="updateUnit">
+    update product
+    <set>
+        <if test="productName != null">
+            product_name = #{productName},
+        </if>
+        <if test="productDescription != null">
+            product_description = #{productDescription},
+        </if>
+        <if test="productInstantPrice != null">
+            product_instant_price = #{productInstantPrice},
+        </if>
+        <if test="productEndDate != null">
+            product_end_date = #{productEndDate},
+        </if>
+        <if test="productStatus != null">
+            product_status = #{productStatus},
+        </if>
+    </set>
+    where product_no = #{productNo}
+</update>
+
+<!-- 입찰 발생 시: 현재가, 입찰자, 상태 갱신 -->
+<update id="updateOnBid">
+    update product
+    set
+        product_current_price = #{bidAmount},
+        product_buyer_no      = #{bidMemberNo},
+        product_status        = 'BIDDING'
+    where product_no = #{productNo}
+      and product_current_price &lt; #{bidAmount} <!--  &lt 사용이유 <(등호) -->
+</update>
+
+<!--  경매종료/낙찰확정 -->
+<update id="closeAuction">
+    update product
+    set
+        product_final_price = product_current_price,
+        product_status      = 'ENDED'
+    where product_no = #{productNo}
+      and product_status = 'BIDDING'
+</update>
+
+
+<select id="countByPaging" resultType="int">
+    select count(*)
+    from product
+</select>
+
+<select id="listByPaging" resultType="ProductDto">
+    select *
+    from (
+        select rownum rn, TMP.*
+        from (
+            select *
+            from product
+            order by product_no desc
+        ) TMP
+    )
+    where rn between #{begin} and #{end}
+</select>
+
+
+
+	
+	
+  
+  
+  </mapper>

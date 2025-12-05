@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="bid">
+  
+  <select id="sequence" resultType="int">
+        select seq_bid_no.nextval from dual
+    </select>
+    
+    <insert id="add">
+    insert into bid(
+bid_no, bid_product, bid_member, bid_amount    
+    )values (
+#{bidNo}, #{bidProduct}, #{bidMember}, #{bidAmount}    
+    )
+    
+    </insert>
+    <!-- 특정 상품 입찰 리스트 -->
+     <select id="listByProduct" resultType="BidDto">
+        select *
+        from bid
+        where bid_product = #{bidProduct}
+        order by bid_time desc
+    </select>
+    
+  
+  
+ </mapper>
