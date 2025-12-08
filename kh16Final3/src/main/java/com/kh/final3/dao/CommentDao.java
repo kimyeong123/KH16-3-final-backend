@@ -36,9 +36,7 @@ public class CommentDao {
 		return sqlSession.update("comment.update", commentDto) > 0;
 	}
 	
-
      // DB에 남겨두기위해  댓글을 소프트 삭제하는 메서드
-
 	public boolean softDelete(long commentNo) {
 		return sqlSession.update("comment.softDelete", commentNo) > 0; // 매퍼 ID는 softDelete 유지
 	}

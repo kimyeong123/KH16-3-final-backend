@@ -48,4 +48,8 @@ public class BoardDao {
 	public boolean delete(long boardNo) {
 		return sqlSession.delete("board.delete", boardNo) > 0;
 	}
+
+	public List<BoardDto> selectListByType(String type) {
+		return sqlSession.selectList("board.listByType", type);
+	}
 }
