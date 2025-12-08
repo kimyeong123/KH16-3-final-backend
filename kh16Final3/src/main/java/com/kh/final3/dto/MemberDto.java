@@ -50,14 +50,14 @@ public class MemberDto {
     @Size(max = 100)	
     private String memberAddress1;
     @Size(max = 100)
-    private String memberAddress2; 
-    private String memberLevel; 
+    private String memberAddress2; 	
+    private String memberRole; 
     private Integer memberPoint;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberCreatedTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberEditTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberRecentTime; 
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+//    private LocalDateTime memberCreatedTime;
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+//    private LocalDateTime memberEditTime;
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+//    private LocalDateTime memberRecentTime; 
 }
 

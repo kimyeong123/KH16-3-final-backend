@@ -9,19 +9,16 @@
     <insert id="insert" parameterType="com.kh.final3.dto.MemberDto">
         insert into member (
             member_no,
-            member_id,
-            member_pw,
-            member_nickname,
-            member_name,
-            member_email,
-            member_birth,
-            member_contact,
-            member_post,
-            member_address1,
-            member_address2,
-            member_level,
-            member_point,
-            member_created_time
+            ID,
+            PW,
+            NICKNAME,
+            NAME,
+            EMAIL,
+            BIRTH,
+            CONTACT,
+            POST,
+            ADDRESS1,
+            ADDRESS2
         ) values (
             member_seq.nextval,
             #{memberId},
@@ -33,25 +30,27 @@
             #{memberContact},
             #{memberPost},
             #{memberAddress1},
-            #{memberAddress2},
-            #{memberLevel},
-            #{memberPoint},
-            SYSTIMESTAMP
+            #{memberAddress2}
         )
     </insert>
 
     <!-- 아이디로 회원 조회 -->
     <select id="detailByMemberId" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
-        select * from member where member_id = #{memberId}
+        select * from member where ID = #{memberId}
     </select>
 
     <!-- 닉네임으로 회원 조회 -->
     <select id="detailByMemberNickname" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
-        select * from member where member_nickname = #{memberNickname}
+        select * from member where NICKNAME = #{memberNickname}
     </select>
     
     <select id="findNicknameByMemberNo" parameterType="long" resultType="String">
-    	select member_nickname from member where member_no = #{memberNo}
-	</select>
+        select NICKNAME from member where NO = #{memberNo}
+    </select>
+    <!-- 이름 + 생일 + 연락처로 회원 조회 -->
+<select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
+    select * from member
+    where name = #{name} and birth = #{birth} and contact = #{contact}
+</select>
 
 </mapper>
