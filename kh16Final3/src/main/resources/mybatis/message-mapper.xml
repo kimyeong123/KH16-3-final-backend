@@ -3,98 +3,121 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kh.final3.dao.MessageDao">
+<mapper namespace="message"> 
 
-	<!-- 1. 시퀀스 번호 생성 -->
 	<select id="sequence" resultType="int">
 		select messages_seq.nextval from dual
 	</select>
 
-	<!-- 2. 쪽지 등록 -->
 	<insert id="insert" parameterType="MessageDto">
 		insert into messages (
-			message_no, message_sender, message_receiver, message_content
+			message_no, sender_no, receiver_no, content, type
 		)
 		values (
-			#{messageNo}, #{messageSender}, #{messageReceiver}, #{messageContent}
+			#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type}
 		)
 	</insert>
 	
-	<!-- 3. 발신함 목록 조회 (내가 보낸 쪽지) -->
-	<!-- <include>를 제거하고 컬럼을 직접 나열하도록 수정 -->
-	<select id="selectSentList" parameterType="int" resultType="MessageDto">
+    <select id="selectSentList" parameterType="long" resultType="MessageDto">
 		select 
 			message_no, 
-			message_sender, 
-			message_receiver, 
-			message_content,
-			message_sent_time as messageSentTime, 
-			message_read_time as messageReadTime, 
-			message_is_read as messageIsRead,
-			message_sender_deleted as messageSenderDeleted, 
-			message_receiver_deleted as messageReceiverDeleted
+			sender_no, 
+			receiver_no, 
+			content,
+			type,
+			sent_time as sentTime,           
+			read_time as readTime,           
+			is_read as isRead,               
+			sender_deleted as senderDeleted, 
+			receiver_deleted as receiverDeleted
 		from messages 
-		where message_sender = #{memberNo} 
-		and message_sender_deleted = 'N'
+		where sender_no = #{memberNo} 
+		and sender_deleted = 'N'
 		order by message_no desc
 	</select>
 	
-	<!-- 4. 수신함 목록 조회 (내가 받은 쪽지) -->
-	<!-- <include>를 제거하고 컬럼을 직접 나열하도록 수정 -->
-	<select id="selectReceivedList" parameterType="int" resultType="MessageDto">
+	<select id="selectReceivedList" parameterType="long" resultType="MessageDto">
 		select 
 			message_no, 
-			message_sender, 
-			message_receiver, 
-			message_content,
-			message_sent_time as messageSentTime, 
-			message_read_time as messageReadTime, 
-			message_is_read as messageIsRead,
-			message_sender_deleted as messageSenderDeleted, 
-			message_receiver_deleted as messageReceiverDeleted
+			sender_no, 
+			receiver_no, 
+			content,
+			type,
+			sent_time as sentTime, 
+			read_time as readTime, 
+			is_read as isRead,
+			sender_deleted as senderDeleted, 
+			receiver_deleted as receiverDeleted
 		from messages
-		where message_receiver = #{memberNo} 
-		and message_receiver_deleted = 'N'
+		where receiver_no = #{memberNo} 
+		and receiver_deleted = 'N'
 		order by message_no desc
 	</select>
 	
-	<!-- 5. 쪽지 상세 조회 -->
-	<!-- <include>를 제거하고 컬럼을 직접 나열하도록 수정 -->
 	<select id="selectOne" parameterType="int" resultType="MessageDto">
 		select 
 			message_no, 
-			message_sender, 
-			message_receiver, 
-			message_content,
-			message_sent_time as messageSentTime, 
-			message_read_time as messageReadTime, 
-			message_is_read as messageIsRead,
-			message_sender_deleted as messageSenderDeleted, 
-			message_receiver_deleted as messageReceiverDeleted
+			sender_no, 
+			receiver_no, 
+			content,
+			type,
+			sent_time as sentTime, 
+			read_time as readTime, 
+			is_read as isRead,
+			sender_deleted as senderDeleted, 
+			receiver_deleted as receiverDeleted
 		from messages
 		where message_no = #{messageNo}
 	</select>
 	
-	<!-- 6. 쪽지 읽음 처리 (수신 시각 및 상태 업데이트) -->
 	<update id="updateReadTime" parameterType="int">
 		update messages set
-			message_is_read = 'Y',
-			message_read_time = systimestamp
+			is_read = 'Y',
+			read_time = systimestamp
 		where message_no = #{messageNo}
 	</update>
 	
-	<!-- 7. 발신자 삭제 처리 -->
 	<update id="updateSenderDelete" parameterType="int">
 		update messages set
-			message_sender_deleted = 'Y'
+			sender_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
 	
-	<!-- 8. 수신자 삭제 처리 -->
 	<update id="updateReceiverDelete" parameterType="int">
 		update messages set
-			message_receiver_deleted = 'Y'
+			receiver_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
 	
+	<select id="countUnreadAlerts" parameterType="long" resultType="int">
+		select count(*) 
+		from messages
+		where receiver_no = #{memberNo}
+		and is_read = 'N'
+		and type = 'SYSTEM_ALERT'
+		and receiver_deleted = 'N'
+	</select>
+	
+	<select id="selectReceivedListByTypes" parameterType="map" resultType="MessageDto">
+		select 
+			message_no, 
+			sender_no, 
+			receiver_no, 
+			content,
+			type,
+			sent_time as sentTime, 
+			read_time as readTime, 
+			is_read as isRead,
+			sender_deleted as senderDeleted, 
+			receiver_deleted as receiverDeleted
+		from messages
+		where receiver_no = #{memberNo}
+		and receiver_deleted = 'N'
+		and type in 
+		<foreach collection="typeList" item="type" open="(" close=")" separator=",">
+			#{type}
+		</foreach>
+		order by message_no desc
+	</select>
+
 </mapper>

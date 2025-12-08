@@ -22,14 +22,11 @@ import com.kh.final3.vo.TokenVO;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/rest/comment") // REST API 관례에 따라 경로를 /rest/comment로 설정
+@RequestMapping("/rest/comment") 
 public class CommentRestController {
     
 	@Autowired
 	private CommentService commentService; 
-	
-	@Autowired
-	private TokenVO tokenVO;
 	
 	/**
 	 * 1. 댓글 등록 (POST)
@@ -40,11 +37,12 @@ public class CommentRestController {
 			) {
         
 		long memberNo = tokenVO.getMemberNo();
+		String loginLevel = tokenVO.getLoginLevel();
         
 		if (memberNo == 0) { 
 	        throw new UnauthorizationException("로그인 후 댓글 작성이 가능합니다.");
 		}
-		return commentService.insert(commentDto, memberNo);
+		return commentService.insert(commentDto, memberNo, loginLevel);
 	}	
 	
 	/**
@@ -90,7 +88,7 @@ public class CommentRestController {
         
 		commentService.softDelete(commentNo, memberNo, loginLevel);
         
-        return ResponseEntity.ok().build(); // 200 OK 반환
+        return ResponseEntity.ok().build();
 	}
     
 }
