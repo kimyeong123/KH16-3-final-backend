@@ -1,4 +1,4 @@
-package com.kh.final3.restcontroller;
+package com.kh.final3.restController;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

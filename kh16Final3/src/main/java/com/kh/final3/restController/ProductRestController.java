@@ -1,4 +1,4 @@
-package com.kh.final3.restcontroller;
+package com.kh.final3.restController;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public class ProductRestController {
 	public void insert(
 			@RequestBody ProductDto productDto
 			) {
-			int productNo=productDao.sequence();
+			long productNo=productDao.sequence();
 			productDto.setProductNo(productNo);
 			productDao.insert(productDto);
 	}
