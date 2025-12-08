@@ -32,4 +32,9 @@ public class MemberDao {
 		params.put("keyword", keyword);
 		return sqlSession.selectList("member.search", params);
 	}
+	
+	//
+	public String findNicknameByMemberNo(long memberNo) {
+	    return sqlSession.selectOne("member.findNicknameByMemberNo", memberNo);
+	}
 }

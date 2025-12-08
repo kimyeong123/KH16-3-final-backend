@@ -20,7 +20,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		)
 	</insert>
 	
-	<!-- 3. 특정 게시글 댓글 목록 조회 (SELECT LIST) -->
+	<!-- 3. 특정 게시글 댓글 목록 조회 -->
     <!-- DTO 필드명에 맞게 컬럼명에 AS 별칭을 사용 (comment_date -> commentTime 등) -->
 	<select id="list" resultType="CommentDto" parameterType="long">
 		select 
@@ -36,8 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by comment_no asc 
 	</select>
 	
-	<!-- 4. 특정 댓글 상세 조회 (SELECT ONE) -->
-    <!-- DTO 필드명에 맞게 컬럼명에 AS 별칭을 사용 -->
+	<!-- 4. 특정 댓글 상세 조회 -->
 	<select id="detail" resultType="CommentDto" parameterType="long">
 		select 
             comment_no, 

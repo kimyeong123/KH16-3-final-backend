@@ -1,4 +1,4 @@
-package com.kh.final3.restController;
+package com.kh.final3.restcontroller;
 
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class BoardRestController {
 	
 	@PostMapping("/")
 	public void insert(@RequestBody BoardDto boardDto) {
-        String loginLevel = "MEMBER";
-		boardService.insert(boardDto, loginLevel);
+//		String loginLevel = tokenVO.getLoginLevel();
+//		boardService.insert(boardDto, loginLevel);
 	}
 	
 	@GetMapping("/")
@@ -37,9 +37,9 @@ public class BoardRestController {
 	public void delete(@PathVariable long boardNo
 //								@RequestAttribute TokenVO tokenVO
 			) {
-        String loginId = "testuser1"; // 실제 로그인 ID
-        String loginLevel = "일반회원"; // 실제 로그인 레벨
-		boardService.delete(boardNo, loginId, loginLevel);
+//		long loginMemberNo = tokenVO.getMemberNo(); 
+//	    String loginLevel = tokenVO.getLoginLevel();
+//		boardService.delete(boardNo, loginMemberNo, loginLevel);
 	}
 	
 	@PatchMapping("/{boardNo}")
@@ -48,8 +48,8 @@ public class BoardRestController {
 //								@RequestAttribute TokenVO tokenVO
 								) {
         boardDto.setBoardNo(boardNo);
-        String loginId = "tester"; // 임시 
-        String loginLevel = "default";//임시
-		boardService.update(boardDto, loginId, loginLevel); 
+//     long loginMemberNo = tokenVO.getMemberNo(); 
+//	    String loginLevel = tokenVO.getLoginLevel();
+//		boardService.update(boardDto, loginMemberNo, loginLevel); 
 	}
 }

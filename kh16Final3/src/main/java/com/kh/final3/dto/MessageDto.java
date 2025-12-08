@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class MessageDto {
-	private int messageNo; // 쪽지 번호 (PK)
-	private int messageSender; // 발신자 회원 번호 (FK)
-	private int messageReceiver; // 수신자 회원 번호 (FK)
+	private Integer messageNo; // 쪽지 번호 (PK)
+	private Integer messageSender; // 발신자 회원 번호 (FK)
+	private Integer messageReceiver; // 수신자 회원 번호 (FK)
 	private String messageContent; // 쪽지 내용
 	
 	private Timestamp messageSentTime; // 발신 시각
