@@ -1,5 +1,7 @@
 package com.kh.final3.service;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,13 @@ public class MemberService {
         if (memberDao.selectOneByMemberNickname(memberDto.getMemberNickname()) != null) {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
-        // 2. 비밀번호 암호화
+        // 2.이름 + 생일 + 연락처 중복 체크
+       if (memberDao.selectOneByNameBirthContact(
+                memberDto.getMemberName(), memberDto.getMemberBirth(), memberDto.getMemberContact()) != null) {
+            throw new IllegalArgumentException("이메일/휴대폰 번호가 이미 사용 중입니다. 로그인 또는 비밀번호 찾기를 이용해 주세요.");
+        }
+
+        // 3. 비밀번호 암호화
         String encoded = passwordEncoder.encode(memberDto.getMemberPw());
         memberDto.setMemberPw(encoded);
         memberDao.insert(memberDto);
@@ -37,4 +45,10 @@ public class MemberService {
     public boolean checkNickname(String memberNickname) {
         return memberDao.selectOneByMemberNickname(memberNickname) == null;
     }
+    // 이름 + 생일 + 연락처 중복 확인
+    public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
+        return memberDao.selectOneByNameBirthContact(name, birth, contact);
+    }
+    
+    
 }

@@ -1,6 +1,9 @@
 package com.kh.final3.restcontroller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import com.kh.final3.dto.MemberDto;
@@ -22,14 +25,24 @@ public class MemberRestController {
         memberService.add(memberDto);
         return "회원가입 성공";
     }
-    // 아이디 중복 체크
-    @GetMapping("/check/id/{memberId}")
+
+    @GetMapping("/memberId/{memberId}")
     public boolean checkId(@PathVariable String memberId) {
         return memberService.checkId(memberId);
     }
-    // 닉네임 중복 체크
-    @GetMapping("/check/nickname/{memberNickname}")
+
+    @GetMapping("/memberNickname/{memberNickname}")
     public boolean checkNickname(@PathVariable String memberNickname) {
         return memberService.checkNickname(memberNickname);
     }
+    @GetMapping("/checkDuplicate")
+    public boolean checkDuplicate(
+            @RequestParam String name,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birth,
+            @RequestParam String contact) {
+        return memberService.selectOneByNameBirthContact(name, birth, contact) == null;
+    }
+
+    // 회원 로그인 (추후 필요 시)
+    // @PostMapping("/login")
 }
