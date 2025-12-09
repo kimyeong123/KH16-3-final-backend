@@ -35,6 +35,7 @@ public class MemberRestController {
     public boolean checkNickname(@PathVariable String memberNickname) {
         return memberService.checkNickname(memberNickname);
     }
+
     @GetMapping("/checkDuplicate")
     public boolean checkDuplicate(
             @RequestParam String name,
