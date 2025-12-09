@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody; // Spring의 RequestBody로 명시적 import
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.final3.dto.MessageDto;
 import com.kh.final3.service.MessageService;
-import com.kh.final3.vo.PageVO;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import com.kh.final3.vo.PageVO; // HEAD 버전에 있던 PageVO import
+import com.kh.final3.vo.TokenVO; // 토큰 관련 VO가 있다면 import (현재 코드에는 없지만 예상하여 추가)
 
 @RestController
 @RequestMapping("/rest/message")
@@ -26,10 +26,12 @@ public class MessageRestController {
 	@Autowired
 	private MessageService messageService;
 	
-	// 쪽지 전송
-	@PostMapping("/")
+	/**
+	 * 1. 쪽지 전송 (POST /rest/message)
+	 */
+	@PostMapping // 💡 RESTful 원칙에 따라 "/" 제거. 기본 경로 사용
 	public ResponseEntity<String> sendMessage(
-											@RequestBody MessageDto messageDto,
+											@RequestBody MessageDto messageDto, // 💡 Spring의 @RequestBody 사용
 											@RequestAttribute("memberNo") long memberNo){
 		
 		// 발신자 번호 설정
@@ -45,7 +47,9 @@ public class MessageRestController {
 		}
 	}
 	
-	// 미확인 알림 개수 조회
+	/**
+	 * 2. 미확인 알림 개수 조회 (GET /rest/message/unread/count)
+	 */
 	@GetMapping("/unread/count")
 	public ResponseEntity<Map<String, Object>> getUnreadAlertCount(@RequestAttribute("memberNo") long memberNo) {
 		
@@ -58,6 +62,9 @@ public class MessageRestController {
         return ResponseEntity.ok(response);
 	}
 	
+	/**
+	 * 3. 수신함 목록 조회 (필터링 지원) (GET /rest/message/received?types=...)
+	 */
 	@GetMapping("/received")
 	public ResponseEntity<List<MessageDto>> getReceivedMessagesByFilter(
 						@RequestParam(required = false) List<String> types,
@@ -79,6 +86,10 @@ public class MessageRestController {
 		return ResponseEntity.ok(list);
 	}
 	
+	/**
+	 * 4. 수신함에서 쪽지 삭제 (POST /rest/message/delete/receiver/{messageNo})
+	 * 참고: PATCH 또는 DELETE를 사용하는 것이 RESTful에 더 적합함.
+	 */
 	@PostMapping("delete/receiver/{messageNo}")
 	public ResponseEntity<String> deleteMessageForReceiver(@PathVariable Integer messageNo) {
 		
@@ -92,32 +103,37 @@ public class MessageRestController {
 		}
 	}
 	
-	//페이징 목록 조회 엔드포인트 추가
-	// 1. 수신함 목록 조회
+	// --- 페이지네이션 및 상세 조회 기능 추가 (HEAD 버전 기능) ---
+	
+	/**
+	 * 5. 수신함 목록 조회 (페이지네이션) (GET /rest/message/received/page)
+	 */
 	@GetMapping("/received/page")
     public ResponseEntity<PageVO<MessageDto>> getReceivedListByPaging(
-            PageVO<MessageDto> pageVO, // page, size 등 페이징 파라미터 자동 바인딩
+            PageVO<MessageDto> pageVO, 
             @RequestAttribute("memberNo") long memberNo
     ) {
-        // Service의 페이징 메서드 호출
         PageVO<MessageDto> resultVO = messageService.getReceivedListByPaging(pageVO, memberNo);
         
         return ResponseEntity.ok(resultVO);
     }
 	
-	// 2. 발신함 목록 조회
+	/**
+	 * 6. 발신함 목록 조회 (페이지네이션) (GET /rest/message/sent/page)
+	 */
 	@GetMapping("/sent/page")
     public ResponseEntity<PageVO<MessageDto>> getSentListByPaging(
-            PageVO<MessageDto> pageVO, // page, size 등 페이징 파라미터 자동 바인딩
+            PageVO<MessageDto> pageVO, 
             @RequestAttribute("memberNo") long memberNo
     ) {
-        // Service의 페이징 메서드 호출
         PageVO<MessageDto> resultVO = messageService.getSentListByPaging(pageVO, memberNo);
         
         return ResponseEntity.ok(resultVO);
     }
 	
-	// 3. 상세 조회 및 읽음 처리
+	/**
+	 * 7. 상세 조회 및 읽음 처리 (GET /rest/message/{messageNo})
+	 */
 	@GetMapping("/{messageNo}")
 	public ResponseEntity<MessageDto> getMessageDetail(
 			@PathVariable Integer messageNo,
