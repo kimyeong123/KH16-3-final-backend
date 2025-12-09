@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="product">
 
+    <!-- 시퀀스 -->
     <select id="sequence" resultType="int">
         select product_seq.nextval
         from dual
     </select>
 
- 
+    <!-- 등록 -->
     <insert id="add">
         insert into product(
               product_no
@@ -42,7 +43,7 @@
         order by product_no desc
     </select>
 
-    <!-- 상세 -->
+    <!-- 상세 조회 -->
     <select id="detail" resultType="ProductDto">
         select *
         from product
@@ -51,7 +52,7 @@
 
     <!-- 삭제 -->
     <delete id="delete">
-        delete product
+        delete from product
         where product_no = #{productNo}
     </delete>
 
@@ -110,21 +111,41 @@
         where product_no = #{productNo}
     </update>
 
-    <!-- 전체 개수 (페이징용) -->
+    <!-- 전체 개수 -->
     <select id="countByPaging" resultType="int">
         select count(*)
         from product
     </select>
 
-    <!-- 페이징 목록 -->
+
+    <!-- ✔ 페이징: 완전 정상 버전 (ROW_NUMBER) -->
     <select id="listByPaging" resultType="ProductDto">
         select *
         from (
-            select *
-            from product
-            order by product_no desc
-        ) TMP
-    )
-    where rn between #{begin} and #{end}
-	</select>
+            select TMP.*, row_number() over(order by product_no desc) rn
+            from product TMP
+        )
+        where rn between #{begin} and #{end}
+    </select>
+
+
+ 
+    <update id="updateOnBid">
+        update product
+        set
+              final_price = #{bidAmount}
+            , buyer_no = #{bidMemberNo}
+            , status = 'BIDDING'
+        where product_no = #{productNo}
+    </update>
+
+   
+    <update id="closeAuction">
+        update product
+        set
+              status = 'CLOSED'
+            , ended_time = systimestamp
+        where product_no = #{productNo}
+    </update>
+
 </mapper>

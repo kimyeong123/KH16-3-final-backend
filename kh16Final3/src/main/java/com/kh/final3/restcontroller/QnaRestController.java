@@ -1,4 +1,4 @@
-package com.kh.final3.restController;
+package com.kh.final3.restcontroller;
 
 import java.io.IOException;
 import java.util.List;
