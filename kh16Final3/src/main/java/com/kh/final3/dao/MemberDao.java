@@ -1,5 +1,7 @@
 package com.kh.final3.dao;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,5 +33,17 @@ public class MemberDao {
 		params.put("column", column);
 		params.put("keyword", keyword);
 		return sqlSession.selectList("member.search", params);
+	}
+	//
+	public String findNicknameByMemberNo(long memberNo) {
+	    return sqlSession.selectOne("member.findNicknameByMemberNo", memberNo);
+	}
+	//중복 가입 제거
+	public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("name", name);
+	    param.put("birth", birth);
+	    param.put("contact", contact);
+	    return sqlSession.selectOne("member.selectOneByNameBirthContact", param);
 	}
 }

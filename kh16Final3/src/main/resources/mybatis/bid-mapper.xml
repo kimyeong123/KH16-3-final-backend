@@ -16,8 +16,8 @@
 	    )
     </insert>
     
-    <select id="list" resultType="BidDto">
-        select * 
+    <select id="listByProduct" resultType="BidDto">
+        select *
         from bid
         		where product_no = #{productNo}
         order by bid_no desc;

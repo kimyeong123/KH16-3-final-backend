@@ -4,88 +4,87 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="board">
 
-	<!--  등록 시퀀스 발급 -->
 	<select id="sequence" resultType="long">
 		select board_seq.nextval from dual
 	</select>
 	
-	<!-- 등록 -->
 	<insert id= "insert" parameterType="BoardDto">
 		insert into board(
-			board_no , board_title , 
-			board_writer , board_content ,
-			board_write_time , board_edit_time ,
-			board_read , board_type
+			board_no , title , 
+			writer_no , content ,
+			write_time , edit_time ,
+			read_count , type
 		)
 		values(
-			#{boardNo} , #{boardTitle} , 
-        	#{boardWriter} , #{boardContent} ,
+			#{boardNo} , #{title} , 
+        	#{writerNo} , #{content} ,
         	systimestamp , null ,
-        	0 , #{boardType}
+        	0 , #{type}
 		)
 	</insert>
 	
-	<!-- 전체 목록 -->
-    <!-- AS 별칭을 사용하여 DTO 필드에 맞게 매핑 -->
 	<select id="list" resultType="BoardDto">
 	    select 
             board_no, 
-            board_title, 
-            board_writer, 
-            board_content, 
-            board_write_time as boardWriteTime, 
-            board_edit_time as boardEditTime, 
-            board_read as boardRead, 
-            board_type
+            title,                      
+            writer_no as writerNo,       
+            content,                    
+            write_time as writeTime,     
+            edit_time as editTime,       
+            read_count as readCount,     
+            type
         from board 
         order by board_no desc 
     </select>
 	
-	<!-- 상세 조회 -->
-    <!-- AS 별칭을 사용하여 DTO 필드에 맞게 매핑 -->
 	<select id="detail" parameterType="long" resultType="BoardDto">
 	    select 
             board_no, 
-            board_title, 
-            board_writer, 
-            board_content, 
-            board_write_time as boardWriteTime, 
-            board_edit_time as boardEditTime, 
-            board_read as boardRead, 
-            board_type
+            title,                      
+            writer_no as writerNo,       
+            content,                    
+            write_time as writeTime,     
+            edit_time as editTime,       
+            read_count as readCount,     
+            type
         from board 
         where board_no = #{boardNo} 
 	</select>
 	
-	<!-- 삭제 -->
+	<select id="listByType" resultType="BoardDto" parameterType="string">
+        select 
+            board_no, title, writer_no as writerNo, content, 
+            write_time as writeTime, edit_time as editTime, 
+            read_count as readCount, type
+        from board 
+        where type = #{type}     order by board_no desc 
+    </select>
+	
 	<delete id="delete" parameterType="long">
 		delete from board where board_no = #{boardNo}
 	</delete>
 	
-	<!-- 수정(PATCH) -->
 	<update id="update" parameterType="BoardDto">
 		update board
 		<set>
-			<if test="boardTitle != null">
-			board_title=#{boardTitle},
+			<if test="title != null">
+			title=#{title},
 			</if>
-			<if test="boardContent != null">
-			board_content=#{boardContent},
+			<if test="content != null">
+			content=#{content},
 			</if>
-			board_edit_time=systimestamp
+			edit_time=systimestamp
 		</set>
 			where board_no=#{boardNo}
 	</update>
 	
-	<!-- 조회수 증가 -->
 	<update id="updateBoardRead" parameterType="long">
     	update board 
     	set
-        	board_read = board_read + 1
+        	read_count = read_count + 1
     	where board_no = #{boardNo}
 	</update>
 	
-	<!-- 페이징 카운트 -->
 	<select id="count" resultType="int">
     	select count(*) from board
     </select>

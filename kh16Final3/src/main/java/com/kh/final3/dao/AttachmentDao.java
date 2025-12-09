@@ -16,26 +16,22 @@ public class AttachmentDao {
     @Autowired
     private SqlSession sqlSession;
 
-
     public int sequence() {
         return sqlSession.selectOne("attachment.sequence");
     }
-
 
     public void insert(AttachmentDto dto) {
         sqlSession.insert("attachment.add", dto);
     }
 
-
     public AttachmentDto selectOne(int attachmentNo) {
         return sqlSession.selectOne("attachment.detail", attachmentNo);
     }
 
-
-    public List<AttachmentDto> selectListByParent(String category, String parent) {
+    public List<AttachmentDto> selectListByParent(String category, int parentPkNo) {
         Map<String, Object> param = new HashMap<>();
-        param.put("attachmentCategory", category);
-        param.put("attachmentParent", parent);
+        param.put("category", category);     
+        param.put("parentPkNo", parentPkNo); 
         return sqlSession.selectList("attachment.listByParent", param);
     }
 
@@ -43,11 +39,10 @@ public class AttachmentDao {
         return sqlSession.delete("attachment.delete", attachmentNo) > 0;
     }
 
-
-    public boolean deleteByParent(String category, String parent) {
+    public boolean deleteByParent(String category, int parentPkNo) {
         Map<String, Object> param = new HashMap<>();
-        param.put("attachmentCategory", category);
-        param.put("attachmentParent", parent);
+        param.put("category", category);
+        param.put("parentPkNo", parentPkNo);
         return sqlSession.delete("attachment.deleteByParent", param) > 0;
     }
 }
