@@ -44,7 +44,7 @@
     <update id="updateStatusByEscrowNo">
         update escrow_ledger
         	set 
-        		status = #{status},
+        		status = #{changeStatus},
            		updated_time = systimestamp
         	where 
         		escrow_ledger_no = #{escrowLedgerNo}

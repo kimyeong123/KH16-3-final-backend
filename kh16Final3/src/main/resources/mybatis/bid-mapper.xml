@@ -20,14 +20,14 @@
         select * 
         from bid
         		where product_no = #{productNo}
-        order by bid_time desc;
+        order by bid_no desc;
     </select>
     
     <select id="selectListBidByProductNo" resultType="BidDto">
     	select * 
     	from bid
     		where product_no = #{productNo}
-    	order by amount desc, bid_time asc;
+    	order by amount desc, bid_no asc;
     </select>
     
     <select id="findHighestBidByProductNo" resultType="BidDto">
@@ -38,7 +38,7 @@
     		where 
     			product_no = #{productNo}
     		order by 
-    			amount desc, bid_time asc
+    			amount desc, bid_no asc
 		)
 		where rownum = 1
     </select>
@@ -46,7 +46,7 @@
    	<select id="countByProductNo" resultType="int">
   		select count(*) 
   		from bid 
-  		where product_no = #{product_no}
+  		where product_no = #{productNo}
   	</select>
     
   	<select id="listByPaging" resultType="BidDto">
@@ -57,7 +57,7 @@
   				select * 
   				from bid
   				where product_no = #{productNo}
-  				order by amount desc, bid_time desc
+  				order by amount desc, bid_no asc
   			)TMP
   		) where rn between #{begin} and #{end}
   	</select>
