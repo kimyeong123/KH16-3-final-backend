@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.vo.MemberComplexSearchVO;
+
+
 
 @Repository
 public class MemberDao {
@@ -27,6 +30,9 @@ public class MemberDao {
 	public MemberDto selectOneByMemberNickname(String memberNickname)
 	{
 		return sqlSession.selectOne("member.detailByMemberNickname", memberNickname);	
+	}
+	public MemberDto selectOne(String memberId) {
+		return sqlSession.selectOne("member.detail", memberId);
 	}
 	public List<MemberDto> selectList(String column, String keyword) {
 		Map<String, Object> params = new HashMap<>();
@@ -45,5 +51,10 @@ public class MemberDao {
 	    param.put("birth", birth);
 	    param.put("contact", contact);
 	    return sqlSession.selectOne("member.selectOneByNameBirthContact", param);
+	}
+
+	public List<MemberDto> selectList(MemberComplexSearchVO vo) {
+
+		return sqlSession.selectList("member.complexSearch", vo);
 	}
 }
