@@ -2,28 +2,34 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  <mapper namespace="bid">
-  
-  <select id="sequence" resultType="int">
-        select seq_bid_no.nextval from dual
+
+<mapper namespace="bid">
+
+    <select id="sequence" resultType="int">
+        select bid_seq.nextval
+        from dual
     </select>
-    
+
     <insert id="add">
-    insert into bid(
-bid_no, bid_product, bid_member, bid_amount    
-    )values (
-#{bidNo}, #{bidProduct}, #{bidMember}, #{bidAmount}    
-    )
-    
+        insert into bid(
+              bid_no
+            , product_no
+            , bidder_no
+            , amount
+        ) values (
+              #{bidNo}
+            , #{productNo}
+            , #{bidderNo}
+            , #{amount}
+        )
     </insert>
-    <!-- 특정 상품 입찰 리스트 -->
-     <select id="listByProduct" resultType="BidDto">
+
+ 
+    <select id="listByProduct" resultType="BidDto">
         select *
         from bid
-        where bid_product = #{bidProduct}
+        where product_no = #{productNo}
         order by bid_time desc
     </select>
-    
-  
-  
- </mapper>
+
+</mapper>

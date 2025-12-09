@@ -7,12 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BidDto {
 
-    private Integer bidNo;       // PK
-    private Integer bidProduct;  
-    private Integer bidMember;  
-    private Integer bidAmount;  
-    private LocalDateTime bidTime; 
+    private Integer bidNo;
+    private Integer productNo;
+    private Integer bidderNo;
+    private Integer amount;
+    private LocalDateTime bidTime;
 }

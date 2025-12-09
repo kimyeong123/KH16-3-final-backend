@@ -5,62 +5,56 @@
 
 <mapper namespace="attachment">
 
-
     <select id="sequence" resultType="int">
-        select attachment_seq.nextval from dual
+        select attachment_seq.nextval
+        from dual
     </select>
 
-    <!-- 등록 -->
     <insert id="add">
         insert into attachment(
-            attachment_no,
-            attachment_type,
-            attachment_path,
-            attachment_category,
-            attachment_parent,
-            attachment_original_name,
-            attachment_stored_name,
-            attachment_size
-        ) values(
-            #{attachmentNo},
-            #{attachmentType},
-            #{attachmentPath},
-            #{attachmentCategory},
-            #{attachmentParent},
-            #{attachmentOriginalName},
-            #{attachmentStoredName},
-            #{attachmentSize}
+              attachment_no
+            , media_type
+            , path
+            , category
+            , parent_pk_no
+            , original_name
+            , stored_name
+            , size
+        ) values (
+              #{attachmentNo}
+            , #{mediaType}
+            , #{path}
+            , #{category}
+            , #{parentPkNo}
+            , #{originalName}
+            , #{storedName}
+            , #{size}
         )
-       
     </insert>
 
-   
     <select id="detail" resultType="AttachmentDto">
         select *
         from attachment
         where attachment_no = #{attachmentNo}
     </select>
 
-
     <select id="listByParent" resultType="AttachmentDto">
         select *
         from attachment
-        where attachment_category = #{attachmentCategory}
-          and attachment_parent   = #{attachmentParent}
+        where category    = #{category}
+          and parent_pk_no = #{parentPkNo}
         order by attachment_no asc
     </select>
-
 
     <delete id="delete">
         delete attachment
         where attachment_no = #{attachmentNo}
     </delete>
 
-
     <delete id="deleteByParent">
         delete attachment
-        where attachment_category = #{attachmentCategory}
-          and attachment_parent   = #{attachmentParent}
+        where category    = #{category}
+          and parent_pk_no = #{parentPkNo}
     </delete>
 
 </mapper>
