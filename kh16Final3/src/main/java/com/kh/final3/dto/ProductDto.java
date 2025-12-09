@@ -7,9 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class ProductDto {
-	private Long productNo;
+	  private Long productNo;
     private Long sellerNo;
     private String name;
     private Long categoryCode;
@@ -23,6 +23,4 @@ public class ProductDto {
     private Long buyerNo;        
     private Timestamp registrationTime;
     private Timestamp endedTime;
-
-
 }

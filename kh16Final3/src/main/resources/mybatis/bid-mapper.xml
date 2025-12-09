@@ -2,34 +2,100 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace="bid">
-
-    <select id="sequence" resultType="int">
-        select bid_seq.nextval
-        from dual
+  <mapper namespace="bid">
+  
+  	<select id="sequence" resultType="long">
+        select bid_seq.nextval from dual
     </select>
-
-    <insert id="add">
-        insert into bid(
-              bid_no
-            , product_no
-            , bidder_no
-            , amount
-        ) values (
-              #{bidNo}
-            , #{productNo}
-            , #{bidderNo}
-            , #{amount}
-        )
+    
+	<insert id="insert">
+	    insert into bid(
+			bid_no, product_no, bidder_no, amount   
+	    ) values (
+			#{bidNo}, #{productNo}, #{bidderNo}, #{amount}
+	    )
     </insert>
-
- 
+    
     <select id="listByProduct" resultType="BidDto">
         select *
         from bid
-        where product_no = #{productNo}
-        order by bid_time desc
+        		where product_no = #{productNo}
+        order by bid_no desc;
     </select>
-
-</mapper>
+    
+    <select id="selectListBidByProductNo" resultType="BidDto">
+    	select * 
+    	from bid
+    		where product_no = #{productNo}
+    	order by amount desc, bid_no asc;
+    </select>
+    
+    <select id="findHighestBidByProductNo" resultType="BidDto">
+   		select *
+		from (
+    		select *
+    		from bid
+    		where 
+    			product_no = #{productNo}
+    		order by 
+    			amount desc, bid_no asc
+		)
+		where rownum = 1
+    </select>
+    
+   	<select id="countByProductNo" resultType="int">
+  		select count(*) 
+  		from bid 
+  		where product_no = #{productNo}
+  	</select>
+    
+  	<select id="listByPaging" resultType="BidDto">
+  		select * 
+  		from(
+  			select rownum rn, TMP.* 
+  			from(
+  				select * 
+  				from bid
+  				where product_no = #{productNo}
+  				order by amount desc, bid_no asc
+  			)TMP
+  		) where rn between #{begin} and #{end}
+  	</select>
+  
+  	<!-- 낙찰자 판단용 — 최고가 입찰자 정보 -->
+	<select id="findHighestBidderNo" resultType="long">
+	    select bidder_no
+	    from (
+	        select bidder_no
+	        from bid
+	        	where product_no = #{productNo}
+	        order by amount desc, bid_no asc
+	    )
+	    where rownum = 1
+	</select>
+  
+  	<!-- 해당 상품의 입찰자 수 조회 -->
+  	<select id="countDistinctBidder" resultType="int">
+    	select count(distinct bidder_no)
+    	from bid
+    	where product_no = #{productNo}
+	</select>
+	
+	<!-- 특정 유저의 전체 입찰 내역 -->
+	<select id="listByBidder" resultType="BidDto">
+    	select *
+    	from bid
+    		where bidder_no = #{bidderNo}
+    	order by bid_no desc
+	</select>
+	
+	<!-- 특정 유저의 특정 상품에 대한 입찰 내역 -->
+	<select id="listMyBidHistory" resultType="BidDto">
+    	select *
+    	from bid
+    		where bidder_no = #{bidderNo}
+      			and product_no = #{productNo}
+    	order by bid_no desc
+	</select>
+  
+ </mapper>

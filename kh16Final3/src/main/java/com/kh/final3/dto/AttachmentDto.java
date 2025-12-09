@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AttachmentDto {
 
-    private Integer attachmentNo;
+    private Long attachmentNo;
     private String mediaType;
     private String path;
     private String category;
@@ -22,4 +22,5 @@ public class AttachmentDto {
     private String storedName;
     private Integer size;
     private LocalDateTime createdTime;
+
 }

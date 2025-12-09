@@ -1,22 +1,18 @@
 package com.kh.final3.dto;
-import java.time.LocalDateTime;
 
+import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Data @NoArgsConstructor @AllArgsConstructor @Builder 
 public class PointHistoryDto {
-
-    private Integer pointHistoryNo;  // point_history_no
-    private Integer memberNo;        // member_no
-    private Integer amount;          // amount
-    private String reason;           // reason
-    private Integer relatedNo;       // related_no
-    private LocalDateTime createdTime; // created_time
+    private Long pointHistoryNo;
+    private Long memberNo; 
+    private Long amount; 
+    private String reason;
+    private Long relatedNo;        
+    private Timestamp createdTime;
 }

@@ -1,4 +1,4 @@
-package com.kh.final3.restcontroller;
+package com.kh.final3.restController;
 
 import java.util.List;
 

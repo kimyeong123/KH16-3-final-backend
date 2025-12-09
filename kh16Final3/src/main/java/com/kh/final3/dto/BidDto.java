@@ -1,21 +1,17 @@
 package com.kh.final3.dto;
 
-import java.time.LocalDateTime;
-
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+import java.sql.Timestamp;
+
+@Data @NoArgsConstructor @AllArgsConstructor @Builder 
 public class BidDto {
-
-    private Integer bidNo;
-    private Integer productNo;
-    private Integer bidderNo;
-    private Integer amount;
-    private LocalDateTime bidTime;
+    private Long bidNo;
+    private Long productNo;
+    private Long bidderNo; 
+    private Long amount; 
+    private Timestamp bidTime;
 }

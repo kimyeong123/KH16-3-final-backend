@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="escrowLedger">
+
+    <select id="sequence" resultType="long">
+        select escrow_ledger_seq.nextval from dual
+    </select>
+
+    <insert id="insert">
+        insert into escrow_ledger (
+            escrow_ledger_no, product_no, bidder_no, amount, status
+        ) values (
+            #{escrowLedgerNo}, #{productNo}, #{bidderNo}, #{amount}, #{status}
+        )
+    </insert>
+
+	<!-- 해당 상품의 status에 따른 객체 찾아오기 (현재 잠금 기록) -->
+    <select id="findStatusByProductNo" resultType="EscrowLedgerDto">
+        select *
+        from escrow_ledger
+        where product_no = #{productNo} and status = #{findStatus}
+    </select>
+    
+    <!-- 해당 상품의 status에 따른 pk 찾아오기 (현재 잠금 기록) -->
+	<select id="findStatusLedgerNoByProductNo" resultType="long">
+	    select escrow_ledger_no
+	    from escrow_ledger
+	    where product_no = #{productNo} and status = #{findStatus}
+	</select>
+	
+    <!-- 특정 입찰자의 escrow 기록 불러오기 -->
+    <select id="findByBidderAndProduct" resultType="EscrowLedgerDto">
+        select *
+        from escrow_ledger
+        	where bidder_no = #{bidderNo}
+          		and product_no = #{productNo}
+        order by created_time desc
+    </select>
+
+    <!-- Status 변경 처리 -->
+    <update id="updateStatusByEscrowNo">
+        update escrow_ledger
+        	set 
+        		status = #{changeStatus},
+           		updated_time = systimestamp
+        	where 
+        		escrow_ledger_no = #{escrowLedgerNo}
+    </update>
+
+</mapper>
