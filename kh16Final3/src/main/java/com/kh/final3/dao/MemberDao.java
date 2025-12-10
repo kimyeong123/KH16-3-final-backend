@@ -57,4 +57,9 @@ public class MemberDao {
 
 		return sqlSession.selectList("member.complexSearch", vo);
 	}
+	//회원 삭제 및 탈퇴
+	public int deleteMember(Long memberNo) {
+	    return sqlSession.delete("member.deleteMember", memberNo);
+	}
+
 }
