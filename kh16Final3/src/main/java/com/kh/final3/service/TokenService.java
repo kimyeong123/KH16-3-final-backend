@@ -45,12 +45,14 @@ public class TokenService {
 				.expiration(expire)//토큰의 만료 시각 설정
 				.issuedAt(now)//발행 시각 설정
 				.issuer(jwtProperties.getIssuer())//발행자 (위변조 방지용)
+				.claim("memberNo", memberDto.getMemberNo()) // 추가
 				.claim("loginId", memberDto.getMemberId())//정보 추가(key,value)
 				.claim("loginLevel", memberDto.getMemberRole())//정보 추가(key,value)
 			.compact();
 	}
 	public String generateAccessToken(TokenVO tokenVO) {
 		return generateAccessToken(MemberDto.builder()
+				    .memberNo(tokenVO.getMemberNo())
 					.memberId(tokenVO.getLoginId())
 					.memberRole(tokenVO.getLoginLevel())
 				.build());
@@ -75,6 +77,7 @@ public class TokenService {
 				.expiration(expire)//토큰의 만료 시각 설정
 				.issuedAt(now)//발행 시각 설정
 				.issuer(jwtProperties.getIssuer())//발행자 (위변조 방지용)
+				.claim("memberNo", memberDto.getMemberNo()) // 추가
 				.claim("loginId", memberDto.getMemberId())//정보 추가(key,value)
 				.claim("loginLevel", memberDto.getMemberRole())//정보 추가(key,value)
 			.compact();
@@ -95,6 +98,7 @@ public class TokenService {
 		return generateRefreshToken(MemberDto.builder()
 				.memberId(tokenVO.getLoginId())
 				.memberRole(tokenVO.getLoginLevel())
+				.memberNo(tokenVO.getMemberNo())
 			.build());
 	}
 	public TokenVO parse(String authorization) {
@@ -112,10 +116,14 @@ public class TokenService {
 			.build()
 				.parse(token)
 				.getPayload();
+		
+		Long memberNo = claims.get("memberNo") != null ? ((Number) claims.get("memberNo")).longValue() : null;
+
 		//claims에 담긴 데이터를 TokenVO에 옮겨담아서 반환
 		return TokenVO.builder()
+				    .memberNo(memberNo)
 					.loginId((String)claims.get("loginId"))
-					.loginLevel((String)claims.get("loginLevel"))
+					.loginLevel((String) claims.get("loginLevel"))
 				.build();
 	}
 	//JWT 토큰의 만료까지 남은시간을 구하는 기능

@@ -1,4 +1,4 @@
-package com.kh.final3.dao;
+// package com.kh.final3.dao;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.MemberDto;
 import com.kh.final3.vo.MemberComplexSearchVO;
-
 
 
 @Repository
@@ -54,18 +53,10 @@ public class MemberDao {
 	}
 
 	public List<MemberDto> selectList(MemberComplexSearchVO vo) {
-
 		return sqlSession.selectList("member.complexSearch", vo);
 	}
 
-	public boolean updateMemberStatus(Long memberNo, String status) {
-        
-        // MyBatis Mapper에 여러 파라미터를 전달하기 위해 Map 사용
-        Map<String, Object> params = new HashMap<>();
-        params.put("memberNo", memberNo);
-        params.put("status", status);
-        
-        // member.updateMemberStatus 쿼리 호출
-        return sqlSession.update("member.updateMemberStatus", params) > 0;
-    }
+	public int deleteMember(Long memberNo) {
+	    return sqlSession.delete("member.deleteMember", memberNo);
+	}
 }

@@ -1,89 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="member"> 
+<mapper namespace="member"> 
 
-    <resultMap id="memberResultMap" type="com.kh.final3.dto.MemberDto">
-        <id column="MEMBER_NO" property="memberNo"/> <result column="ID" property="memberId"/> 
-        <result column="PW" property="memberPw"/> 
-        
-        <result column="NICKNAME" property="memberNickname"/>
-        <result column="NAME" property="memberName"/>
-        <result column="EMAIL" property="memberEmail"/>
-        </resultMap>
+    <resultMap id="memberResultMap" type="com.kh.final3.dto.MemberDto">
+        <id column="MEMBER_NO" property="memberNo"/> <result column="ID" property="memberId"/> 
+        <result column="PW" property="memberPw"/>      
+        <result column="NICKNAME" property="memberNickname"/>
+        <result column="NAME" property="memberName"/>
+        <result column="EMAIL" property="memberEmail"/>
+        <result column="ADDRESS1" property="memberAddress1"/>
+        <result column="ADDRESS2" property="memberAddress2"/>
+        <result column="ROLE" property="memberRole"/>
+        <result column="POINT" property="memberPoint"/>
+        <result column="CONTACT" property="memberContact"/>
+        <result column="CREATED_TIME" property="memberCreatedTime"/>
+        </resultMap>
 
 
-    <insert id="insert" parameterType="com.kh.final3.dto.MemberDto">
-        insert into member (
-            member_no,
-            id,
-            pw,
-            nickname,
-            name,
-            email,
-            birth,
-            contact,
-            post,
-            address1,
-            address2
-        ) values (
-            member_seq.nextval,
-            #{memberId},
-            #{memberPw},
-            #{memberNickname},
-            #{memberName},
-            #{memberEmail},
-            #{memberBirth},
-            #{memberContact},
-            #{memberPost},
-            #{memberAddress1},
-            #{memberAddress2}
-        )
-    </insert>
-<!--
-    <select id="detail" resultType="MemberDto">
-        select * from member where id = #{memberId}
-    </select>
-    -->
-    <select id="detail" parameterType="String" resultMap="memberResultMap">
-        SELECT * FROM MEMBER WHERE ID = #{memberId}
-    </select>
+    <insert id="insert" parameterType="com.kh.final3.dto.MemberDto">
+        insert into member (
+            member_no,
+            id,
+            pw,
+            nickname,
+            name,
+            email,
+            birth,
+            contact,
+            post,
+            address1,
+            address2
+        ) values (
+            member_seq.nextval,
+            #{memberId},
+            #{memberPw},
+            #{memberNickname},
+            #{memberName},
+            #{memberEmail},
+            #{memberBirth},
+            #{memberContact},
+            #{memberPost},
+            #{memberAddress1},
+            #{memberAddress2}
+        )
+    </insert>
+    <select id="detail" parameterType="String" resultMap="memberResultMap">
+        SELECT * FROM MEMBER WHERE ID = #{memberId}
+    </select>
 
-    <select id="detailByMemberNickname" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
-        select * from member where NICKNAME = #{memberNickname}
-    </select>
-    
-    <select id="findNicknameByMemberNo" parameterType="long" resultType="String">
-        select NICKNAME from member where NO = #{memberNo}
-    </select>
-    
-    <select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
-        select * from member
-        where name = #{name} and birth = #{birth} and contact = #{contact}
-    </select>
-    
-    <select id="search" resultType="MemberDto">
-        select * from member
-        where 
-            instr(${column} , #{keyword}) > 0 
-            and 
-            role != 'admin'
-        order by ${column} asc , id asc
-    </select>
-    
-    <select id="complexSearch" resultType="MemberDto">
-        select *
-        from member
-        <where>
-            </where>
-    </select>
-    
-    <update id="updateMemberStatus" parameterType="map">
-    	update member
-    	set role = #{status}
-    	where member_no = #{memberNo}
-	</update>
+ <select id="detailByMemberId" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
+        select * from member where id = #{memberId}
+    </select>
+    <select id="detailByMemberNickname" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
+        select * from member where NICKNAME = #{memberNickname}
+    </select>
+    
+    <select id="findNicknameByMemberNo" parameterType="long" resultType="String">
+        select NICKNAME from member where NO = #{memberNo}
+    </select>
+    
+    <select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
+        select * from member
+        where name = #{name} and birth = #{birth} and contact = #{contact}
+    </select>
+    
+    <select id="search" resultType="MemberDto">
+        select * from member
+        where 
+            instr(${column} , #{keyword}) > 0 
+            and 
+            role != 'admin'
+        order by ${column} asc , id asc
+    </select>
+    
+    <select id="complexSearch" resultType="MemberDto">
+        select *
+        from member
+        <where>
+            </where>
+    </select>
+    
+    <delete id="deleteMember" parameterType="long">
+      delete from member
+      where member_no = #{memberNo,jdbcType=BIGINT}
+    </delete>
 
 </mapper>

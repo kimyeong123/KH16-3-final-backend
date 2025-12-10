@@ -49,6 +49,9 @@ public class MemberService {
     public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
         return memberDao.selectOneByNameBirthContact(name, birth, contact);
     }
+    public boolean deleteMember(Long memberNo) {
+        return memberDao.deleteMember(memberNo) > 0;
+    }
     
     
 }

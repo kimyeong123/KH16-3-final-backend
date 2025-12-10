@@ -53,11 +53,11 @@ public class MemberDto {
     private String memberAddress2; 	
     private String memberRole; 
     private Integer memberPoint;
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-//    private LocalDateTime memberCreatedTime;
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-//    private LocalDateTime memberEditTime;
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-//    private LocalDateTime memberRecentTime; 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private LocalDateTime memberCreatedTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private LocalDateTime memberEditTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    private LocalDateTime memberRecentTime; 
 }
 
