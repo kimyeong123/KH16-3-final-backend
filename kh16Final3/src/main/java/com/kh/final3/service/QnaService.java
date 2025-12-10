@@ -51,7 +51,7 @@ public class QnaService { // QnaService 새로 생성
     /**
      * 2. 문의 목록 조회 (QNA 전용)
      */
-    public List<BoardDto> selectQnaList() {
+    public List<BoardDto> selectList() {
         // DAO의 listByType을 사용하여 QNA 타입만 조회
 	    List<BoardDto> list = boardDao.selectListByType("QNA"); 
 	    

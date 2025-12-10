@@ -1,4 +1,4 @@
-package com.kh.final3.restController;
+package com.kh.final3.restcontroller;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class ProductRestController {
 	public void insert(
 			@RequestBody ProductDto productDto
 			) {
-			int productNo=productDao.sequence();
+			long productNo=productDao.sequence();
 			productDto.setProductNo(productNo);
 			productDao.insert(productDto);
 	}
@@ -41,35 +41,35 @@ public class ProductRestController {
 		return productDao.selectList();
 	}
 	@GetMapping("/{productNo}")
-		public ProductDto detail(@PathVariable int productNo) {
+		public ProductDto detail(@PathVariable long productNo) {
 		ProductDto productDto=productDao.selectOne(productNo);
 		if(productDto==null) throw new TargetNotfoundException("존재하지 않는 상품 입니다");
 		return productDto;
 	}
 	
 	@DeleteMapping("/{productNo}")
-	public void delete(@PathVariable int productNo) {
+	public void delete(@PathVariable long productNo) {
 			ProductDto productDto=productDao.selectOne(productNo);
 			if(productDto==null) throw new TargetNotfoundException("존재하지 않는 상품입니다");
 			productDao.delete(productNo);
 	}
 	@PutMapping("/{productNo}")
-	public  void edit(@PathVariable int productNo,
+	public  void edit(@PathVariable long productNo,
 										@RequestBody ProductDto productDto) {
 		ProductDto originDto=productDao.selectOne(productNo);
 		if(originDto == null) throw new TargetNotfoundException();
-		originDto.setProductName(productDto.getProductName());
-		originDto.setProductDescription(productDto.getProductDescription());
-		originDto.setProductInstantPrice(productDto.getProductInstantPrice());
-		originDto.setProductEndDate(productDto.getProductEndDate());
-		originDto.setProductStatus(productDto.getProductStatus());
+		originDto.setName(productDto.getName());
+		originDto.setDescription(productDto.getDescription());
+		originDto.setInstantPrice(productDto.getInstantPrice());
+		originDto.setEndTime(productDto.getEndTime());
+		originDto.setStatus(productDto.getStatus());
 		
 		productDao.update(originDto);
 	
 	}
 			
 	@PatchMapping("/{productNo}")
-	public void update(@PathVariable int productNo,
+	public void update(@PathVariable long productNo,
 			@RequestBody ProductDto productDto) {
 		ProductDto originDto=productDao.selectOne(productNo);
 		if(originDto==null) throw new TargetNotfoundException();

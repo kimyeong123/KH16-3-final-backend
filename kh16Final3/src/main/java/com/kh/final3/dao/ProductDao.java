@@ -27,11 +27,11 @@ public class ProductDao {
 		return sqlSession.selectList("product.list");
 	}
 	
-	public ProductDto selectOne(int productNo) {
+	public ProductDto selectOne(long productNo) {
 		return sqlSession.selectOne("product.detail", productNo);
 	}
 	
-	public boolean delete(int productNo) {
+	public boolean delete(long productNo) {
 		return sqlSession.delete("product.delete", productNo)>0;
 	}
 	
@@ -66,6 +66,7 @@ public class ProductDao {
 	public boolean closeAuction(int productNo) {
 	    return sqlSession.update("product.closeAuction", productNo) > 0;
 	}
+
 
 	
 	
