@@ -21,7 +21,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="list" resultType="CommentDto" parameterType="long">
 		select 
             comment_no, 
-            board_no as boardNo,             writer_no as writerNo,           content,                         created_time as createdTime,     edit_time as editTime,           status
+            board_no as boardNo, 
+            writer_no as writerNo, 
+            content, 
+            created_time as createdTime, 
+            edit_time as editTime, 
+            status
 		from comments
 		where board_no = #{boardNo} and status = 'N'
 		order by comment_no asc 

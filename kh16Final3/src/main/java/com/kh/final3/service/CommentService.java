@@ -39,7 +39,7 @@ public class CommentService {
         
         boolean success = commentDao.insert(commentDto);
         if (!success) {
-            throw new RuntimeException("댓글 등록에 실패했습니다."); 
+            throw new TargetNotfoundException("댓글 등록에 실패했습니다."); 
         }
         
         // QNA 답변 알림 로직

@@ -99,7 +99,7 @@
 		</if>
 	</select>
 
-	<select id="selectQnaList" resultType="BoardDto" parameterType="PageVO">
+	<select id="selectList" resultType="BoardDto" parameterType="PageVO">
 		select *
 		from (
 		select rownum rn, board.*

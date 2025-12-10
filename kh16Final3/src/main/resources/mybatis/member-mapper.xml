@@ -79,5 +79,11 @@
         <where>
             </where>
     </select>
+    
+    <update id="updateMemberStatus" parameterType="map">
+    	update member
+    	set role = #{status}
+    	where member_no = #{memberNo}
+	</update>
 
 </mapper>

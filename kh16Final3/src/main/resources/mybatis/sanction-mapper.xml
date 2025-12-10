@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="sanction">
+    
+    <select id="sequence" resultType="long">
+        select sanction_seq.nextval from dual
+    </select>
+    
+    <insert id="insert" parameterType="SanctionDto">
+        insert into sanction (
+            sanction_no, member_no, type, duration_day,
+            start_time, end_time, reason, status
+        )
+        values (
+            #{sanctionNo}, #{memberNo}, #{type}, #{durationDay}, 
+            #{startTime}, #{endTime}, #{reason}, #{status}
+        )
+    </insert>
+    
+    <select id="selectOne" parameterType="long" resultType="SanctionDto">
+        select 
+            sanction_no as sanctionNo,
+            member_no as memberNo,
+            type,
+            duration_day as durationDay,
+            start_time as startTime,
+            end_time as endTime,
+            reason,
+            status
+        from sanction
+        where sanction_no = #{sanctionNo}
+    </select>
+    
+    <select id="selectActiveSanctions" parameterType="long" resultType="SanctionDto">
+        select 
+            sanction_no as sanctionNo,
+            member_no as memberNo,
+            type,
+            duration_day as durationDay,
+            start_time as startTime,
+            end_time as endTime,
+            reason,
+            status
+        from sanction
+        where member_no = #{memberNo}
+        and status = 'Y'
+        and end_time > systimestamp  
+        order by start_time desc
+    </select>
+    
+    <update id="updateStatus" parameterType="SanctionDto"> update sanction
+        set status = #{status}
+        where sanction_no = #{sanctionNo}
+    </update>
+    
+    <delete id="delete" parameterType="long">
+        delete from sanction
+        where sanction_no = #{sanctionNo}
+    </delete>
+    
+    <select id="count" resultType="int">
+        select count(*) from sanction
+    </select>
+    
+    <select id="selectHistoryWithPaging" parameterType="map" resultType="SanctionDto">
+        select *
+        from (
+            select rownum rn, tmp.*
+            from (
+                select 
+                    s.sanction_no as sanctionNo,
+                    s.member_no as memberNo,
+                    s.type,
+                    s.duration_day as durationDay,
+                    s.start_time as startTime,
+                    s.end_time as endTime,
+                    s.reason,
+                    s.status,
+                    m.member_nickname as memberNickname
+                from sanction s
+                left outer join member m on s.member_no = m.member_no
+                order by s.sanction_no desc
+            ) tmp
+        )
+        where rn between #{begin} and #{end}
+    </select>
+
+</mapper>
