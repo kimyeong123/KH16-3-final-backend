@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity; // 💡 ResponseEntity 사용을 위해 추가
+import org.springframework.http.ResponseEntity; 
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping; // 💡 DELETE 사용
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.final3.dto.BoardDto;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
-import com.kh.final3.service.BoardService; // 상세 조회를 위한 BoardService 주입 (공통 로직)
+import com.kh.final3.service.BoardService; 
 import com.kh.final3.service.QnaService;
 import com.kh.final3.vo.TokenVO; 
 
@@ -69,7 +69,6 @@ public class QnaRestController {
 	 */
 	@GetMapping("/{boardNo}")
 	public BoardDto detail(@PathVariable long boardNo) {
-        // 상세 조회는 공지사항과 동일한 BoardService의 로직을 사용합니다.
         return boardService.selectOne(boardNo);
 	}
 	
