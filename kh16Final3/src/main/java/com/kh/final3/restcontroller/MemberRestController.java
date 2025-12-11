@@ -184,6 +184,29 @@ public class MemberRestController {
 	    }
 	}
 
-	
+
+	// 토큰 유효성 검사 및 사용자 정보 반환 (새로고침 시 상태 복구용)
+	@PostMapping("/check-token") 
+	public ResponseEntity<TokenVO> checkToken(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+	    
+	    //  1. 토큰 존재 여부 확인 및 "Bearer " 접두사 검증
+	    if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+	        // 토큰이 없으면 권한 없음 처리 (401 Unauthorized)
+	        throw new UnauthorizationException("토큰이 존재하지 않습니다.");
+	    }
+	    
+	    try {
+	        //  2. 토큰 파싱 및 유효성 검사
+	        // tokenService.parse 내부에서 서명, 만료 시간 등이 검사됩니다. (실패 시 예외 발생)
+	        TokenVO tokenVO = tokenService.parse(bearerToken);
+	        
+	        // 3. 유효한 토큰 정보 반환 (프론트엔드가 loginLevel을 가져감)
+	        return ResponseEntity.ok(tokenVO); 
+	        
+	    } catch (Exception e) {
+	        // 토큰 파싱/검증 실패 (예: 만료, 변조) 시 권한 없음 처리 (401 Unauthorized)
+	        throw new UnauthorizationException("유효하지 않거나 만료된 토큰입니다."); 
+	    }
+	}
 
 }
