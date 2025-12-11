@@ -60,6 +60,10 @@ public class MemberDao {
 	//회원 삭제 및 탈퇴
 	public int deleteMember(Long memberNo) {
 	    return sqlSession.delete("member.deleteMember", memberNo);
-	}
+	}	
+    // 비밀번호 확인
+    public String findPasswordByMemberNo(Long memberNo) {
+        return sqlSession.selectOne("member.findPasswordByMemberNo", memberNo);
+    }
 
 }
