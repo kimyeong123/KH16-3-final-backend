@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.final3.dao.MemberDao;
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.vo.MemberRequestVO;
 
 @Service
 public class MemberService {
@@ -29,7 +30,7 @@ public class MemberService {
         // 2.이름 + 생일 + 연락처 중복 체크
        if (memberDao.selectOneByNameBirthContact(
                 memberDto.getMemberName(), memberDto.getMemberBirth(), memberDto.getMemberContact()) != null) {
-            throw new IllegalArgumentException("이메일/휴대폰 번호가 이미 사용 중입니다. 로그인 또는 비밀번호 찾기를 이용해 주세요.");
+            throw new IllegalArgumentException("이미 사용된 인증 휴대폰 번호입니다. 로그인 또는 비밀번호 찾기를 이용해 주세요.");
         }
 
         // 3. 비밀번호 암호화
@@ -49,9 +50,20 @@ public class MemberService {
     public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
         return memberDao.selectOneByNameBirthContact(name, birth, contact);
     }
+    //비밀번호 확인
+    public boolean checkPassword(MemberRequestVO requestVO) {
+        if (requestVO.getMemberNo() == null || requestVO.getMemberPw() == null) {
+            return false;
+        }
+        String originPw = memberDao.findPasswordByMemberNo(requestVO.getMemberNo());
+        if (originPw == null) return false;
+        // BCrypt 매칭
+        return passwordEncoder.matches(requestVO.getMemberPw(), originPw);
+    }
+    // 회원 삭제
     public boolean deleteMember(Long memberNo) {
         return memberDao.deleteMember(memberNo) > 0;
     }
-    
+
     
 }

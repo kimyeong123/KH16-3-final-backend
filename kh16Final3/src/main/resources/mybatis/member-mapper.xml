@@ -92,7 +92,11 @@
     delete from member
     where member_no = #{memberNo,jdbcType=BIGINT}
 </delete>
-
-
+<!-- 비밀번호 조회 -->
+<select id="findPasswordByMemberNo" parameterType="long" resultType="string">
+    SELECT pw
+    FROM member
+    WHERE member_no = #{memberNo}
+</select>
 
 </mapper>
