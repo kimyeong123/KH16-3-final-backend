@@ -70,7 +70,7 @@ public class MemberDao {
 	    
 	    return sqlSession.update("member.updateMemberStatus", params) > 0; 
 	}
-	}	
+	
     // 비밀번호 확인
     public String findPasswordByMemberNo(Long memberNo) {
         return sqlSession.selectOne("member.findPasswordByMemberNo", memberNo);

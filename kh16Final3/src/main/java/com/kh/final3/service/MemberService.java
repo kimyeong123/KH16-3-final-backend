@@ -66,22 +66,33 @@ public class MemberService {
     public boolean deleteMember(Long memberNo) {
         return memberDao.deleteMember(memberNo) > 0;
     }
-    //회원 정보 변경
     @Transactional
     public boolean updateMember(Long memberNo, MemberUpdateVO vo) {
         // 1. 회원 조회
         MemberDto member = memberDao.selectOneByMemberNo(memberNo);
         if (member == null) return false;
+        
         // 2. 수정할 필드 세팅
-        member.setMemberEmail(vo.getEmail());
-        member.setMemberPost(vo.getPost());
-        member.setMemberAddress1(vo.getAddress1());
-        member.setMemberAddress2(vo.getAddress2());
-        member.setMemberContact(vo.getContact());
+        if (vo.getEmail() != null && !vo.getEmail().isEmpty()) {
+            member.setMemberEmail(vo.getEmail());
+        }
+        if (vo.getPost() != null && !vo.getPost().isEmpty()) {
+            member.setMemberPost(vo.getPost());
+        }
+        if (vo.getAddress1() != null && !vo.getAddress1().isEmpty()) {
+            member.setMemberAddress1(vo.getAddress1());
+        }
+        if (vo.getAddress2() != null && !vo.getAddress2().isEmpty()) {
+            member.setMemberAddress2(vo.getAddress2());
+        }
+        if (vo.getContact() != null && !vo.getContact().isEmpty()) {
+            member.setMemberContact(vo.getContact());
+        }
 
         // 3. DB 업데이트
         return memberDao.updateMember(member) > 0;
     }
+
 
     
 }
