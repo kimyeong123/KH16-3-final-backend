@@ -17,7 +17,6 @@ public void insert(TokenDto tokenDto) {
 	sqlSession.insert("Token.insert", tokenDto);
 }
 
-//public AccountTokenDto selectOne(Long accountTokenNo) {//지금 해당 없음
 public TokenDto selectOne(TokenDto tokenDto) {
 	return sqlSession.selectOne("Token.detail", tokenDto);
 }

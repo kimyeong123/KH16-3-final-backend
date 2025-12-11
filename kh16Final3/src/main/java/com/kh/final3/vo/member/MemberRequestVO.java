@@ -1,4 +1,4 @@
-package com.kh.final3.vo;
+package com.kh.final3.vo.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

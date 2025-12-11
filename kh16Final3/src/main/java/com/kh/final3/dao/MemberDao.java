@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.MemberDto;
-import com.kh.final3.vo.MemberComplexSearchVO;
+import com.kh.final3.vo.member.MemberComplexSearchVO;
 
 
 
@@ -64,6 +64,15 @@ public class MemberDao {
     // 비밀번호 확인
     public String findPasswordByMemberNo(Long memberNo) {
         return sqlSession.selectOne("member.findPasswordByMemberNo", memberNo);
+    }
+    // 회원번호로 회원 조회
+    public MemberDto selectOneByMemberNo(Long memberNo) {
+        return sqlSession.selectOne("member.selectOneByMemberNo", memberNo);
+    }
+
+    // 회원정보 수정
+    public int updateMember(MemberDto member) {
+        return sqlSession.update("member.updateMember", member);
     }
 
 }

@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.final3.dao.MemberDao;
 import com.kh.final3.dto.MemberDto;
-import com.kh.final3.vo.MemberRequestVO;
+import com.kh.final3.vo.member.MemberRequestVO;
+import com.kh.final3.vo.member.MemberUpdateVO;
+
 
 @Service
 public class MemberService {
@@ -63,6 +65,22 @@ public class MemberService {
     // 회원 삭제
     public boolean deleteMember(Long memberNo) {
         return memberDao.deleteMember(memberNo) > 0;
+    }
+    //회원 정보 변경
+    @Transactional
+    public boolean updateMember(Long memberNo, MemberUpdateVO vo) {
+        // 1. 회원 조회
+        MemberDto member = memberDao.selectOneByMemberNo(memberNo);
+        if (member == null) return false;
+        // 2. 수정할 필드 세팅
+        member.setMemberEmail(vo.getEmail());
+        member.setMemberPost(vo.getPost());
+        member.setMemberAddress1(vo.getAddress1());
+        member.setMemberAddress2(vo.getAddress2());
+        member.setMemberContact(vo.getContact());
+
+        // 3. DB 업데이트
+        return memberDao.updateMember(member) > 0;
     }
 
     
