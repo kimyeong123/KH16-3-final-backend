@@ -83,11 +83,7 @@
         <where>
             </where>
     </select>
-    
-	<delete id="deleteMember" parameterType="long">
-    	delete from member
-    	where member_no = #{memberNo,jdbcType=BIGINT}
-	</delete>
+   
 
 	<update id="updateMemberStatus" parameterType="map">
         update member
@@ -96,5 +92,16 @@
     </update>
 
 
+   <!-- 회원 삭제 -->
+<delete id="deleteMember" parameterType="long">
+    delete from member
+    where member_no = #{memberNo,jdbcType=BIGINT}
+</delete>
+<!-- 비밀번호 조회 -->
+<select id="findPasswordByMemberNo" parameterType="long" resultType="string">
+    SELECT pw
+    FROM member
+    WHERE member_no = #{memberNo}
+</select>
 
 </mapper>

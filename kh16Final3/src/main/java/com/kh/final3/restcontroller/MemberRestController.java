@@ -20,6 +20,7 @@ import com.kh.final3.service.TokenService;
 import com.kh.final3.vo.MemberComplexSearchVO;
 import com.kh.final3.vo.MemberLoginResponseVO;
 import com.kh.final3.vo.MemberRefreshVO;
+import com.kh.final3.vo.MemberRequestVO;
 import com.kh.final3.vo.TokenVO;
 
 import jakarta.validation.Valid;
@@ -127,10 +128,12 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
+	
+
 
 	@DeleteMapping("/{memberNo}")
 	public ResponseEntity<String> deleteMember(@PathVariable Long memberNo,
-			@RequestHeader("Authorization") String bearerToken) {
+			@RequestHeader("Authorization") String bearerToken,  @RequestBody MemberRequestVO requestVO) {
 
 		// 1. 토큰에서 로그인된 사용자 정보 추출
 		TokenVO tokenVO = tokenService.parse(bearerToken);
@@ -139,6 +142,12 @@ public class MemberRestController {
 		if (!tokenVO.getMemberNo().equals(memberNo)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인 계정만 탈퇴할 수 있습니다.");
 		}
+	    // 3. 비밀번호 확인
+	    requestVO.setMemberNo(memberNo); // PathVariable -> VO에 세팅
+	    boolean passwordOk = memberService.checkPassword(requestVO);
+	    if (!passwordOk) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 올바르지 않습니다.");
+	    }
 
 		// 3. 회원 삭제 수행
 		boolean result = memberService.deleteMember(memberNo);
@@ -151,5 +160,6 @@ public class MemberRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 삭제 실패");
 		}
 	}
+	
 
 }
