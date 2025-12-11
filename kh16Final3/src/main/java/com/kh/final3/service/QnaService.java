@@ -33,7 +33,7 @@ public class QnaService { // QnaService 새로 생성
 	@Transactional
 	public BoardDto insert(BoardDto boardDto, List<MultipartFile> attachments, String loginLevel, long memberNo) {
 	    
-	    if (loginLevel.equals("admin")) {
+	    if (loginLevel.equals("ADMIN")) {
 	    	throw new UnauthorizationException("관리자는 문의 게시판에 글을 등록할 수 없습니다.");
 	    }
         
@@ -101,7 +101,7 @@ public class QnaService { // QnaService 새로 생성
 
 		// 2. 권한 체크 (본인 또는 관리자만 삭제 가능)
 		// DTO 필드명: writerNo 사용
-		if (loginLevel.equals("admin")) {
+		if (loginLevel.equals("ADMIN")) {
 			// 통과
 		} else if (originDto.getWriterNo() == memberNo) { // DTO 필드명: writerNo 사용
 			// 통과

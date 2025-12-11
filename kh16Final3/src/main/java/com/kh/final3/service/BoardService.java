@@ -32,7 +32,7 @@ public class BoardService {
 	public BoardDto insert(BoardDto boardDto, List<MultipartFile> attachments, String loginLevel, long memberNo) {
 
 		// 공지 권한 체크
-		if (!loginLevel.equals("admin")) {
+		if (!loginLevel.equals("ADMIN")) {
 			throw new UnauthorizationException("등록 권한이 없습니다");
 		}
 
@@ -70,25 +70,21 @@ public class BoardService {
 	/**
 	 * 3. 상세 조회 - 조회수 증가, 게시글 조회, 작성자 정보 조합을 하나의 트랜잭션으로 처리합니다.
 	 */
-	@Transactional
 	public BoardDto selectOne(long boardNo) {
-
-		// 1. 조회수 증가
-		boolean isSuccess = boardDao.updateBoardRead(boardNo);
-		if (!isSuccess)
-			throw new TargetNotfoundException("존재하지 않는 게시글입니다.");
-
-		// 2. 게시글 정보 조회
-		BoardDto boardDto = boardDao.selectOne(boardNo);
-
-		// 3. 작성자 정보 조합
-		if (boardDto != null) {
-			// DTO 필드명: writerNo 사용
-			String writerNickname = memberDao.findNicknameByMemberNo(boardDto.getWriterNo());
-			boardDto.setWriterNickname(writerNickname);
-		}
-
-		return boardDto;
+	    BoardDto boardDto = boardDao.selectOne(boardNo);
+	    
+	    // 작성자 닉네임 조합 로직은 그대로 유지
+	    if (boardDto != null && boardDto.getWriterNo() > 0) {
+	        String writerNickname = memberDao.findNicknameByMemberNo(boardDto.getWriterNo());
+	        boardDto.setWriterNickname(writerNickname);
+	    }
+	    
+	    return boardDto;
+	}
+	
+	@Transactional
+	public void updateReadCount(long boardNo) {
+	    boardDao.updateBoardRead(boardNo);
 	}
 
 	/**
@@ -106,7 +102,7 @@ public class BoardService {
 
 		// 2. 권한 체크 (본인 또는 관리자만 수정 가능)
 		// DTO 필드명: writerNo 사용
-		if (loginLevel.equals("admin")) {
+		if (loginLevel.equals("ADMIN")) {
 			// 통과
 		} else if (originDto.getWriterNo() == memberNo) { // DTO 필드명: writerNo 사용
 			// 통과
@@ -131,7 +127,7 @@ public class BoardService {
 
 		// 2. 권한 체크 (본인 또는 관리자만 삭제 가능)
 		// DTO 필드명: writerNo 사용
-		if (loginLevel.equals("admin")) {
+		if (loginLevel.equals("ADMIN")) {
 			// 통과
 		} else if (originDto.getWriterNo() == memberNo) { // DTO 필드명: writerNo 사용
 			// 통과
@@ -142,4 +138,5 @@ public class BoardService {
 		// 3. DAO를 통한 삭제
 		boardDao.delete(boardNo);
 	}
+
 }

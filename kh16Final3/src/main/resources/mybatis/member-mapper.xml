@@ -46,14 +46,10 @@
             #{memberAddress1},
             #{memberAddress2}
         )
+        
     </insert>
-<!--
-    <select id="detail" resultType="MemberDto">
-        select * from member where id = #{memberId}
-    </select>
-    -->
     <select id="detail" parameterType="String" resultMap="memberResultMap">
-        SELECT * FROM MEMBER WHERE ID = #{memberId}
+        select * from member where id = #{memberId}
     </select>
 
  <select id="detailByMemberId" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
@@ -87,11 +83,17 @@
         <where>
             </where>
     </select>
-   <!-- 회원 삭제 -->
-<delete id="deleteMember" parameterType="long">
-    delete from member
-    where member_no = #{memberNo,jdbcType=BIGINT}
-</delete>
+    
+	<delete id="deleteMember" parameterType="long">
+    	delete from member
+    	where member_no = #{memberNo,jdbcType=BIGINT}
+	</delete>
+
+	<update id="updateMemberStatus" parameterType="map">
+        update member
+        set role = #{status}
+        where member_no = #{memberNo}
+    </update>
 
 
 

@@ -81,7 +81,7 @@
 		where board_no=#{boardNo}
 	</update>
 
-	<update id="updateBoardRead" parameterType="long">
+	<update id="updateBoardRead" parameterType="long" >
 		update board
 		set
 		read_count = read_count + 1
