@@ -47,12 +47,8 @@
             #{memberAddress1},
             #{memberAddress2}
         )
+        
     </insert>
-<!--
-    <select id="detail" resultType="MemberDto">
-        select * from member where id = #{memberId}
-    </select>
-    -->
     <select id="detail" parameterType="String" resultMap="memberResultMap">
         select * from member where id = #{memberId}
     </select>
@@ -88,6 +84,15 @@
         <where>
             </where>
     </select>
+   
+
+	<update id="updateMemberStatus" parameterType="map">
+        update member
+        set role = #{status}
+        where member_no = #{memberNo}
+    </update>
+
+
    <!-- 회원 삭제 -->
 <delete id="deleteMember" parameterType="long">
     delete from member

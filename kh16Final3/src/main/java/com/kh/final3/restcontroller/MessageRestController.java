@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,7 @@ import com.kh.final3.vo.PageVO;
 import com.kh.final3.error.TargetNotfoundException; 
 import com.kh.final3.error.UnauthorizationException; 
 
+@CrossOrigin
 @RestController
 @RequestMapping("/rest/message")
 public class MessageRestController {

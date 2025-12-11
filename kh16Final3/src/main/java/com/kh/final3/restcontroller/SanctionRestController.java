@@ -2,6 +2,7 @@ package com.kh.final3.restcontroller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import com.kh.final3.dto.SanctionDto;
 // import com.kh.final3.error.TargetNotfoundException; // 이 예외는 Service에서 던져지고 Advice에서 처리되므로, Controller에서는 직접 사용할 필요 없음
 import com.kh.final3.vo.PageVO;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/rest/sanction")
 public class SanctionRestController {

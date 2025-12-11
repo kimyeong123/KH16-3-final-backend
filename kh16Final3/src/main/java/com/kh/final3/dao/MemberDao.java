@@ -44,6 +44,7 @@ public class MemberDao {
 	public String findNicknameByMemberNo(long memberNo) {
 	    return sqlSession.selectOne("member.findNicknameByMemberNo", memberNo);
 	}
+	
 	//중복 가입 제거
 	public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
 	    Map<String, Object> param = new HashMap<>();
@@ -57,9 +58,18 @@ public class MemberDao {
 
 		return sqlSession.selectList("member.complexSearch", vo);
 	}
-	//회원 삭제 및 탈퇴
+
 	public int deleteMember(Long memberNo) {
 	    return sqlSession.delete("member.deleteMember", memberNo);
+	}
+	
+	public boolean updateMemberStatus(long memberNo, String status) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("memberNo", memberNo);
+	    params.put("status", status);
+	    
+	    return sqlSession.update("member.updateMemberStatus", params) > 0; 
+	}
 	}	
     // 비밀번호 확인
     public String findPasswordByMemberNo(Long memberNo) {
