@@ -17,11 +17,12 @@ import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
 import com.kh.final3.service.TokenService;
-import com.kh.final3.vo.MemberComplexSearchVO;
-import com.kh.final3.vo.MemberLoginResponseVO;
-import com.kh.final3.vo.MemberRefreshVO;
-import com.kh.final3.vo.MemberRequestVO;
 import com.kh.final3.vo.TokenVO;
+import com.kh.final3.vo.member.MemberComplexSearchVO;
+import com.kh.final3.vo.member.MemberLoginResponseVO;
+import com.kh.final3.vo.member.MemberRefreshVO;
+import com.kh.final3.vo.member.MemberRequestVO;
+import com.kh.final3.vo.member.MemberUpdateVO;
 
 import jakarta.validation.Valid;
 
@@ -85,6 +86,7 @@ public class MemberRestController {
 				.loginId(findDto.getMemberId())// 아이디
 				.loginLevel(findDto.getMemberRole())// 등급
 				.nickname(findDto.getMemberNickname()).email(findDto.getMemberEmail())
+				.post(findDto.getMemberPost())
 				.address1(findDto.getMemberAddress1()).address2(findDto.getMemberAddress2())
 				.point(findDto.getMemberPoint()).contact(findDto.getMemberContact())
 				.createdTime(findDto.getMemberCreatedTime()).accessToken(tokenService.generateAccessToken(findDto))// 액세스토큰
@@ -128,9 +130,7 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
-	
-
-
+	// 회원탈퇴
 	@DeleteMapping("/{memberNo}")
 	public ResponseEntity<String> deleteMember(@PathVariable Long memberNo,
 			@RequestHeader("Authorization") String bearerToken,  @RequestBody MemberRequestVO requestVO) {
@@ -160,6 +160,30 @@ public class MemberRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 삭제 실패");
 		}
 	}
+	@PutMapping("/{memberNo}")
+	public ResponseEntity<String> updateMember(
+	        @PathVariable Long memberNo,
+	        @RequestHeader("Authorization") String bearerToken,
+	        @RequestBody MemberUpdateVO vo) {
+
+	    // 1. 토큰에서 로그인된 사용자 정보 추출
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+
+	    // 2. 본인 계정인지 확인
+	    if (!tokenVO.getMemberNo().equals(memberNo)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인 계정만 수정할 수 있습니다.");
+	    }
+
+	    // 3. 수정 수행
+	    boolean result = memberService.updateMember(memberNo, vo);
+
+	    if (result) {
+	        return ResponseEntity.ok("회원정보가 수정되었습니다.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원정보 수정 실패");
+	    }
+	}
+
 	
 
 }
