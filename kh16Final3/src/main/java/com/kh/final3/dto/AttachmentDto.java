@@ -18,6 +18,6 @@ public class AttachmentDto {
     private Long parentPkNo;
     private String originalName;
     private String storedName;
-    private Integer fileSize;      
+    private Long fileSize;      
     private LocalDateTime createdTime;
 }
