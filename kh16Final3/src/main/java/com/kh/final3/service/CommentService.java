@@ -47,7 +47,7 @@ public class CommentService {
         BoardDto parentBoard = boardDao.selectOne(parentBoardNo);
         
         // 조건 검사: 'QNA 타입'이며 '관리자'가 작성한 댓글(답변)인 경우
-        if (parentBoard != null && parentBoard.getType().equals("QNA") && loginLevel.equals("admin")) {
+        if (parentBoard != null && parentBoard.getType().equals("QNA") && loginLevel.equals("ADMIN")) {
             
             long qnaWriterNo = parentBoard.getWriterNo(); // QNA 작성자
             
@@ -95,7 +95,7 @@ public class CommentService {
         // 2. 권한 체크 (본인 또는 관리자만 수정 가능)
         // DTO 필드명: writerNo 사용
         // a. 관리자 권한
-        if (loginLevel.equals("admin")) {
+        if (loginLevel.equals("ADMIN")) {
             // 통과
         }
         // b. 작성자 본인 확인

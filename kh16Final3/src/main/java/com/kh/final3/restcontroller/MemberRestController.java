@@ -17,10 +17,12 @@ import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
 import com.kh.final3.service.TokenService;
-import com.kh.final3.vo.MemberComplexSearchVO;
-import com.kh.final3.vo.MemberLoginResponseVO;
-import com.kh.final3.vo.MemberRefreshVO;
 import com.kh.final3.vo.TokenVO;
+import com.kh.final3.vo.member.MemberComplexSearchVO;
+import com.kh.final3.vo.member.MemberLoginResponseVO;
+import com.kh.final3.vo.member.MemberRefreshVO;
+import com.kh.final3.vo.member.MemberRequestVO;
+import com.kh.final3.vo.member.MemberUpdateVO;
 
 import jakarta.validation.Valid;
 
@@ -84,6 +86,7 @@ public class MemberRestController {
 				.loginId(findDto.getMemberId())// 아이디
 				.loginLevel(findDto.getMemberRole())// 등급
 				.nickname(findDto.getMemberNickname()).email(findDto.getMemberEmail())
+				.post(findDto.getMemberPost())
 				.address1(findDto.getMemberAddress1()).address2(findDto.getMemberAddress2())
 				.point(findDto.getMemberPoint()).contact(findDto.getMemberContact())
 				.createdTime(findDto.getMemberCreatedTime()).accessToken(tokenService.generateAccessToken(findDto))// 액세스토큰
@@ -127,10 +130,10 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
-
+	// 회원탈퇴
 	@DeleteMapping("/{memberNo}")
 	public ResponseEntity<String> deleteMember(@PathVariable Long memberNo,
-			@RequestHeader("Authorization") String bearerToken) {
+			@RequestHeader("Authorization") String bearerToken,  @RequestBody MemberRequestVO requestVO) {
 
 		// 1. 토큰에서 로그인된 사용자 정보 추출
 		TokenVO tokenVO = tokenService.parse(bearerToken);
@@ -139,6 +142,12 @@ public class MemberRestController {
 		if (!tokenVO.getMemberNo().equals(memberNo)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인 계정만 탈퇴할 수 있습니다.");
 		}
+	    // 3. 비밀번호 확인
+	    requestVO.setMemberNo(memberNo); // PathVariable -> VO에 세팅
+	    boolean passwordOk = memberService.checkPassword(requestVO);
+	    if (!passwordOk) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 올바르지 않습니다.");
+	    }
 
 		// 3. 회원 삭제 수행
 		boolean result = memberService.deleteMember(memberNo);
@@ -150,6 +159,54 @@ public class MemberRestController {
 		} else {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 삭제 실패");
 		}
+	}
+	@PutMapping("/{memberNo}")
+	public ResponseEntity<String> updateMember(
+	        @PathVariable Long memberNo,
+	        @RequestHeader("Authorization") String bearerToken,
+	        @RequestBody MemberUpdateVO vo) {
+
+	    // 1. 토큰에서 로그인된 사용자 정보 추출
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+
+	    // 2. 본인 계정인지 확인
+	    if (!tokenVO.getMemberNo().equals(memberNo)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("본인 계정만 수정할 수 있습니다.");
+	    }
+
+	    // 3. 수정 수행
+	    boolean result = memberService.updateMember(memberNo, vo);
+
+	    if (result) {
+	        return ResponseEntity.ok("회원정보가 수정되었습니다.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원정보 수정 실패");
+	    }
+	}
+
+
+	// 토큰 유효성 검사 및 사용자 정보 반환 (새로고침 시 상태 복구용)
+	@PostMapping("/check-token") 
+	public ResponseEntity<TokenVO> checkToken(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
+	    
+	    //  1. 토큰 존재 여부 확인 및 "Bearer " 접두사 검증
+	    if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+	        // 토큰이 없으면 권한 없음 처리 (401 Unauthorized)
+	        throw new UnauthorizationException("토큰이 존재하지 않습니다.");
+	    }
+	    
+	    try {
+	        //  2. 토큰 파싱 및 유효성 검사
+	        // tokenService.parse 내부에서 서명, 만료 시간 등이 검사됩니다. (실패 시 예외 발생)
+	        TokenVO tokenVO = tokenService.parse(bearerToken);
+	        
+	        // 3. 유효한 토큰 정보 반환 (프론트엔드가 loginLevel을 가져감)
+	        return ResponseEntity.ok(tokenVO); 
+	        
+	    } catch (Exception e) {
+	        // 토큰 파싱/검증 실패 (예: 만료, 변조) 시 권한 없음 처리 (401 Unauthorized)
+	        throw new UnauthorizationException("유효하지 않거나 만료된 토큰입니다."); 
+	    }
 	}
 
 }

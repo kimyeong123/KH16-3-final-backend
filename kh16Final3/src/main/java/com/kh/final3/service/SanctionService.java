@@ -63,8 +63,8 @@ public class SanctionService {
             throw new TargetNotfoundException("제재 정보 등록 실패: Sanction DB INSERT 오류"); 
         }
 
-        // 3. 💡 회원 테이블의 ROLE 컬럼을 'SUSPENDED'로 업데이트
-       // memberDao.updateMemberStatus(memberNo, "SUSPENDED");
+//        // 3. 💡 회원 테이블의 ROLE 컬럼을 'SUSPENDED'로 업데이트
+//        memberDao.updateMemberStatus(memberNo, "SUSPENDED");
         
         // 4. MessageService를 이용해 제재 알림 전송
         String endDateString = (endTime != null) ? endTime.toString() : "영구 정지";

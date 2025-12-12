@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.MemberDto;
-import com.kh.final3.vo.MemberComplexSearchVO;
+import com.kh.final3.vo.member.MemberComplexSearchVO;
 
 
 
@@ -44,6 +44,7 @@ public class MemberDao {
 	public String findNicknameByMemberNo(long memberNo) {
 	    return sqlSession.selectOne("member.findNicknameByMemberNo", memberNo);
 	}
+	
 	//중복 가입 제거
 	public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
 	    Map<String, Object> param = new HashMap<>();
@@ -57,9 +58,31 @@ public class MemberDao {
 
 		return sqlSession.selectList("member.complexSearch", vo);
 	}
-	//회원 삭제 및 탈퇴
+
 	public int deleteMember(Long memberNo) {
 	    return sqlSession.delete("member.deleteMember", memberNo);
 	}
+	
+	public boolean updateMemberStatus(long memberNo, String status) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("memberNo", memberNo);
+	    params.put("status", status);
+	    
+	    return sqlSession.update("member.updateMemberStatus", params) > 0; 
+	}
+	
+    // 비밀번호 확인
+    public String findPasswordByMemberNo(Long memberNo) {
+        return sqlSession.selectOne("member.findPasswordByMemberNo", memberNo);
+    }
+    // 회원번호로 회원 조회
+    public MemberDto selectOneByMemberNo(Long memberNo) {
+        return sqlSession.selectOne("member.selectOneByMemberNo", memberNo);
+    }
+
+    // 회원정보 수정
+    public int updateMember(MemberDto member) {
+        return sqlSession.update("member.updateMember", member);
+    }
 
 }

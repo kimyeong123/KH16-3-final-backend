@@ -11,6 +11,7 @@
         <result column="NICKNAME" property="memberNickname"/>
         <result column="NAME" property="memberName"/>
         <result column="EMAIL" property="memberEmail"/>
+         <result column="POST" property="memberPost"/>
         <result column="ADDRESS1" property="memberAddress1"/>
         <result column="ADDRESS2" property="memberAddress2"/>
         <result column="ROLE" property="memberRole"/>
@@ -46,25 +47,21 @@
             #{memberAddress1},
             #{memberAddress2}
         )
+        
     </insert>
-<!--
-    <select id="detail" resultType="MemberDto">
-        select * from member where id = #{memberId}
-    </select>
-    -->
     <select id="detail" parameterType="String" resultMap="memberResultMap">
-        SELECT * FROM MEMBER WHERE ID = #{memberId}
+        select * from member where id = #{memberId}
     </select>
 
  <select id="detailByMemberId" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
         select * from member where id = #{memberId}
     </select>
     <select id="detailByMemberNickname" parameterType="String" resultType="com.kh.final3.dto.MemberDto">
-        select * from member where NICKNAME = #{memberNickname}
+        select * from member where nickname = #{memberNickname}
     </select>
     
     <select id="findNicknameByMemberNo" parameterType="long" resultType="String">
-        select NICKNAME from member where MEMBER_NO = #{memberNo}
+        select nickname from member where member_no = #{memberNo}
     </select>
     
     <select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
@@ -87,12 +84,43 @@
         <where>
             </where>
     </select>
+   
+
+	<update id="updateMemberStatus" parameterType="map">
+        update member
+        set role = #{status}
+        where member_no = #{memberNo}
+    </update>
+
+
    <!-- 회원 삭제 -->
 <delete id="deleteMember" parameterType="long">
     delete from member
     where member_no = #{memberNo,jdbcType=BIGINT}
 </delete>
+<!-- 비밀번호 조회 -->
+<select id="findPasswordByMemberNo" parameterType="long" resultType="string">
+    select pw
+    from member
+    where member_no = #{memberNo}
+</select>
+<!-- 회원 수정 -->
+<update id="updateMember" parameterType="MemberDto">
+    update member
+    set
+        email = #{memberEmail},
+        post = #{memberPost},
+        address1 = #{memberAddress1},
+        address2 = #{memberAddress2},
+        contact = #{memberContact}
+    where member_no = #{memberNo}
+</update>
 
-
+<!-- 회원번호로 회원 조회-->
+<select id="selectOneByMemberNo" parameterType="long" resultMap="memberResultMap">
+    select *
+    from member
+    where member_no = #{memberNo}
+</select>
 
 </mapper>
