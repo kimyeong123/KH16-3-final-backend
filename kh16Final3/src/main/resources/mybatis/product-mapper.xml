@@ -39,7 +39,7 @@
     <select id="list" resultType="ProductDto">
         select *
         from product
-        order by product_no desc
+        order by product_no desc 
     </select>
 
     <!-- 상세 -->
@@ -127,4 +127,44 @@
     )
     where rn between #{begin} and #{end}
 	</select>
+	
+	<update id="updateStatus">
+		update product
+			set status = #{changeStatus}
+		where product_no = #{productNo}
+	</update>
+	
+	<update id="updateEndedAuction">
+		update product
+			set 
+				status = 'ENDED', final_price = #{finalPrice},
+				buyer_no = #{buyerNo}, ended_time = systimestamp
+		where product_no = #{productNo}
+	</update>
+	
+	<!-- 동시성 처리를 위해서 해당 ROW locking 조회 -->
+	<select id="selectOneForUpdate" resultType="ProductDto">
+    	select *
+    	from product
+    	where product_no = #{productNo}
+    	for update nowait
+	</select>
+	
+	<!-- null일 수도 있어서 wrapper 클래스 사용 -->
+	<select id="findExpiredProductNos" resultType="Long">
+   		select product_no
+    	from product
+    		where 
+			<![CDATA[
+				end_time < systimestamp
+			]]>
+      			and status = 'BIDDING'
+	</select>
+	
+	<select id="findSellerNoByProductNo" resultType="long">
+		select seller_no
+		from product
+		where product_no = #{productNo}
+	</select>
+	
 </mapper>

@@ -21,7 +21,7 @@ public class MessageService {
 	public boolean sendMessage(MessageDto messageDto) {
 		
 		// 1. 시퀀스 번호 발급
-        int messageNo = messageDao.sequence();
+        long messageNo = messageDao.sequence();
         messageDto.setMessageNo(messageNo);
 
         // 2. 쪽지 등록 (DAO의 insert 호출)
@@ -92,7 +92,7 @@ public class MessageService {
                 .build();
         
         // 2. 시퀀스 번호 발급
-        int messageNo = messageDao.sequence();
+        long messageNo = messageDao.sequence();
         messageDto.setMessageNo(messageNo);
 
         // 3. 쪽지(알림) 등록

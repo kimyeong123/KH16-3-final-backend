@@ -8,65 +8,79 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
+import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
 @Repository
 public class ProductDao {
+	
 	@Autowired
 	private SqlSession sqlSession;
 	
-	public int sequence() {
-		return sqlSession.selectOne("product.sequence");
+	private static final String NAMESPACE = "product."; 
+	
+	public long sequence() {
+		return sqlSession.selectOne(NAMESPACE + "sequence");
 	}
 	
-	public void insert(ProductDto productDto) {
-		sqlSession.insert("product.add", productDto);
+	public int insert(ProductDto productDto) {
+		return sqlSession.insert(NAMESPACE + "add", productDto);
 	}
 	
 	public List<ProductDto>selectList(){
-		return sqlSession.selectList("product.list");
+		return sqlSession.selectList(NAMESPACE + "list");
 	}
 	
-	public ProductDto selectOne(int productNo) {
-		return sqlSession.selectOne("product.detail", productNo);
+	public ProductDto selectOne(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "detail", productNo);
 	}
 	
-	public boolean delete(int productNo) {
-		return sqlSession.delete("product.delete", productNo)>0;
+	public int delete(long productNo) {
+		return sqlSession.delete(NAMESPACE + "delete", productNo);
 	}
 	
-	public boolean update(ProductDto productDto) {
-		return sqlSession.update("product.update", productDto)>0;
+	public int update(ProductDto productDto) {
+		return sqlSession.update(NAMESPACE + "update", productDto);
 	}
 	
-	public boolean updateUnit(ProductDto productDto) {
-			return sqlSession.update("product.updateUnit", productDto)>0;
+	public int updateUnit(ProductDto productDto) {
+		return sqlSession.update(NAMESPACE + "updateUnit", productDto);
 	}
 	
 	public int count() {
-		return sqlSession.selectOne("product.countByPaging");
+		return sqlSession.selectOne(NAMESPACE + "countByPaging");
 		
 	}
 	public List<ProductDto>selectList(PageVO pageVO){
 		Map<String,Integer>params=new HashMap<>();
 		params.put("begin", pageVO.getBegin());
 		params.put("end", pageVO.getEnd());
-		return sqlSession.selectList("product.listByPaging", params);
+		return sqlSession.selectList(NAMESPACE + "listByPaging", params);
 		
 	}
-	//<!-- 입찰 발생 시: 현재가, 입찰자, 상태 갱신 -->
-	public boolean updateOnBid(int productNo, int bidMemberNo, int bidAmount) {
-	    Map<String, Object> param = new HashMap<>();
-	    param.put("productNo", productNo);
-	    param.put("bidMemberNo", bidMemberNo);
-	    param.put("bidAmount", bidAmount);
-	    return sqlSession.update("product.updateOnBid", param) > 0;
-	}
-//<!--  경매종료/낙찰확정 -->
-	public boolean closeAuction(int productNo) {
-	    return sqlSession.update("product.closeAuction", productNo) > 0;
-	}
-
 	
+	public int updateStatus(long productNo, ProductStatus changeStatus) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("productNo", productNo);
+	    params.put("changeStatus", changeStatus.getStatus());
+		return sqlSession.update(NAMESPACE + "updateStatus", params);
+	}
+	
+	public int updateEndedAuction(AuctionEndRequestVO endRequestVO) {
+		return sqlSession.update(NAMESPACE + "updateEndedAuction", endRequestVO);
+	}
+	
+	public ProductDto selectOneForUpdate(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "selectOneForUpdate", productNo);
+	}
+	
+	public List<Long> findExpiredProductNos(){
+		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
+	}
+	
+	public long findSellerNoByProductNo(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo");
+	}
 	
 }

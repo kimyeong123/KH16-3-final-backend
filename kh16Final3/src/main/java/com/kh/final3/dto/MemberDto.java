@@ -1,12 +1,9 @@
 package com.kh.final3.dto;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.validation.constraints.Email;
@@ -14,10 +11,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -52,7 +49,7 @@ public class MemberDto {
     @Size(max = 100)
     private String memberAddress2; 	
     private String memberRole; 
-    private Integer memberPoint;
+    private Long memberPoint;
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
 //    private LocalDateTime memberCreatedTime;
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")

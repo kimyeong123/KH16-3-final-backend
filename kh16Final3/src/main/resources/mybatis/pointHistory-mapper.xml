@@ -5,31 +5,28 @@
 
 <mapper namespace="pointHistory">
 
-    <select id="sequence" resultType="int">
+    <select id="sequence" resultType="long">
         select point_history_seq.nextval
         from dual
     </select>
 
     <insert id="insert">
-        insert into point_history(
-              point_history_no
-            , member_no
-            , amount
-            , reason
-            , related_no
+        insert into 
+        	point_history(
+            	point_history_no, member_no, type, 
+              	amount, reason, product_no
         ) values(
-              #{pointHistoryNo}
-            , #{memberNo}
-            , #{amount}
-            , #{reason}
-            , #{relatedNo}
+              #{pointHistoryNo}, #{memberNo}, #{type}, 
+              #{amount}, #{reason}, #{productNo}
         )
     </insert>
 
     <select id="detail" resultType="PointHistoryDto">
         select *
         from point_history
-        where point_history_no = #{pointHistoryNo}
+        where 
+        	point_history_no = #{pointHistoryNo}
+        order by point_history_no desc
     </select>
 
     <select id="listByMember" resultType="PointHistoryDto">
@@ -38,5 +35,19 @@
         where member_no = #{memberNo}
         order by created_time desc
     </select>
-
+    
+    <!-- 히스토리 내 회원의 포인트  -->
+    <select id="calculateMemberBalance" resultType="long" parameterType="int">
+	    select
+	        sum(case
+	            when type = 'ADD' then amount
+	            when type = 'DEDUCT' then -amount
+	            else 0
+	        end) as current_point_balance
+	    from
+	        point_history
+	    where
+	        member_no = #{memberNo}
+	</select>
+    
 </mapper>

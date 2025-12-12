@@ -48,9 +48,32 @@
         select NICKNAME from member where NO = #{memberNo}
     </select>
     <!-- 이름 + 생일 + 연락처로 회원 조회 -->
-<select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
-    select * from member
-    where name = #{name} and birth = #{birth} and contact = #{contact}
-</select>
+	<select id="selectOneByNameBirthContact" parameterType="map" resultType="com.kh.final3.dto.MemberDto">
+    	select * from member
+    	where name = #{name} and birth = #{birth} and contact = #{contact}
+	</select>
 
+	<!-- 잔액이 음수가 되는 경우를 방지 및 실행 0건으로 확인 가능 -->
+	<update id="deductMemberPoint"> 
+		update member
+    		set 
+        		point = point - #{amount}
+    	where 
+    		member_no = #{memberNo} and point >= #{amount}
+	</update>
+	
+	<update id="addMemberPoint">
+    	update member
+    		set 
+        		point = point + #{amount}
+    		where 
+        		member_no = #{memberNo}
+	</update>
+	
+	<select id="findMemberPoint" resultType="long">
+		select point
+			from member
+		where memebr_no = #{memberNo}
+	</select>
+	
 </mapper>
