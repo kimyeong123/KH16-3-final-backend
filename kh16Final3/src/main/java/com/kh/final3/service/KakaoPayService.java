@@ -32,7 +32,7 @@ public KakaoPayReadyResponseVO ready(KakaoPayReadyRequestVO requestVO) {
 
 	Map<String, String> body =new HashMap<>();
 	body.put("cid", kakaoPayProperties.getCid());
-	body.put("partner_order_id", requestVO.getPartnerOrderId()); 
+
 	body.put("partner_order_id", requestVO.getPartnerOrderId());
 	body.put("partner_user_id", requestVO.getPartnerUserId());
 	body.put("item_name", requestVO.getItemName());

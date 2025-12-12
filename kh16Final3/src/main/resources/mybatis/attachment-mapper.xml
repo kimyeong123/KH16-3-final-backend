@@ -5,56 +5,79 @@
 
 <mapper namespace="attachment">
 
-    <select id="sequence" resultType="int">
-        select attachment_seq.nextval
-        from dual
-    </select>
+  <select id="sequence" resultType="int">
+    select attachment_seq.nextval
+    from dual
+  </select>
 
-    <insert id="add">
-        insert into attachment(
-              attachment_no
-            , media_type
-            , path
-            , category
-            , parent_pk_no
-            , original_name
-            , stored_name
-            , size
-        ) values (
-              #{attachmentNo}
-            , #{mediaType}
-            , #{path}
-            , #{category}
-            , #{parentPkNo}
-            , #{originalName}
-            , #{storedName}
-            , #{size}
-        )
-    </insert>
+  <!-- 등록 -->
+  <insert id="add">
+    insert into attachment(
+          attachment_no
+        , media_type
+        , path
+        , category
+        , parent_pk_no
+        , original_name
+        , stored_name
+        , file_size
+    ) values (
+          #{attachmentNo}
+        , #{mediaType}
+        , #{path}
+        , #{category}
+        , #{parentPkNo}
+        , #{originalName}
+        , #{storedName}
+        , #{fileSize}  
+    )
+  </insert>
 
-    <select id="detail" resultType="AttachmentDto">
-        select *
-        from attachment
-        where attachment_no = #{attachmentNo}
-    </select>
+  <!-- 상세 -->
+  <select id="detail" resultType="AttachmentDto">
+    select
+          attachment_no as attachmentNo
+        , media_type     as mediaType
+        , path           as path
+        , category       as category
+        , parent_pk_no   as parentPkNo
+        , original_name  as originalName
+        , stored_name    as storedName
+        , file_size      as fileSize
+        , created_time   as createdTime
+    from attachment
+    where attachment_no = #{attachmentNo}
+  </select>
 
-    <select id="listByParent" resultType="AttachmentDto">
-        select *
-        from attachment
-        where category    = #{category}
-          and parent_pk_no = #{parentPkNo}
-        order by attachment_no asc
-    </select>
+  <!-- 부모 기준 목록 -->
+  <select id="listByParent" resultType="AttachmentDto">
+    select
+          attachment_no as attachmentNo
+        , media_type     as mediaType
+        , path           as path
+        , category       as category
+        , parent_pk_no   as parentPkNo
+        , original_name  as originalName
+        , stored_name    as storedName
+        , file_size      as fileSize
+        , created_time   as createdTime
+    from attachment
+    where category = #{category}
+      and parent_pk_no = #{parentPkNo}
+    order by attachment_no asc
+  </select>
 
-    <delete id="delete">
-        delete attachment
-        where attachment_no = #{attachmentNo}
-    </delete>
+  <!-- 삭제 -->
+  <delete id="delete">
+    delete from attachment
+    where attachment_no = #{attachmentNo}
+  </delete>
 
-    <delete id="deleteByParent">
-        delete attachment
-        where category    = #{category}
-          and parent_pk_no = #{parentPkNo}
-    </delete>
+  <!-- 부모 기준 전체 삭제 -->
+  <delete id="deleteByParent">
+    delete from attachment
+    where category = #{category}
+      and parent_pk_no = #{parentPkNo}
+  </delete>
 
 </mapper>

@@ -101,7 +101,7 @@ public class SanctionService {
         }
         
         // 3.  회원 상태를 'DEFAULT'로 업데이트 (ROLE 변경)
-        memberDao.updateMemberStatus(detail.getMemberNo(), "DEFAULT");
+        //memberDao.updateMemberStatus(detail.getMemberNo(), "DEFAULT");
         
         return true;
     }
