@@ -56,7 +56,7 @@ public class MemberDao {
 	//비밀번호 찾기
 	public MemberDto selectOneByIdAndEmail(String memberId, String email) {
 	    Map<String, Object> param = new HashMap<>();
-	    param.put("memberId", memberId);
+	    param.put("id", memberId);
 	    param.put("email", email);
 	    return sqlSession.selectOne("member.selectOneByIdAndEmail", param);
 	}

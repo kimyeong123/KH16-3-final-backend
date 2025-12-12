@@ -113,12 +113,12 @@
     where member_no = #{memberNo}
 </update>
 <!--이메일로 아이디 찾기-->
-<select id="selectOneByEmail" resultType="MemberFindIdVO">
-select * from member where email = #{email}
+<select id="selectOneByEmail" resultType="MemberDto">
+  select * from member where email = #{email}
 </select>
 <!--이메일과 아이디로 비밀번호 찾기-->
-<select id="selectOneByIdAndEmail" resultType="MemberResetPwVO">
-select * from member where id = #{memberId} and email = #{email}
+<select id="selectOneByIdAndEmail" resultType="MemberDto">
+  select * from member where id = #{id} and email = #{email}
 </select>
 
 
