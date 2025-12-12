@@ -24,14 +24,14 @@ import com.kh.final3.error.UnauthorizationException;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/rest/message")
+@RequestMapping("/message")
 public class MessageRestController {
 	
 	@Autowired
 	private MessageService messageService;
 	
 	/**
-	 * 1. 쪽지 전송 (POST /rest/message)
+	 * 1. 쪽지 전송 (POST /message)
 	 */
 	@PostMapping
 	public ResponseEntity<String> sendMessage(
@@ -41,15 +41,13 @@ public class MessageRestController {
 		// 발신자 번호 설정
 		messageDto.setSenderNo(memberNo);
 		
-		// Service 호출 (Service 반환 타입이 void라고 가정하며, 실패 시 예외 발생)
-		messageService.sendMessage(messageDto);
+		messageService.sendMessage(messageDto); // Service 호출
 		
-		// 예외 없이 성공
 		return ResponseEntity.ok("쪽지 전송 완료");
 	}
 	
 	/**
-	 * 2. 미확인 알림 개수 조회 (GET /rest/message/unread/count)
+	 * 2. 미확인 알림 개수 조회 (GET /message/unread/count)
 	 */
 	@GetMapping("/unread/count")
 	public ResponseEntity<Map<String, Object>> getUnreadAlertCount(@RequestAttribute("memberNo") long memberNo) {
@@ -57,101 +55,87 @@ public class MessageRestController {
 		int count = messageService.countUnreadAlerts(memberNo);
 		
 		Map<String, Object> response = new HashMap<>();
-    response.put("memberNo", memberNo);
-    response.put("unreadCount", count);
+		response.put("memberNo", memberNo);
+		response.put("unreadCount", count);
      
-    return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response);
 	}
 	
 	/**
-	 * 3. 수신함 목록 조회 (필터링 지원) (GET /rest/message/received?types=...)
+	 * 3. 미확인 쪽지/알림 목록 조회 (헤더 드롭다운용) (GET /message/unread/list)
 	 */
-	@GetMapping("/received")
-	public ResponseEntity<List<MessageDto>> getReceivedMessagesByFilter(
-						@RequestParam(required = false) List<String> types,
-						@RequestAttribute("memberNo") long memberNo) {
-		
-		List<MessageDto> list;
-		
-		if(types == null || types.isEmpty()) {
-			// 필터가 없을 경우 전체 수신함 목록 조회
-			list = messageService.getReceivedList(memberNo);
-		}
-		else {
-			// 필터가 있을 경우 타입별 목록 조회
-			Map<String, Object> param = new HashMap<>();
-			param.put("memberNo", memberNo);
-			param.put("typeList", types);
-			
-			list = messageService.getReceivedListByTypes(param);
-		}
-		
-		return ResponseEntity.ok(list);
+	@GetMapping("/unread/list")
+	public ResponseEntity<List<MessageDto>> getUnreadMessagesList(
+	    @RequestAttribute("memberNo") long memberNo
+	) {
+	    List<MessageDto> list = messageService.getUnreadListForHeader(memberNo); 
+	    return ResponseEntity.ok(list);
 	}
 	
 	/**
-	 * 4. 수신함에서 쪽지 삭제 (POST /rest/message/delete/receiver/{messageNo})
+	 * 4. 수신함 목록 조회 (페이지네이션 및 필터링 지원)
+	 * (GET /message/received/page?page=1&size=10&types=GENERAL,SYSTEM_ALERT)
+	 * * 모든 수신함 조회 요청을 이 단일 엔드포인트에서 처리합니다.
+	 */
+	@GetMapping("/received/page")
+    public ResponseEntity<PageVO<MessageDto>> getReceivedListByPagingAndFilter(
+			PageVO<MessageDto> pageVO,
+			@RequestParam(required = false) List<String> types,
+			@RequestAttribute("memberNo") long memberNo) {
+		
+		// Service 호출 시 types 파라미터를 함께 전달해야 합니다.
+		PageVO<MessageDto> resultVO = messageService.getReceivedListByPaging(pageVO, memberNo, types);
+		
+		return ResponseEntity.ok(resultVO);
+	}
+	
+	/**
+	 * 5. 발신함 목록 조회 (페이지네이션 및 필터링 지원)
+	 * (GET /message/sent/page?page=1&size=10&types=...)
+	 */
+	@GetMapping("/sent/page")
+    public ResponseEntity<PageVO<MessageDto>> getSentListByPagingAndFilter(
+			PageVO<MessageDto> pageVO,
+			@RequestParam(required = false) List<String> types, // 발신함에도 필터링 필요시 사용
+			@RequestAttribute("memberNo") long memberNo) {
+		
+		// Service 호출 시 types 파라미터를 함께 전달해야 합니다.
+		PageVO<MessageDto> resultVO = messageService.getSentListByPaging(pageVO, memberNo, types);
+		
+		return ResponseEntity.ok(resultVO);
+	}
+
+	/**
+	 * 6. 수신함에서 쪽지 삭제 (POST /message/delete/receiver/{messageNo})
 	 */
 	@PostMapping("delete/receiver/{messageNo}")
 	public ResponseEntity<String> deleteMessageForReceiver(@PathVariable Integer messageNo) {
 		
-		// Service 호출 (Service 반환 타입이 void라고 가정하며, 실패 시 예외 발생)
 		messageService.deleteMessageByReceiver(messageNo);
 		
-		// 예외 없이 성공
 		return ResponseEntity.ok("수신함 쪽지 삭제 성공");
 	}
 	
-	// --- 페이지네이션 및 상세 조회 기능 ---
-	
 	/**
-	 * 5. 수신함 목록 조회 (페이지네이션) (GET /rest/message/received/page)
-	 */
-	@GetMapping("/received/page")
-  public ResponseEntity<PageVO<MessageDto>> getReceivedListByPaging(
-       PageVO<MessageDto> pageVO,
-       @RequestAttribute("memberNo") long memberNo
-  ) {
-    PageVO<MessageDto> resultVO = messageService.getReceivedListByPaging(pageVO, memberNo);
-     
-    return ResponseEntity.ok(resultVO);
-  }
-	
-	/**
-	 * 6. 발신함 목록 조회 (페이지네이션) (GET /rest/message/sent/page)
-	 */
-	@GetMapping("/sent/page")
-  public ResponseEntity<PageVO<MessageDto>> getSentListByPaging(
-       PageVO<MessageDto> pageVO,
-       @RequestAttribute("memberNo") long memberNo
-  ) {
-    PageVO<MessageDto> resultVO = messageService.getSentListByPaging(pageVO, memberNo);
-     
-    return ResponseEntity.ok(resultVO);
-  }
-	
-	/**
-	 * 7. 상세 조회 및 읽음 처리 (GET /rest/message/{messageNo})
+	 * 7. 상세 조회 및 읽음 처리 (GET /message/{messageNo})
 	 */
 	@GetMapping("/{messageNo}")
 	public ResponseEntity<MessageDto> getMessageDetail(
 			@PathVariable Integer messageNo,
-	    @RequestAttribute("memberNo") long currentMemberNo // 현재 로그인한 회원 번호 (보안 체크용)
-	) {
-	  // 1. 서비스 호출: 상세 조회 및 읽음 처리 트랜잭션 실행
-	  MessageDto detail = messageService.getMessageDetailAndRead(messageNo);
+	    @RequestAttribute("memberNo") long currentMemberNo) {
 
-	  // 2. 보안 체크 (예외 처리)
-	  if (detail == null) {
-	    throw new TargetNotfoundException("해당 쪽지를 찾을 수 없습니다.");
-	  }
-        
-      // 쪽지 수신자 또는 발신자가 현재 로그인한 사용자가 아니면 권한 없음
-      if (detail.getReceiverNo() != currentMemberNo && detail.getSenderNo() != currentMemberNo) {
-	    throw new UnauthorizationException("해당 쪽지를 조회할 권한이 없습니다.");
-      }
+	    MessageDto detail = messageService.getMessageDetailAndRead(messageNo);
 
-	  return ResponseEntity.ok(detail);
+	    if (detail == null) {
+	        throw new TargetNotfoundException("해당 쪽지를 찾을 수 없습니다.");
+	    }
+	        
+        // 쪽지 수신자 또는 발신자가 현재 로그인한 사용자가 아니면 권한 없음
+        if (detail.getReceiverNo() != currentMemberNo && detail.getSenderNo() != currentMemberNo) {
+	        throw new UnauthorizationException("해당 쪽지를 조회할 권한이 없습니다.");
+        }
+
+	    return ResponseEntity.ok(detail);
 	}
 	
 }

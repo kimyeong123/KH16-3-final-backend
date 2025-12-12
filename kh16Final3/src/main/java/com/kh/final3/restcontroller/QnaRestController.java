@@ -27,7 +27,7 @@ import com.kh.final3.vo.TokenVO;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/rest/qna")
+@RequestMapping("/qna")
 public class QnaRestController {
 	
 	@Autowired
@@ -38,9 +38,9 @@ public class QnaRestController {
     private BoardService boardService; 
 	
 	/**
-	 * 1. 문의 등록 (POST /rest/qna)
+	 * 1. 문의 등록 (POST /qna)
 	 */
-	@PostMapping
+	@PostMapping("/list")
 	public BoardDto insert(
             @RequestPart BoardDto boardDto,
             @RequestPart(required = false) List<MultipartFile> attachments,
@@ -60,7 +60,7 @@ public class QnaRestController {
 	/**
 	 * 2. 문의 목록 조회 (GET /rest/qna) - 페이지네이션 지원 버전 채택
 	 */
-	@GetMapping
+	@GetMapping("/")
 	public ResponseEntity<PageVO<BoardDto>> list(PageVO<BoardDto> pageVO) {
         // PageVO는 클라이언트의 URL 쿼리 파라미터 (page, size, column, keyword)에 자동 바인딩됩니다.
         PageVO<BoardDto> resultVO = qnaService.selectList(pageVO);

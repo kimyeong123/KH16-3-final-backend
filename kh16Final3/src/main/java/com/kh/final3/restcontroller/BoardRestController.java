@@ -47,7 +47,7 @@ public class BoardRestController {
 		return boardService.selectNoticeList(); 
 	}
 	
-	@GetMapping("/{boardNo}")
+	@GetMapping("/detail/{boardNo}")
 	public BoardDto detail(@PathVariable long boardNo,
 										HttpServletRequest request, 
 										HttpServletResponse response) {
@@ -91,7 +91,7 @@ public class BoardRestController {
 		return boardDto; 
 	}
 	
-	@DeleteMapping("/{boardNo}")
+	@DeleteMapping("/delete/{boardNo}")
 	public void delete(@PathVariable long boardNo,
 								@RequestAttribute TokenVO tokenVO
 			) {
@@ -100,7 +100,7 @@ public class BoardRestController {
 		boardService.delete(boardNo, loginLevel, memberNo);
 	}
 	
-	@PatchMapping("/{boardNo}")
+	@PatchMapping("/edit/{boardNo}")
 	public void edit(@PathVariable long boardNo,
 								@RequestBody BoardDto boardDto,
 								@RequestAttribute TokenVO tokenVO
