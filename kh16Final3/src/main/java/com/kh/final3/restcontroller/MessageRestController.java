@@ -1,8 +1,6 @@
 package com.kh.final3.restcontroller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,17 +8,17 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.final3.dto.MessageDto;
+import com.kh.final3.error.TargetNotfoundException;
+import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MessageService;
-import com.kh.final3.vo.PageVO;
-import com.kh.final3.error.TargetNotfoundException; 
-import com.kh.final3.error.UnauthorizationException; 
+import com.kh.final3.vo.PageVO; 
 
 @CrossOrigin
 @RestController
@@ -46,21 +44,21 @@ public class MessageRestController {
 		return ResponseEntity.ok("쪽지 전송 완료");
 	}
 	
-	/**
-	 * 2. 미확인 알림 개수 조회 (GET /message/unread/count)
-	 */
-	@GetMapping("/unread/count")
-	public ResponseEntity<Map<String, Object>> getUnreadAlertCount(@RequestAttribute("memberNo") long memberNo) {
-		
-		int count = messageService.countUnreadAlerts(memberNo);
-		
-		Map<String, Object> response = new HashMap<>();
-		response.put("memberNo", memberNo);
-		response.put("unreadCount", count);
-     
-		return ResponseEntity.ok(response);
-	}
-	
+//	/**
+//	 * 2. 미확인 알림 개수 조회 (GET /message/unread/count)
+//	 */
+//	@GetMapping("/unread/count")
+//	public ResponseEntity<Map<String, Object>> getUnreadAlertCount(@RequestAttribute("memberNo") long memberNo) {
+//		
+//		int count = messageService.countUnreadAlerts(memberNo);
+//		
+//		Map<String, Object> response = new HashMap<>();
+//		response.put("memberNo", memberNo);
+//		response.put("unreadCount", count);
+//     
+//		return ResponseEntity.ok(response);
+//	}
+//	
 	/**
 	 * 3. 미확인 쪽지/알림 목록 조회 (헤더 드롭다운용) (GET /message/unread/list)
 	 */

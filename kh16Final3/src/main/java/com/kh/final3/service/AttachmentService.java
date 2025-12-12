@@ -24,24 +24,24 @@ public class AttachmentService {
     private static final String UPLOAD_ROOT = "final3_uploads";
 //영도님 board쓰시면돼요 
     public AttachmentDto saveProduct(MultipartFile file, long productNo) throws IOException {
-        return saveInternal(file, "PRODUCT", (int) productNo);
+        return saveInternal(file, "PRODUCT", productNo);
     }
 
     public AttachmentDto saveBoard(MultipartFile file, long boardNo) throws IOException {
-        return saveInternal(file, "BOARD", (int) boardNo);
+        return saveInternal(file, "BOARD", boardNo);
     }
 
 
     public AttachmentDto saveQna(MultipartFile file, long qnaNo) throws IOException {
-        return saveInternal(file, "BOARD", (int) qnaNo); 
+        return saveInternal(file, "BOARD", qnaNo); 
     }
 
-    public AttachmentDto save(MultipartFile file, String category, int parentPkNo) throws IOException {
+    public AttachmentDto save(MultipartFile file, String category, long parentPkNo) throws IOException {
         return saveInternal(file, category, parentPkNo);
     }
 
     @Transactional
-    private AttachmentDto saveInternal(MultipartFile file, String category, int parentPkNo) throws IOException {
+    private AttachmentDto saveInternal(MultipartFile file, String category, long parentPkNo) throws IOException {
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("업로드 파일이 비어있습니다");
@@ -76,9 +76,6 @@ public class AttachmentService {
         try {
             file.transferTo(target);
 
-            long sizeLong = file.getSize();
-            int sizeInt = (sizeLong > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) sizeLong;
-
             AttachmentDto dto = AttachmentDto.builder()
                     .attachmentNo(attachmentNo)
                     .mediaType(file.getContentType())
@@ -87,7 +84,7 @@ public class AttachmentService {
                     .parentPkNo(parentPkNo)
                     .originalName(originalName)
                     .storedName(storedName)
-                    .fileSize(sizeInt)
+                    .fileSize(file.getSize())
                     .build();
 
             attachmentDao.insert(dto);
