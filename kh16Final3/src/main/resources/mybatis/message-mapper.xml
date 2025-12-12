@@ -3,211 +3,190 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="message"> 
+<mapper namespace="message">
 
 	<select id="sequence" resultType="int">
-		select messages_seq.nextval from dual
+		select messages_seq.nextval
+		from dual
 	</select>
 
 	<insert id="insert" parameterType="MessageDto">
 		insert into message (
-			message_no, sender_no, receiver_no, content, type, url, product_no
+		message_no, sender_no, receiver_no, content, type, url, product_no
 		)
 		values (
-			#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type}, #{url}, #{productNo}
+		#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type}, #{url}, #{productNo}
 		)
 	</insert>
-	
-    <select id="selectSentList" parameterType="long" resultType="MessageDto">
-		select 
-			message_no, 
-			sender_no, 
-			receiver_no, 
-			content,
-			type,
-			sent_time as sentTime,           
-			read_time as readTime,           
-			is_read as isRead,               
-			sender_deleted as senderDeleted, 
-			receiver_deleted as receiverDeleted,
-            url as url, 
-            product_no as productNo
-        from message 
-		where sender_no = #{memberNo} 
-		and sender_deleted = 'N'
-		order by message_no desc
-	</select>
-	
-	<select id="selectReceivedList" parameterType="long" resultType="MessageDto">
-		select 
-			message_no, 
-			sender_no, 
-			receiver_no, 
-			content,
-			type,
-			sent_time as sentTime, 
-			read_time as readTime, 
-			is_read as isRead,
-			sender_deleted as senderDeleted, 
-			receiver_deleted as receiverDeleted,
-            url as url, 
-            product_no as productNo
-        from message
-		where receiver_no = #{memberNo} 
-		and receiver_deleted = 'N'
-		order by message_no desc
-	</select>
-	
+
 	<select id="selectOne" parameterType="int" resultType="MessageDto">
-		select 
-			message_no, 
-			sender_no, 
-			receiver_no, 
-			content,
-			type,
-			sent_time as sentTime, 
-			read_time as readTime, 
-			is_read as isRead,
-			sender_deleted as senderDeleted, 
-			receiver_deleted as receiverDeleted,
-            url as url, 
-            product_no as productNo
-        from message
+		select
+		message_no,
+		sender_no,
+		receiver_no,
+		content,
+		type,
+		sent_time as sentTime,
+		read_time as readTime,
+		is_read as isRead,
+		sender_deleted as senderDeleted,
+		receiver_deleted as receiverDeleted,
+		url as url,
+		product_no as productNo
+		from message
 		where message_no = #{messageNo}
 	</select>
-	
+
 	<update id="updateReadTime" parameterType="int">
 		update message set
-			is_read = 'Y',
-			read_time = systimestamp
+		is_read = 'Y',
+		read_time = systimestamp
 		where message_no = #{messageNo}
 	</update>
-	
+
 	<update id="updateSenderDelete" parameterType="int">
 		update message set
-			sender_deleted = 'Y'
+		sender_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
-	
+
 	<update id="updateReceiverDelete" parameterType="int">
-		update message set
-			receiver_deleted = 'Y'
+		update message
+		set
+		receiver_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
-	
+
 	<select id="countUnreadAlerts" parameterType="long" resultType="int">
-		select count(*) 
+		select count(*)
 		from message
 		where receiver_no = #{memberNo}
 		and is_read = 'N'
-		and type = 'ALERT' 
+		and type =
+		'ALERT'
 		and receiver_deleted = 'N'
 	</select>
-	
-	<select id="countUnreadAll" parameterType="long" resultType="int">
-    SELECT COUNT(*) 
-    FROM message
-    WHERE receiver_no = #{memberNo}
-      AND is_read = 'N'
-      AND receiver_deleted = 'N'
-</select>
-	
-	<select id="selectReceivedListByTypes" parameterType="map" resultType="MessageDto">
-		select 
-			message_no, 
-			sender_no, 
-			receiver_no, 
-			content,
-			type,
-			sent_time as sentTime, 
-			read_time as readTime, 
-			is_read as isRead,
-			sender_deleted as senderDeleted, 
-			receiver_deleted as receiverDeleted,
-            url as url, 
-            product_no as productNo
-        from message
-		where receiver_no = #{memberNo}
-		and receiver_deleted = 'N'
-		and type in 
-		<foreach collection="typeList" item="type" open="(" close=")" separator=",">
-			#{type}
-		</foreach>
-		order by message_no desc
-	</select>
-	
-	<select id="countSent" parameterType="long" resultType="long">
-		select count(*) from message 
+
+	<select id="countSent" parameterType="map" resultType="long"> select
+		count(*) from message
 		where sender_no = #{memberNo}
 		and sender_deleted = 'N'
+		<if test="types != null and !types.isEmpty()">
+            AND type IN
+            <foreach collection="types" item="type" open="(" close=")" separator=",">
+                #{type}
+            </foreach>
+        </if>
 	</select>
-	
+
 	<select id="selectSentListByPaging" parameterType="map" resultType="MessageDto">
-		select * from (
-            select rownum rn, tmp.* from (
-                select 
-                    message_no, 
-                    sender_no, 
-                    receiver_no, 
-                    content,
-                    type,
-                    sent_time as sentTime,           
-                    read_time as readTime,           
-                    is_read as isRead,               
-                    sender_deleted as senderDeleted, 
-                    receiver_deleted as receiverDeleted,
-                    url as url, 
-                    product_no as productNo
-                from message 
-                where sender_no = #{memberNo} 
-                and sender_deleted = 'N'
-                order by message_no desc
-            ) tmp
-        )
-        where rn between #{begin} and #{end}
+		SELECT * FROM (
+		SELECT ROWNUM AS rn, tmp.* FROM (
+		SELECT
+			M.message_no,
+			M.sender_no,
+			M.receiver_no,
+			M.content,
+			M.type,
+			M.sent_time AS sentTime,
+			M.read_time AS readTime,
+			M.is_read AS isRead,
+			M.sender_deleted AS senderDeleted,
+			M.receiver_deleted AS receiverDeleted,
+			M.url AS url,
+			M.product_no AS productNo,
+			(SELECT nickname FROM member WHERE member_no = M.receiver_no) AS receiverId 
+		FROM message M
+		WHERE M.sender_no = #{memberNo}
+		AND M.sender_deleted = 'N'
+        <if test="types != null and !types.isEmpty()">
+            AND M.type IN
+            <foreach collection="types" item="type" open="(" close=")" separator=",">
+                #{type}
+            </foreach>
+        </if>
+		ORDER BY M.message_no DESC
+		) tmp
+		)
+		WHERE rn BETWEEN #{begin} AND #{end}
 	</select>
-	
-	<select id="countReceived" parameterType="long" resultType="int">
-		select count(*) 
+
+	<select id="countReceived" parameterType="map" resultType="long"> select count(*)
 		from message
-		where receiver_no = #{memberNo} 
+		where receiver_no = #{memberNo}
 		and receiver_deleted = 'N'
+		<if test="types != null and !types.isEmpty()">
+            AND type IN
+            <foreach collection="types" item="type" open="(" close=")" separator=",">
+                #{type}
+            </foreach>
+        </if>
 	</select>
-    
-    <select id="selectReceivedListByPaging" parameterType="map" resultType="MessageDto">
-        select * from (
-            select rownum rn, tmp.* from (
-                select 
-                    message_no, 
-                    sender_no, 
-                    receiver_no, 
-                    content,
-                    type,
-                    sent_time as sentTime,           
-                    read_time as readTime,           
-                    is_read as isRead,               
-                    sender_deleted as senderDeleted, 
-                    receiver_deleted as receiverDeleted,
-                    url as url, 
-                    product_no as productNo
-                from message 
-                where receiver_no = #{memberNo} 
-                and receiver_deleted = 'N'
-                order by message_no desc
-            ) tmp
-        )
-        where rn between #{begin} and #{end}
+
+	<select id="selectReceivedListByPaging" parameterType="map" resultType="MessageDto">
+		SELECT * FROM (
+		SELECT ROWNUM AS rn, tmp.* FROM (
+		SELECT
+			M.message_no,
+			M.sender_no,
+			M.receiver_no,
+			M.content,
+			M.type,
+			M.sent_time AS sentTime,
+			M.read_time AS readTime,
+			M.is_read AS isRead,
+			M.sender_deleted AS senderDeleted,
+			M.receiver_deleted AS receiverDeleted,
+			M.url AS url,
+			M.product_no AS productNo,
+			(SELECT nickname FROM member WHERE member_no = M.sender_no) AS senderId
+		FROM message M
+		WHERE M.receiver_no = #{memberNo}
+		AND M.receiver_deleted = 'N'
+        <if test="types != null and !types.isEmpty()">
+            AND M.type IN
+            <foreach collection="types" item="type" open="(" close=")" separator=",">
+                #{type}
+            </foreach>
+        </if>
+		ORDER BY M.message_no DESC
+		) tmp
+		)
+		WHERE rn BETWEEN #{begin} AND #{end}
 	</select>
-	
-    <select id="selectConversationByProduct" parameterType="map" resultType="MessageDto">
-        select 
-            message_no, sender_no, receiver_no, content, type, sent_time as sentTime, 
-            is_read as isRead, product_no as productNo,
-            (select nickname from member where member_no = sender_no) as sender_nickname
-        from message
-        where product_no = #{productNo}
-          and (sender_no = #{memberNo} or receiver_no = #{memberNo}) 
-          and type = 'INQUIRY' 
-        order by sent_time asc
-    </select>
+
+	<select id="selectConversationByProduct" parameterType="map"
+		resultType="MessageDto">
+		select
+		message_no, sender_no, receiver_no, content, type, sent_time as sentTime,
+		is_read as isRead, product_no as productNo,
+		(select nickname from member where member_no = sender_no) as sender_nickname
+		from message
+		where product_no = #{productNo}
+		and (sender_no = #{memberNo} or receiver_no = #{memberNo})
+		and type = 'INQUIRY'
+		order by sent_time asc
+	</select>
+
+	<select id="selectUnreadList" resultType="MessageDto"
+		parameterType="long">
+		SELECT *
+		FROM (
+		SELECT
+		MESSAGE_NO AS messageNo,
+		SENDER_NO AS senderNo,
+		RECEIVER_NO AS receiverNo,
+		CONTENT,
+		SENT_TIME AS sentTime,
+		IS_READ AS isRead,
+		URL
+		FROM MESSAGE
+		WHERE
+		RECEIVER_NO = #{receiverNo}
+		AND IS_READ = 'N'
+		AND RECEIVER_DELETED = 'N'
+		ORDER BY SENT_TIME DESC
+		)
+		WHERE ROWNUM &lt; 6
+	</select>
 </mapper>

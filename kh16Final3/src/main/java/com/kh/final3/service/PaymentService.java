@@ -24,10 +24,10 @@ public class PaymentService {
     public void insert(KakaoPayApproveResponseVO responseVO, KakaoPayFlashVO flashVO) {
 
         // partnerUserId 에 memberNo 를 문자열로 넣어두었다고 가정
-        Integer memberNo = Integer.valueOf(flashVO.getPartnerUserId());
+        Long memberNo = Long.valueOf(flashVO.getPartnerUserId());
 
-        int paymentNo = paymentDao.sequence();
-        int amount    = responseVO.getAmount().getTotal();
+        long paymentNo = paymentDao.sequence();
+        long amount    = responseVO.getAmount().getTotal();
 
         // payment 저장
         PaymentDto paymentDto = PaymentDto.builder()
@@ -45,14 +45,13 @@ public class PaymentService {
         paymentDao.insert(paymentDto);
 
         // point_history 저장
-        int pointHistoryNo = pointHistoryDao.sequence();
+        long pointHistoryNo = pointHistoryDao.sequence();
 
         PointHistoryDto pointHistoryDto = PointHistoryDto.builder()
-                .pointHistoryNo((long) pointHistoryNo)
+                .pointHistoryNo(pointHistoryNo)
                 .memberNo(memberNo.longValue())
-                .amount((long) amount)
+                .amount(amount)
                 .reason("CHARGE")
-                .relatedNo((long) paymentNo)
                 .build();
 
         pointHistoryDao.insert(pointHistoryDto);

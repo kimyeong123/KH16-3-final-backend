@@ -19,7 +19,7 @@ import com.kh.final3.vo.PageVO;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/rest/sanction")
+@RequestMapping("/sanction")
 public class SanctionRestController {
 
     @Autowired

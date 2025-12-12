@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class MessageDto {
-	private Integer messageNo; // 쪽지 번호 (PK)
+	private Long messageNo; // 쪽지 번호 (PK)
 	private Long senderNo; // 발신자 회원 번호 (FK)  <-- messageSender -> senderNo로 변경
 	private Long receiverNo; // 수신자 회원 번호 (FK) <-- messageReceiver -> receiverNo로 변경
 	private String content; // 쪽지 내용           <-- messageContent -> content로 변경
@@ -28,7 +28,7 @@ public class MessageDto {
 
 	
 	// 1. 판매자 문의 시 사용할 상품 번호 (DB 컬럼 아님, 로직 처리용)
-	private Integer productNo;
+	private Long productNo;
 	
 	// 2. 목록/상세 조회 시 필요한 발신자/수신자 닉네임
 	// DTO 필드명을 변경해도 이 필드들은 그대로 유지합니다.

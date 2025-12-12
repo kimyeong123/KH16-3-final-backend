@@ -15,7 +15,7 @@ public class AttachmentDto {
     private String mediaType;
     private String path;
     private String category;
-    private Integer parentPkNo;
+    private Long parentPkNo;
     private String originalName;
     private String storedName;
     private Integer fileSize;      

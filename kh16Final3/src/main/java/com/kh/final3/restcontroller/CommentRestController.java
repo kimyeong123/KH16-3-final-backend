@@ -22,7 +22,7 @@ import com.kh.final3.vo.TokenVO;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/rest/comment") 
+@RequestMapping("/comment") 
 public class CommentRestController {
     
 	@Autowired
@@ -31,17 +31,24 @@ public class CommentRestController {
 	/**
 	 * 1. 댓글 등록 (POST)
 	 */
-	@PostMapping("/")
+	@PostMapping("/write")
 	public CommentDto insert(@RequestBody CommentDto commentDto,
-			@RequestAttribute TokenVO tokenVO
+			@RequestAttribute(required = false) TokenVO tokenVO
 			) {
         
+		if (tokenVO == null) {
+	        // 토큰이 없으므로 인증이 필요한 요청임을 가정하고 예외 처리
+	        throw new UnauthorizationException("유효한 인증 정보가 없습니다. 로그인 후 댓글 작성이 가능합니다.");
+	        // 또는 디버깅을 위해 임시 memberNo를 넣을 수도 있습니다.
+	    }
+		
 		long memberNo = tokenVO.getMemberNo();
 		String loginLevel = tokenVO.getLoginLevel();
         
 		if (memberNo == 0) { 
 	        throw new UnauthorizationException("로그인 후 댓글 작성이 가능합니다.");
 		}
+		
 		return commentService.insert(commentDto, memberNo, loginLevel);
 	}	
 	
@@ -49,7 +56,7 @@ public class CommentRestController {
 	 * 2. 댓글 목록 조회 (GET)
 	 * - 특정 게시글의 모든 댓글 조회
 	 */
-	@GetMapping("/{boardNo}")
+	@GetMapping("/list/{boardNo}")
 	public List<CommentDto> list(@PathVariable long boardNo) {
 		return commentService.selectList(boardNo); 
 	}
@@ -57,7 +64,7 @@ public class CommentRestController {
 	/**
 	 * 3. 댓글 수정 (PATCH)
 	 */
-	@PatchMapping("/{commentNo}")
+	@PatchMapping("/edit/{commentNo}")
 	public ResponseEntity<?> edit(
 				@PathVariable long commentNo,
 				@RequestBody CommentDto commentDto,
@@ -77,7 +84,7 @@ public class CommentRestController {
 	 * 4. 댓글 삭제 (DELETE)
 	 * - softDelete 처리 (실제 DB에서 삭제하는 대신 상태만 변경)
 	 */
-	@DeleteMapping("/{commentNo}")
+	@DeleteMapping("/delete/{commentNo}")
 	public ResponseEntity<?> delete(
 				@PathVariable long commentNo,
 				@RequestAttribute TokenVO tokenVO

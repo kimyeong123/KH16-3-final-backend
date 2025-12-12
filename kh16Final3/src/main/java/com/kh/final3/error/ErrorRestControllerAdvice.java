@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class ErrorRestControllerAdvice {
+	
 	@ExceptionHandler(value = {TargetNotfoundException.class, NoResourceFoundException.class})
 	public ResponseEntity<String> notFound(Exception e) {
 		return ResponseEntity.notFound().build();//404
@@ -25,12 +26,11 @@ public class ErrorRestControllerAdvice {
 	public ResponseEntity<String> needPermission(NeedPermissionException e, Model model) {
 		return ResponseEntity.status(403).build();
 	}
-	
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> all(Exception e) {
 		log.error("예외발생", e);
 		return ResponseEntity.internalServerError().build();
 	}
-
+	
 }

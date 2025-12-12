@@ -58,9 +58,9 @@ public class TokenRenewalInterceptor implements HandlerInterceptor{
 			TokenVO tokenVO = tokenService.parse(bearerToken);
 			String newAccessToken = tokenService.generateAccessToken(
 				MemberDto.builder()
-				  .memberNo(tokenVO.getMemberNo()) 
-					.memberId(tokenVO.getLoginId())
-					.memberRole(tokenVO.getLoginLevel())
+          .memberNo(tokenVO.getMemberNo()) 
+					.id(tokenVO.getLoginId())
+					.role(tokenVO.getLoginLevel())
 				.build()
 			);
 			

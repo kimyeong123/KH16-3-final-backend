@@ -22,6 +22,6 @@ public class MemberLoginResponseVO {
 	private String accessToken;//나중에 사용자가 들고올 토큰
 	private String refreshToken;//accessToken에 문제가 있을 때 갱신할 토큰
 	private LocalDateTime createdTime;
-	private Integer point;//보유 머니
+	private Long point;//보유 머니
 	private String contact;
 }

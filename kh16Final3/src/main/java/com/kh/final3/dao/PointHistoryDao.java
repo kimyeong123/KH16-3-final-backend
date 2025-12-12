@@ -13,19 +13,25 @@ public class PointHistoryDao {
     @Autowired
     private SqlSession sqlSession;
 
-    public int sequence() {
-        return sqlSession.selectOne("pointHistory.sequence");
+    private static final String NAMESPACE = "pointHistory."; 
+    
+    public long sequence() {
+        return sqlSession.selectOne(NAMESPACE + "sequence");
     }
 
-    public void insert(PointHistoryDto pointHistoryDto) {
-        sqlSession.insert("pointHistory.insert", pointHistoryDto);
+    public int insert(PointHistoryDto pointHistoryDto) {
+        return sqlSession.insert(NAMESPACE + "insert", pointHistoryDto);
     }
 
     public PointHistoryDto selectOne(int pointHistoryNo) {
-        return sqlSession.selectOne("pointHistory.detail", pointHistoryNo);
+        return sqlSession.selectOne(NAMESPACE + "detail", pointHistoryNo);
     }
 
     public List<PointHistoryDto> selectListByMember(int memberNo) {
-        return sqlSession.selectList("pointHistory.listByMember", memberNo);
+        return sqlSession.selectList(NAMESPACE + "listByMember", memberNo);
+    }
+    
+    public long calculateMemberBalance(int memberNo) {
+    	return sqlSession.selectOne(NAMESPACE + "calculateMemberBalance", memberNo);
     }
 }

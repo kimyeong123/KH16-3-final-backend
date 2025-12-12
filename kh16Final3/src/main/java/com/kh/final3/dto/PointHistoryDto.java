@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class PointHistoryDto {
     private Long pointHistoryNo;
     private Long memberNo;
-    private Long amount;
-    private String type;     
+    private String type;
+    private Long amount; 
     private String reason;
-    private Long relatedNo;
+    private Long productNo;
     private Timestamp createdTime;
 }
