@@ -64,7 +64,7 @@
             role != 'ADMIN'
         order by ${column} asc , id asc
     </select>
-    
+    <!--복합 검색-->
     <select id="complexSearch" resultType="MemberDto">
         select *
         from member
@@ -77,8 +77,6 @@
         set role = #{status}
         where member_no = #{memberNo}
     </update>
-
-
    <!-- 회원 삭제 -->
 <delete id="deleteMember" parameterType="long">
     delete from member
@@ -102,13 +100,27 @@
         contact = #{contact}
     where member_no = #{memberNo}
 </update>
-
 <!-- 회원번호로 회원 조회-->
 <select id="selectOneByMemberNo" parameterType="long" resultType="MemberDto">
     select *
     from member
     where member_no = #{memberNo}
 </select>
+<!--비밀번호 변경-->
+<update id="updatePassword" parameterType="map">
+    update member
+    set pw = #{memberPw}
+    where member_no = #{memberNo}
+</update>
+<!--이메일로 아이디 찾기-->
+<select id="selectOneByEmail" parameterType="string" resultMap="memberResultMap">
+select * from member where email = #{email}
+</select>
+<!--이메일과 아이디로 비밀번호 찾기-->
+<select id="selectOneByIdAndEmail" parameterType="map" resultMap="memberResultMap">
+select * from member where id = #{memberId} and email = #{email}
+</select>
+
 
 	<!-- 잔액이 음수가 되는 경우를 방지 및 실행 0건으로 확인 가능 -->
 	<update id="deductMemberPoint"> 

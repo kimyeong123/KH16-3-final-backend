@@ -68,7 +68,8 @@ public class TokenService {
 		Date now = c.getTime();//현재 시각
 		//c.add(Calendar.MINUTE, 4 * 7 * 24 * 60);//4주
 		//c.add(Calendar.DATE, 28);//4주
-		c.add(Calendar.DATE, jwtProperties.getRefreshExpiration());
+//		c.add(Calendar.DATE, jwtProperties.getRefreshExpiration());
+		c.add(Calendar.MINUTE, 120);  // 액세스 토큰 만료 시간을 2시간(120분)으로 설정
 		Date expire = c.getTime();//만료 시각
 		
 		//JWT 토큰 생성

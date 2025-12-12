@@ -18,10 +18,13 @@ import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.vo.TokenVO;
+import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
+import com.kh.final3.vo.member.MemberFindIdVO;
 import com.kh.final3.vo.member.MemberLoginResponseVO;
 import com.kh.final3.vo.member.MemberRefreshVO;
 import com.kh.final3.vo.member.MemberRequestVO;
+import com.kh.final3.vo.member.MemberResetPwVO;
 import com.kh.final3.vo.member.MemberUpdateVO;
 
 import jakarta.validation.Valid;
@@ -93,7 +96,30 @@ public class MemberRestController {
 				.refreshToken(tokenService.generateRefreshToken(findDto))// 갱신토큰
 				.build();
 	}
-
+	//아이디 찾기 
+	@PostMapping("/find-id")
+	public ResponseEntity<String> findId(@RequestBody MemberFindIdVO vo) {
+	    try {
+	        memberService.sendMemberIdByEmail(vo.getEmail());
+	        return ResponseEntity.ok("입력하신 이메일로 아이디를 전송했습니다.");
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("아이디 찾기 처리 중 오류가 발생했습니다.");
+	    }
+	}
+	// 비밀번호 재설정 (아이디 + 이메일 확인 후 임시 비밀번호 발급/메일 발송)
+	@PostMapping("/reset-password")
+	public ResponseEntity<String> resetPassword(@RequestBody MemberResetPwVO vo) {
+	    try {
+	        memberService.resetPasswordByIdAndEmail(vo.getMemberId(), vo.getEmail());
+	        return ResponseEntity.ok("임시 비밀번호를 이메일로 발송했습니다.");
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 재설정 처리 중 오류가 발생했습니다.");
+	    }
+	}
 	// 토큰 갱신
 	@PostMapping("/refresh")
 	public MemberLoginResponseVO refresh(@RequestBody MemberRefreshVO memberRefreshVO) {
@@ -130,6 +156,9 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
+	 
+	
+	
 	// 회원탈퇴
 	@DeleteMapping("/{memberNo}")
 	public ResponseEntity<String> deleteMember(@PathVariable Long memberNo,
@@ -148,7 +177,6 @@ public class MemberRestController {
 	    if (!passwordOk) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 올바르지 않습니다.");
 	    }
-
 		// 3. 회원 삭제 수행
 		boolean result = memberService.deleteMember(memberNo);
 		if (result) {
@@ -160,6 +188,7 @@ public class MemberRestController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 삭제 실패");
 		}
 	}
+	//회원 수정
 	@PutMapping("/{memberNo}")
 	public ResponseEntity<String> updateMember(
 	        @PathVariable Long memberNo,
@@ -184,7 +213,6 @@ public class MemberRestController {
 	    }
 	}
 
-
 	// 토큰 유효성 검사 및 사용자 정보 반환 (새로고침 시 상태 복구용)
 	@PostMapping("/check-token") 
 	public ResponseEntity<TokenVO> checkToken(@RequestHeader(value = "Authorization", required = false) String bearerToken) {
@@ -208,5 +236,48 @@ public class MemberRestController {
 	        throw new UnauthorizationException("유효하지 않거나 만료된 토큰입니다."); 
 	    }
 	}
+	// 비밀번호 변경
+	@PutMapping("/changePassword/{memberNo}")
+	public ResponseEntity<String> changePassword(
+	        @PathVariable Long memberNo,
+	        @RequestHeader("Authorization") String bearerToken,
+	        @RequestBody MemberChangePwVO changePwVO) {
+	    // 1. 토큰에서 로그인된 사용자 정보 추출
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    // 2. 본인 계정인지 확인
+	    if (!tokenVO.getMemberNo().equals(memberNo)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                .body("본인 계정만 비밀번호를 변경할 수 있습니다.");
+	    }
+	    // 3. 기존 비밀번호 확인 (현재 비번으로 체크)
+	    MemberRequestVO checkVO = MemberRequestVO.builder()
+	            .memberNo(memberNo)
+	            .memberPw(changePwVO.getCurrentPw()) //
+	            .build();
+	    boolean passwordOk = memberService.checkPassword(checkVO);
+	    if (!passwordOk) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body("현재 비밀번호가 올바르지 않습니다.");
+	    }
+	    // 4. 새 비밀번호가 현재 비밀번호와 같은지 검사
+	    if (changePwVO.getCurrentPw().equals(changePwVO.getNewPw())) {
+	        return ResponseEntity
+	                .status(HttpStatus.BAD_REQUEST)
+	                .body("새 비밀번호는 현재 비밀번호와 다르게 설정해야 합니다.");
+	    }
+	    // 5. 새 비밀번호 암호화
+	    String encryptedPassword = passwordEncoder.encode(changePwVO.getNewPw());
+	    // 6. 비밀번호 업데이트
+	    boolean result = memberService.updatePassword(memberNo, encryptedPassword);
+	    if (result) {
+	        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("비밀번호 변경 실패");
+	    }
+	}
+
+
+
 
 }

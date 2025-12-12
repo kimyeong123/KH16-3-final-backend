@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -48,7 +49,18 @@ public class MemberDao {
 	public String findNicknameByMemberNo(long memberNo) {
 	    return sqlSession.selectOne(NAMESPACE + "findNicknameByMemberNo", memberNo);
 	}
-	
+	//아이디
+	public MemberDto selectOneByEmail(String email) {
+	    return sqlSession.selectOne("member.selectOneByEmail", email);
+	}
+	//비밀번호 찾기
+	public MemberDto selectOneByIdAndEmail(String memberId, String email) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("memberId", memberId);
+	    param.put("email", email);
+	    return sqlSession.selectOne("member.selectOneByIdAndEmail", param);
+	}
+
 	//중복 가입 제거
 	public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
 	    Map<String, Object> param = new HashMap<>();
@@ -108,6 +120,12 @@ public class MemberDao {
     // 회원정보 수정
     public int updateMember(MemberDto memberDto) {
         return sqlSession.update(NAMESPACE + "updateMember", memberDto);
+    }
+    public int updatePassword(@Param("memberNo") Long memberNo, @Param("memberPw") String memberPw) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberNo", memberNo);
+        params.put("memberPw", memberPw);
+        return sqlSession.update("member.updatePassword", params);
     }
 
 }
