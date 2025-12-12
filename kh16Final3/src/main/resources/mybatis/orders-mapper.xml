@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="orders">
+
+	<select id="">
+		select order_seq.nextval
+        from dual
+	</select>
+
+    <!-- 주문 생성 -->
+    <insert id="insert">
+        insert into orders(
+            order_no, product_no, buyer_no, seller_no, final_price,
+            receiver_name, receiver_phone, post, address1, address2,
+            courier, tracking_number, status
+        ) values (
+            #{orderNo}, #{productNo}, #{buyerNo}, #{sellerNo}, #{finalPrice},
+            #{receiverName}, #{receiverPhone}, #{post}, #{address1}, #{address2},
+            #{courier}, #{trackingNumber}, #{status}
+        )
+    </insert>
+
+    <!-- 주문 단건 조회 -->
+    <select id="selectOne" resultType="ordersDto">
+        select *
+        from orders
+        where order_no = #{orderNo}
+    </select>
+
+    <!-- 구매자가 주문한 내역 -->
+    <select id="selectByBuyer"  resultType="ordersDto">
+        select *
+        from orders
+        where buyer_no = #{buyerNo}
+        order by created_time desc
+    </select>
+
+    <!-- 판매자가 판매한 내역 -->
+    <select id="selectBySeller" resultType="ordersDto">
+        select *
+        from orders
+        where seller_no = #{sellerNo}
+        order by created_time desc
+    </select>
+
+    <!-- 송장 번호 업데이트 -->
+    <update id="updateTrackingNumber" >
+        update orders
+        set tracking_number = #{trackingNumber},
+            status = 'SHIPPING',
+            updated_time = systimestamp
+        where order_no = #{orderNo}
+    </update>
+
+    <!-- 주문 상태 업데이트 -->
+    <update id="updateStatus">
+        update orders
+        set status = #{changeStatus},
+            updated_time = systimestamp
+        where order_no = #{orderNo}
+    </update>
+
+    <!-- 주문 완료 처리 -->
+    <update id="completeOrder">
+        update orders
+        set status = 'COMPLETED',
+            completed_time = systimestamp,
+            updated_time = systimestamp
+        where order_no = #{orderNo}
+    </update>
+    
+    <update id="updateShippingInfo" parameterType="orderShippingRequestVO">
+	    update orders
+	    set
+	        receiver_name = #{receiverName},
+	        receiver_phone = #{receiverPhone},
+	        post = #{post},
+	        address1 = #{address1},
+	        address2 = #{address2},
+	        updated_time = systimestamp
+	    where order_no = #{orderNo}
+	</update>
+
+</mapper>

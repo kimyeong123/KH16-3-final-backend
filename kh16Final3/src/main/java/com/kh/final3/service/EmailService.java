@@ -78,7 +78,7 @@ public class EmailService {
 		MimeMessage message = sender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 		
-		helper.setTo(memberDto.getMemberEmail());
+		helper.setTo(memberDto.getEmail());
 		helper.setSubject("[비드하우스] 가입을 진심으로 환영합니다!");
 
 		//이메일 본문 생성
@@ -102,7 +102,7 @@ public class EmailService {
 		Document document = Jsoup.parse(buffer.toString());//String을 HTML로 해석
 		Element targetId = document.selectFirst("#target");//id=target인 대상을 탐색
 		Element targetLink = document.selectFirst("#link");//id=link인 대상을 탐색
-		targetId.text(memberDto.getMemberNickname());//textContent변경
+		targetId.text(memberDto.getNickname());//textContent변경
 		
 		//targetLink.attr("href", "http://localhost:8080");//attribute 변경
 		//(+추가) 현재 접속중인 홈페이지의 주소에 기반해서 링크의 이동 경로를 설정

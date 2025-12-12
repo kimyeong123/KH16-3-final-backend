@@ -32,8 +32,8 @@ public class MessageService {
 	public boolean sendMessage(MessageDto messageDto) {
 
 		// 1. 시퀀스 번호 발급
-		int messageNo = messageDao.sequence();
-		messageDto.setMessageNo(messageNo);
+        long messageNo = messageDao.sequence();
+        messageDto.setMessageNo(messageNo);
 
 		// 2. 쪽지 등록 (DAO의 insert 호출)
 		boolean insertResult = messageDao.insert(messageDto);
@@ -53,11 +53,11 @@ public class MessageService {
 	        .receiverNo(receiverNo)
 	        .content(content)
 	        .type("INQUIRY")         
-	        .productNo((int)productNo)
+	        .productNo(productNo)
 	        .build();
 
 	    // 2. 시퀀스 번호 발급
-	    int messageNo = messageDao.sequence();
+	    long messageNo = messageDao.sequence();
 	    messageDto.setMessageNo(messageNo);
 
 	    // 3. 쪽지(문의) 등록
@@ -87,7 +87,7 @@ public class MessageService {
 				.build();
 
 		// 2. 시퀀스 번호 발급
-		int messageNo = messageDao.sequence();
+		long messageNo = messageDao.sequence();
 		messageDto.setMessageNo(messageNo);
 
 		// 3. 쪽지(알림) 등록
@@ -149,7 +149,7 @@ public class MessageService {
 	public List<MessageDto> getReceivedListByTypes(Map<String, Object> paramMap) {
 		return messageDao.selectReceivedListByTypes(paramMap);
 	}
-	
+
 	/**
 	 * 2-6. 전체 미확인 쪽지 개수 조회
 	 * (FaBell 아이콘에 표시될, 모든 타입의 미확인 메시지 개수를 계산)

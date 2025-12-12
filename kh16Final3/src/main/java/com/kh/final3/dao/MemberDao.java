@@ -1,7 +1,6 @@
 package com.kh.final3.dao;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,28 +20,33 @@ public class MemberDao {
 	@Autowired
     private SqlSession sqlSession;
 	
+	private static final String NAMESPACE = "member."; 
+	
 	public void insert(MemberDto memberDto) {
-		sqlSession.insert("member.insert", memberDto);
+		sqlSession.insert(NAMESPACE + "insert", memberDto);
 	}
-	public MemberDto selectOneByMemberId(String memberId) {
-		return sqlSession.selectOne("member.detailByMemberId", memberId);			
+	
+	public MemberDto selectOne(String memberNo) {
+		return sqlSession.selectOne(NAMESPACE + "detail", memberNo);
 	}
-	public MemberDto selectOneByMemberNickname(String memberNickname)
-	{
-		return sqlSession.selectOne("member.detailByMemberNickname", memberNickname);	
+	
+	public MemberDto selectOneByMemberId(String id) {
+		return sqlSession.selectOne(NAMESPACE + "detailById", id);			
 	}
-	public MemberDto selectOne(String memberId) {
-		return sqlSession.selectOne("member.detail", memberId);
+	
+	public MemberDto selectOneByNickname(String nickname){
+		return sqlSession.selectOne(NAMESPACE + "detailByNickname", nickname);	
 	}
+	
 	public List<MemberDto> selectList(String column, String keyword) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("column", column);
 		params.put("keyword", keyword);
-		return sqlSession.selectList("member.search", params);
+		return sqlSession.selectList(NAMESPACE + "search", params);
 	}
-	//
+	
 	public String findNicknameByMemberNo(long memberNo) {
-	    return sqlSession.selectOne("member.findNicknameByMemberNo", memberNo);
+	    return sqlSession.selectOne(NAMESPACE + "findNicknameByMemberNo", memberNo);
 	}
 	
 	//중복 가입 제거
@@ -51,16 +55,36 @@ public class MemberDao {
 	    param.put("name", name);
 	    param.put("birth", birth);
 	    param.put("contact", contact);
-	    return sqlSession.selectOne("member.selectOneByNameBirthContact", param);
+	    return sqlSession.selectOne(NAMESPACE + "selectOneByNameBirthContact", param);
+	}
+	
+	// 회원 포인트 차감
+	public int deductMemberPoint(long memberNo, long amount) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("memberNo", memberNo);
+	    params.put("amount", amount);
+		return sqlSession.update(NAMESPACE + "deductMemberPoint", params);
+	}
+
+	// 회원 포인트 증가
+	public int addMemberPoint(long memberNo, long amount) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("memberNo", memberNo);
+	    params.put("amount", amount);
+		return sqlSession.update(NAMESPACE + "addMemberPoint", params);
+	}
+	
+	// 회원 포인트 조회
+	public long findMemberPoint(long memberNo) {
+		return sqlSession.selectOne(NAMESPACE + "findMemberPoint", memberNo);
 	}
 
 	public List<MemberDto> selectList(MemberComplexSearchVO vo) {
-
-		return sqlSession.selectList("member.complexSearch", vo);
+		return sqlSession.selectList(NAMESPACE + "complexSearch", vo);
 	}
 
 	public int deleteMember(Long memberNo) {
-	    return sqlSession.delete("member.deleteMember", memberNo);
+	    return sqlSession.delete(NAMESPACE + "deleteMember", memberNo);
 	}
 	
 	public boolean updateMemberStatus(long memberNo, String status) {
@@ -68,21 +92,22 @@ public class MemberDao {
 	    params.put("memberNo", memberNo);
 	    params.put("status", status);
 	    
-	    return sqlSession.update("member.updateMemberStatus", params) > 0; 
+	    return sqlSession.update(NAMESPACE  + "updateMemberStatus", params) > 0; 
 	}
 	
     // 비밀번호 확인
     public String findPasswordByMemberNo(Long memberNo) {
-        return sqlSession.selectOne("member.findPasswordByMemberNo", memberNo);
+        return sqlSession.selectOne(NAMESPACE + "findPasswordByMemberNo", memberNo);
     }
+    
     // 회원번호로 회원 조회
     public MemberDto selectOneByMemberNo(Long memberNo) {
-        return sqlSession.selectOne("member.selectOneByMemberNo", memberNo);
+        return sqlSession.selectOne(NAMESPACE + "selectOneByMemberNo", memberNo);
     }
 
     // 회원정보 수정
-    public int updateMember(MemberDto member) {
-        return sqlSession.update("member.updateMember", member);
+    public int updateMember(MemberDto memberDto) {
+        return sqlSession.update(NAMESPACE + "updateMember", memberDto);
     }
 
 }

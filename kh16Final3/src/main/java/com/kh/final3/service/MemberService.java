@@ -23,21 +23,21 @@ public class MemberService {
     @Transactional
     public void add(MemberDto memberDto) {
         // 1. 중복 체크
-        if (memberDao.selectOneByMemberId(memberDto.getMemberId()) != null) {
+        if (memberDao.selectOneByMemberId(memberDto.getId()) != null) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
-        if (memberDao.selectOneByMemberNickname(memberDto.getMemberNickname()) != null) {
+        if (memberDao.selectOneByNickname(memberDto.getNickname()) != null) {
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
         // 2.이름 + 생일 + 연락처 중복 체크
        if (memberDao.selectOneByNameBirthContact(
-                memberDto.getMemberName(), memberDto.getMemberBirth(), memberDto.getMemberContact()) != null) {
+                memberDto.getName(), memberDto.getBirth(), memberDto.getContact()) != null) {
             throw new IllegalArgumentException("이미 사용된 인증 휴대폰 번호입니다. 로그인 또는 비밀번호 찾기를 이용해 주세요.");
         }
 
         // 3. 비밀번호 암호화
-        String encoded = passwordEncoder.encode(memberDto.getMemberPw());
-        memberDto.setMemberPw(encoded);
+        String encoded = passwordEncoder.encode(memberDto.getPw());
+        memberDto.setPw(encoded);
         memberDao.insert(memberDto);
     }
     // 아이디 사용 가능 여부
@@ -46,7 +46,7 @@ public class MemberService {
     }
     // 닉네임 사용 가능 여부
     public boolean checkNickname(String memberNickname) {
-        return memberDao.selectOneByMemberNickname(memberNickname) == null;
+        return memberDao.selectOneByNickname(memberNickname) == null;
     }
     // 이름 + 생일 + 연락처 중복 확인
     public MemberDto selectOneByNameBirthContact(String name, LocalDate birth, String contact) {
@@ -74,19 +74,19 @@ public class MemberService {
         
         // 2. 수정할 필드 세팅
         if (vo.getEmail() != null && !vo.getEmail().isEmpty()) {
-            member.setMemberEmail(vo.getEmail());
+            member.setEmail(vo.getEmail());
         }
         if (vo.getPost() != null && !vo.getPost().isEmpty()) {
-            member.setMemberPost(vo.getPost());
+            member.setPost(vo.getPost());
         }
         if (vo.getAddress1() != null && !vo.getAddress1().isEmpty()) {
-            member.setMemberAddress1(vo.getAddress1());
+            member.setAddress1(vo.getAddress1());
         }
         if (vo.getAddress2() != null && !vo.getAddress2().isEmpty()) {
-            member.setMemberAddress2(vo.getAddress2());
+            member.setAddress2(vo.getAddress2());
         }
         if (vo.getContact() != null && !vo.getContact().isEmpty()) {
-            member.setMemberContact(vo.getContact());
+            member.setContact(vo.getContact());
         }
 
         // 3. DB 업데이트

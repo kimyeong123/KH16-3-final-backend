@@ -46,15 +46,15 @@ public class TokenService {
 				.issuedAt(now)//발행 시각 설정
 				.issuer(jwtProperties.getIssuer())//발행자 (위변조 방지용)
 				.claim("memberNo", memberDto.getMemberNo()) // 추가
-				.claim("loginId", memberDto.getMemberId())//정보 추가(key,value)
-				.claim("loginLevel", memberDto.getMemberRole())//정보 추가(key,value)
+				.claim("loginId", memberDto.getId())//정보 추가(key,value)
+				.claim("loginLevel", memberDto.getRole())//정보 추가(key,value)
 			.compact();
 	}
 	public String generateAccessToken(TokenVO tokenVO) {
 		return generateAccessToken(MemberDto.builder()
 				    .memberNo(tokenVO.getMemberNo())
-					.memberId(tokenVO.getLoginId())
-					.memberRole(tokenVO.getLoginLevel())
+					.id(tokenVO.getLoginId())
+					.role(tokenVO.getLoginLevel())
 				.build());
 	}
 	
@@ -78,16 +78,16 @@ public class TokenService {
 				.issuedAt(now)//발행 시각 설정
 				.issuer(jwtProperties.getIssuer())//발행자 (위변조 방지용)
 				.claim("memberNo", memberDto.getMemberNo()) // 추가
-				.claim("loginId", memberDto.getMemberId())//정보 추가(key,value)
-				.claim("loginLevel", memberDto.getMemberRole())//정보 추가(key,value)
+				.claim("loginId", memberDto.getId())//정보 추가(key,value)
+				.claim("loginLevel", memberDto.getRole())//정보 추가(key,value)
 			.compact();
 		
 		//같은 아이디로 저장된 발행 내역을 모두 삭제
-		tokenDao.deleteByTarget(memberDto.getMemberId());
+		tokenDao.deleteByTarget(memberDto.getId());
 		
 		//DB 저장 (액세스 토큰과 달라지는 작업)
 		tokenDao.insert(TokenDto.builder()
-					.targetId(memberDto.getMemberId())//누구에게
+					.targetId(memberDto.getId())//누구에게
 					.value(token)//무슨토큰을 발행했는지
 				.build());
 		
@@ -96,8 +96,8 @@ public class TokenService {
 	}
 	public String generateRefreshToken(TokenVO tokenVO) {
 		return generateRefreshToken(MemberDto.builder()
-				.memberId(tokenVO.getLoginId())
-				.memberRole(tokenVO.getLoginLevel())
+				.id(tokenVO.getLoginId())
+				.role(tokenVO.getLoginLevel())
 				.memberNo(tokenVO.getMemberNo())
 			.build());
 	}

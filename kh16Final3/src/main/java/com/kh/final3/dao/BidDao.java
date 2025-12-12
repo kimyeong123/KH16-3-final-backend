@@ -15,18 +15,62 @@ public class BidDao {
     @Autowired
     private SqlSession sqlSession;
     
-    public int sequence() {
-        return sqlSession.selectOne("bid.sequence");
+    private static final String NAMESPACE = "bid."; 
+    
+    public long sequence() {
+        return sqlSession.selectOne(NAMESPACE + "sequence");
     }
     
-    public void insert(BidDto bidDto) {
-        sqlSession.insert("bid.add", bidDto);
+    public int insert(BidDto bidDto) {
+        return sqlSession.insert(NAMESPACE + "insert", bidDto);
     }
     
-    public List<BidDto> listByProduct(int productNo) {
-        Map<String, Object> param = new HashMap<>();
+    // 상품별 입찰 랭킹 목록 조회(금액 1순위, 입찰순서 2순위)
+    public List<BidDto> findBidRankingByProduct(long productNo) { 
+        return sqlSession.selectList(NAMESPACE + "selectListBidByProductNo", productNo);
+    }
+    
+    // 상품별 최고 입찰 단건 조회
+    public BidDto findHighestBid(long productNo) {
+        return sqlSession.selectOne(NAMESPACE + "findHighestBidByProductNo", productNo);
+    }
+    
+    // 상품별 총 입찰 횟수 조회
+    public int countByProduct(long productNo) {
+    	return sqlSession.selectOne(NAMESPACE + "countByProductNo", productNo);
+    }
+    
+    // 최고 입찰자 회원 번호 조회
+    public Long findHighestBidderNo(long productNo) { 
+    	return sqlSession.selectOne(NAMESPACE + "findHighestBidderNo", productNo);
+    }
+    
+    // 특정 상품의 입찰자 수 조회
+    public int countDistinctBidder(long productNo) {
+    	return sqlSession.selectOne(NAMESPACE + "countDistinctBidder", productNo);
+    }
+    
+    // 특정 유저의 전체 입찰 내역
+    public List<BidDto> findHistoryByBidder(long bidderNo) {
+    	return sqlSession.selectList(NAMESPACE + "selectListByBidder", bidderNo);
+    }
+    
+    // 특정 유저의 특정 상품에 대한 입찰 내역
+    public List<BidDto> findMyBidHistoryByProduct(long bidderNo, long productNo) {
+    	Map<String, Object> params = new HashMap<>();
+        params.put("bidderNo", bidderNo);
+        params.put("productNo", productNo);
         
-        param.put("productNo", productNo);
-        return sqlSession.selectList("bid.listByProduct", param);
+        return sqlSession.selectList(NAMESPACE + "selectListMyBidHistory", params);
+    }
+    
+    // 특정 상품의 입찰 내역 페이징
+    public List<BidDto> findProductBidPaging(long productNo, int begin, int end) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("productNo", productNo);
+        params.put("begin", begin);
+        params.put("end", end);
+        
+        return sqlSession.selectList(NAMESPACE + "selectListByProductNoPaging", params);
     }
 }

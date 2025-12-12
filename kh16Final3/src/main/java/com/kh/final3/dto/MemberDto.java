@@ -1,6 +1,5 @@
 package com.kh.final3.dto;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -14,10 +13,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -28,36 +27,36 @@ public class MemberDto {
     private Long memberNo;
     @NotBlank(message = "아이디는 필수 항목입니다.")
 	@Pattern(regexp = "^[a-z][a-z0-9]{4,19}$")
-    private String memberId;
+    private String id;
     @NotBlank
 	@Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\!\\@\\#\\$])[A-Za-z0-9\\!\\@\\#\\$]{8,16}$")
-    private String memberPw;
+    private String pw;
     @Pattern(regexp = "^[가-힣0-9]{2,10}$")
-    private String memberNickname; 
+    private String nickname; 
     @Pattern(regexp = "^[가-힣]{2,6}$")
-    private String memberName;
+    private String name;
 	@NotBlank
 	@Email
 	@Pattern(regexp="^[A-Za-z0-9.%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$")
-    private String memberEmail;
+    private String email;
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate memberBirth;
+	private LocalDate birth;
 	@Pattern(regexp = "^010-[1-9][0-9]{3}-[0-9]{4}$")
-    private String memberContact;
+    private String contact;
     @Pattern(regexp="^[0-9]{5,6}$")
-    private String memberPost;
+    private String post;
     @Size(max = 100)	
-    private String memberAddress1;
+    private String address1;
     @Size(max = 100)
-    private String memberAddress2; 	
-    private String memberRole; 
-    private Integer memberPoint;
+    private String address2; 	
+    private String role; 
+    private Long point;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberCreatedTime;
+    private LocalDateTime createdTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberEditTime;
+    private LocalDateTime editTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
-    private LocalDateTime memberRecentTime; 
+    private LocalDateTime recentTime; 
 }
 

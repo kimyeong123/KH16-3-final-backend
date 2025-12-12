@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PaymentDto {
 
-    private Integer paymentNo;
+    private Long paymentNo;
 
-    private Integer memberNo;
+    private Long memberNo;
 
     private String type;
 
@@ -23,9 +23,9 @@ public class PaymentDto {
 
     private String pgTid;
 
-    private Integer amount;
+    private Long amount;
 
-    private Integer point;
+    private Long point;
 
     private String status;
 

@@ -8,53 +8,75 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
+import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
 
 @Repository
 public class ProductDao {
-
-    @Autowired
-    private SqlSession sqlSession;
-
-    /** 상품 번호 시퀀스 조회 */
-    public int sequence() {
-        return sqlSession.selectOne("product.sequence");
-    }
-
-    /** 상품 등록 */
-    public void insert(ProductDto productDto) {
-        sqlSession.insert("product.add", productDto);
-    }
-
-    /** 상품 목록 조회 */
-    public List<ProductDto> selectList() {
-        return sqlSession.selectList("product.list");
-    }
-
-    /** 상품 상세 조회 */
-    public ProductDto selectOne(Long productNo) {
-        return sqlSession.selectOne("product.detail", productNo);
-    }
-
-    /** 상품 삭제 */
-    public boolean delete(Long productNo) {
-        return sqlSession.delete("product.delete", productNo) > 0;
-    }
+	
+	@Autowired
+	private SqlSession sqlSession;
+	
+	private static final String NAMESPACE = "product."; 
+	
+	public long sequence() {
+		return sqlSession.selectOne(NAMESPACE + "sequence");
+	}
+	
+	public int insert(ProductDto productDto) {
+		return sqlSession.insert(NAMESPACE + "add", productDto);
+	}
+	
+	public List<ProductDto>selectList(){
+		return sqlSession.selectList(NAMESPACE + "list");
+	}
+	
+	public ProductDto selectOne(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "detail", productNo);
+	}
+	
+	public int delete(long productNo) {
+		return sqlSession.delete(NAMESPACE + "delete", productNo);
+	}
+	
+	public int updateStatus(long productNo, ProductStatus changeStatus) {
+		Map<String, Object> params = new HashMap<>();
+	    params.put("productNo", productNo);
+	    params.put("changeStatus", changeStatus.getStatus());
+		return sqlSession.update(NAMESPACE + "updateStatus", params);
+	}
+	
+	public int updateEndedAuction(AuctionEndRequestVO endRequestVO) {
+		return sqlSession.update(NAMESPACE + "updateEndedAuction", endRequestVO);
+	}
+	
+	public ProductDto selectOneForUpdate(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "selectOneForUpdate", productNo);
+	}
+	
+	public List<Long> findExpiredProductNos(){
+		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
+	}
+	
+	public long findSellerNoByProductNo(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo");
+	}
 
     /** 상품 정보 수정 */
     public boolean update(ProductDto productDto) {
-        return sqlSession.update("product.update", productDto) > 0;
+        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
     }
 
     /** 상품 단위 가격 수정 */
     public boolean updateUnit(ProductDto productDto) {
-        return sqlSession.update("product.updateUnit", productDto) > 0;
+        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
     }
 
     /** 페이지네이션을 위한 상품 전체 개수 조회 */
     public int count() {
-        return sqlSession.selectOne("product.countByPaging");
+        return sqlSession.selectOne(NAMESPACE + "countByPaging");
     }
 
     /** 페이지네이션 목록 조회 */

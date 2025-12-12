@@ -16,13 +16,6 @@
 	    )
     </insert>
     
-    <select id="listByProduct" resultType="BidDto">
-        select *
-        from bid
-        		where product_no = #{productNo}
-        order by bid_no desc;
-    </select>
-    
     <select id="selectListBidByProductNo" resultType="BidDto">
     	select * 
     	from bid
@@ -49,7 +42,7 @@
   		where product_no = #{productNo}
   	</select>
     
-  	<select id="listByPaging" resultType="BidDto">
+  	<select id="selectListByProductNoPaging" resultType="BidDto">
   		select * 
   		from(
   			select rownum rn, TMP.* 
@@ -63,7 +56,7 @@
   	</select>
   
   	<!-- 낙찰자 판단용 — 최고가 입찰자 정보 -->
-	<select id="findHighestBidderNo" resultType="long">
+	<select id="findHighestBidderNo" resultType="Long">
 	    select bidder_no
 	    from (
 	        select bidder_no
@@ -82,7 +75,7 @@
 	</select>
 	
 	<!-- 특정 유저의 전체 입찰 내역 -->
-	<select id="listByBidder" resultType="BidDto">
+	<select id="selectListByBidder" resultType="BidDto">
     	select *
     	from bid
     		where bidder_no = #{bidderNo}
@@ -90,7 +83,7 @@
 	</select>
 	
 	<!-- 특정 유저의 특정 상품에 대한 입찰 내역 -->
-	<select id="listMyBidHistory" resultType="BidDto">
+	<select id="selectListMyBidHistory" resultType="BidDto">
     	select *
     	from bid
     		where bidder_no = #{bidderNo}

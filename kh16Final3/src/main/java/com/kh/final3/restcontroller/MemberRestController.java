@@ -49,13 +49,13 @@ public class MemberRestController {
 	}
 
 	@GetMapping("/memberId/{memberId}")
-	public boolean checkId(@PathVariable String memberId) {
-		return memberService.checkId(memberId);
+	public boolean checkId(@PathVariable String id) {
+		return memberService.checkId(id);
 	}
 
 	@GetMapping("/memberNickname/{memberNickname}")
-	public boolean checkNickname(@PathVariable String memberNickname) {
-		return memberService.checkNickname(memberNickname);
+	public boolean checkNickname(@PathVariable String nickname) {
+		return memberService.checkNickname(nickname);
 	}
 
 	@GetMapping("/checkDuplicate")
@@ -69,13 +69,13 @@ public class MemberRestController {
 	// @GetMapping("/accountId/{accountId}/accountPw/{accountPw}")
 	@PostMapping("/login")
 	public MemberLoginResponseVO login(@RequestBody MemberDto memberDto) {
-		MemberDto findDto = memberDao.selectOne(memberDto.getMemberId());
+		MemberDto findDto = memberDao.selectOne(memberDto.getId());
 		if (findDto == null) {// 아이디 없음
 			throw new TargetNotfoundException("로그인 정보 오류");
 		}
 		// boolean valid =
 		// findDto.getAccountPw().equals(accountDto.getAccountPw());//암호화 전에 쓰던 코드
-		boolean valid = passwordEncoder.matches(memberDto.getMemberPw(), findDto.getMemberPw());
+		boolean valid = passwordEncoder.matches(memberDto.getPw(), findDto.getPw());
 		if (valid == false) {// 비밀번호 불일치
 			throw new TargetNotfoundException("로그인 정보 오류");
 		}
@@ -83,13 +83,13 @@ public class MemberRestController {
 		// 로그인 성공
 		return MemberLoginResponseVO.builder()
 				.loginNo(findDto.getMemberNo())
-				.loginId(findDto.getMemberId())// 아이디
-				.loginLevel(findDto.getMemberRole())// 등급
-				.nickname(findDto.getMemberNickname()).email(findDto.getMemberEmail())
-				.post(findDto.getMemberPost())
-				.address1(findDto.getMemberAddress1()).address2(findDto.getMemberAddress2())
-				.point(findDto.getMemberPoint()).contact(findDto.getMemberContact())
-				.createdTime(findDto.getMemberCreatedTime()).accessToken(tokenService.generateAccessToken(findDto))// 액세스토큰
+				.loginId(findDto.getId())// 아이디
+				.loginLevel(findDto.getRole())// 등급
+				.nickname(findDto.getNickname()).email(findDto.getEmail())
+				.post(findDto.getPost())
+				.address1(findDto.getAddress1()).address2(findDto.getAddress2())
+				.point(findDto.getPoint()).contact(findDto.getContact())
+				.createdTime(findDto.getCreatedTime()).accessToken(tokenService.generateAccessToken(findDto))// 액세스토큰
 				.refreshToken(tokenService.generateRefreshToken(findDto))// 갱신토큰
 				.build();
 	}

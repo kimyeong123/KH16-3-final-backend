@@ -11,28 +11,45 @@
 
     <insert id="insert">
         insert into escrow_ledger (
-            escrow_ledger_no, product_no, bidder_no, amount, status
+            escrow_ledger_no, bid_no, product_no, bidder_no, amount, status, description
         ) values (
-            #{escrowLedgerNo}, #{productNo}, #{bidderNo}, #{amount}, #{status}
+            #{escrowLedgerNo}, #{bidNo}, #{productNo}, #{bidderNo}, #{amount}, #{status}, #{description}
         )
     </insert>
 
-	<!-- 해당 상품의 status에 따른 객체 찾아오기 (현재 잠금 기록) -->
-    <select id="findStatusByProductNo" resultType="EscrowLedgerDto">
-        select *
-        from escrow_ledger
-        where product_no = #{productNo} and status = #{findStatus}
-    </select>
+	<!-- 해당 상품의 status로 객체 찾아오기 (단일 조회 기대) -->
+    <select id="findDtoByProductNoAndStatus" resultType="EscrowLedgerDto">
+    	select *
+    	from escrow_ledger
+    	where
+        	product_no = #{productNo}	AND status = #{targetStatus}
+        order by amount desc, escrow_ledger_no asc
+	</select>
     
-    <!-- 해당 상품의 status에 따른 pk 찾아오기 (현재 잠금 기록) -->
-	<select id="findStatusLedgerNoByProductNo" resultType="long">
+    <!-- 해당 상품의 status로 pk 찾아오기 (현재 잠금 상태 및 낙찰 상태 / 단일 조회 기대) -->
+	<select id="findEscrowNoByProductNoAndStatus" resultType="Long">
 	    select escrow_ledger_no
 	    from escrow_ledger
-	    where product_no = #{productNo} and status = #{findStatus}
+    	where
+        	product_no = #{productNo}	AND status = #{targetStatus}
+	</select>
+	
+	<!-- 입찰 번호로 Dto 찾아오기 (단일 조회) -->
+	<select id="findDtoByBidNo" resultType="EscrowLedgerDto">
+	    select *
+	    from escrow_ledger
+    	where bid_no = #{bidNo}
+	</select>
+	
+	<!-- 입찰 번호로 pk 찾아오기 (단일 조회) -->
+	<select id="findEscrowNoByBidNo" resultType="Long">
+	    select escrow_ledger_no
+	    from escrow_ledger
+    	where bid_no = #{bidNo}
 	</select>
 	
     <!-- 특정 입찰자의 escrow 기록 불러오기 -->
-    <select id="findByBidderAndProduct" resultType="EscrowLedgerDto">
+    <select id="selectListByBidderAndProduct" resultType="EscrowLedgerDto">
         select *
         from escrow_ledger
         	where bidder_no = #{bidderNo}
@@ -49,5 +66,5 @@
         	where 
         		escrow_ledger_no = #{escrowLedgerNo}
     </update>
-
+    
 </mapper>
