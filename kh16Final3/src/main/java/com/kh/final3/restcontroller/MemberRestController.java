@@ -156,6 +156,8 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
+	 
+	
 	
 	// 회원탈퇴
 	@DeleteMapping("/{memberNo}")
