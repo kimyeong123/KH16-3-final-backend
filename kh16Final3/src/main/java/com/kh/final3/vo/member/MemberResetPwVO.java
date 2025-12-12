@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberResetPwVO {
-	  private String memberId;
+	  private String id;
 	  private String email;
 }

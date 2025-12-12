@@ -59,13 +59,13 @@ public class MemberService {
     }
     //비밀번호 확인
     public boolean checkPassword(MemberRequestVO requestVO) {
-        if (requestVO.getMemberNo() == null || requestVO.getMemberPw() == null) {
+        if (requestVO.getMemberNo() == null || requestVO.getPw() == null) {
             return false;
         }
         String originPw = memberDao.findPasswordByMemberNo(requestVO.getMemberNo());
         if (originPw == null) return false;
         // BCrypt 매칭
-        return passwordEncoder.matches(requestVO.getMemberPw(), originPw);
+        return passwordEncoder.matches(requestVO.getPw(), originPw);
     }
     // 회원 삭제
     public boolean deleteMember(Long memberNo) {
@@ -114,7 +114,7 @@ public class MemberService {
         if (updated) {
             MemberDto member = memberDao.selectOneByMemberNo(memberNo);
             if (member != null) {
-                tokenDao.deleteByTarget(member.getMemberId()); // 네 프로젝트에서 쓰던 방식
+                tokenDao.deleteByTarget(member.getId()); // 네 프로젝트에서 쓰던 방식
             }
         }
 
@@ -131,7 +131,7 @@ public class MemberService {
         if (member == null) {
             throw new IllegalArgumentException("해당 이메일로 가입된 계정을 찾을 수 없습니다.");
         }
-        emailService.sendFindIdMail(email, member.getMemberId());
+        emailService.sendFindIdMail(email, member.getId());
     }
     //비밀번호 임시발급
     private String generateTempPassword() {

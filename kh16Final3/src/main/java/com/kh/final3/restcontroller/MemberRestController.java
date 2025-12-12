@@ -51,12 +51,12 @@ public class MemberRestController {
 		return "회원가입 성공";
 	}
 
-	@GetMapping("/memberId/{memberId}")
+	@GetMapping("/memberId/{id}")
 	public boolean checkId(@PathVariable String id) {
 		return memberService.checkId(id);
 	}
 
-	@GetMapping("/memberNickname/{memberNickname}")
+	@GetMapping("/memberNickname/{nickname}")
 	public boolean checkNickname(@PathVariable String nickname) {
 		return memberService.checkNickname(nickname);
 	}
@@ -72,7 +72,8 @@ public class MemberRestController {
 	// @GetMapping("/accountId/{accountId}/accountPw/{accountPw}")
 	@PostMapping("/login")
 	public MemberLoginResponseVO login(@RequestBody MemberDto memberDto) {
-		MemberDto findDto = memberDao.selectOne(memberDto.getId());
+		System.out.println(memberDto);
+		MemberDto findDto = memberDao.selectOneByMemberId(memberDto.getId());
 		if (findDto == null) {// 아이디 없음
 			throw new TargetNotfoundException("로그인 정보 오류");
 		}
@@ -112,7 +113,7 @@ public class MemberRestController {
 	@PostMapping("/reset-password")
 	public ResponseEntity<String> resetPassword(@RequestBody MemberResetPwVO vo) {
 	    try {
-	        memberService.resetPasswordByIdAndEmail(vo.getMemberId(), vo.getEmail());
+	        memberService.resetPasswordByIdAndEmail(vo.getId(), vo.getEmail());
 	        return ResponseEntity.ok("임시 비밀번호를 이메일로 발송했습니다.");
 	    } catch (IllegalArgumentException e) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -252,7 +253,7 @@ public class MemberRestController {
 	    // 3. 기존 비밀번호 확인 (현재 비번으로 체크)
 	    MemberRequestVO checkVO = MemberRequestVO.builder()
 	            .memberNo(memberNo)
-	            .memberPw(changePwVO.getCurrentPw()) //
+	            .pw(changePwVO.getCurrentPw()) //
 	            .build();
 	    boolean passwordOk = memberService.checkPassword(checkVO);
 	    if (!passwordOk) {

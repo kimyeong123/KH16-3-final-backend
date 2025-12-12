@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberRequestVO {
 	private Long memberNo;
-	private String memberPw;
+	private String pw;
 }

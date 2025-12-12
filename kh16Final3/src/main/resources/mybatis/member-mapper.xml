@@ -34,24 +34,24 @@
         
     </insert>
     
-    <select id="detail" parameterType="String" resultType="MemberDto">
+    <select id="detail" resultType="MemberDto">
         select * from member where member_no = #{memberNo}
     </select>
 
- <select id="detailById" parameterType="String" resultType="MemberDto">
+ 	<select id="detailById" resultType="MemberDto">
         select * from member where id = #{id}
     </select>
     
-    <select id="detailByNickname" parameterType="String" resultType="MemberDto">
+    <select id="detailByNickname"  resultType="MemberDto">
         select * from member where nickname = #{nickname}
     </select>
     
-    <select id="findNicknameByMemberNo" parameterType="long" resultType="String">
+    <select id="findNicknameByMemberNo" resultType="String">
         select nickname from member where member_no = #{memberNo}
     </select>
     
     <!-- 이름 + 생일 + 연락처로 회원 조회 -->
-	<select id="selectOneByNameBirthContact" parameterType="map" resultType="MemberDto">
+	<select id="selectOneByNameBirthContact" resultType="MemberDto">
     	select * from member
     	where name = #{name} and birth = #{birth} and contact = #{contact}
 	</select>
@@ -72,25 +72,25 @@
             </where>
     </select>
 
-	<update id="updateMemberStatus" parameterType="map">
+	<update id="updateMemberStatus" >
         update member
         set role = #{status}
         where member_no = #{memberNo}
     </update>
    <!-- 회원 삭제 -->
-<delete id="deleteMember" parameterType="long">
+<delete id="deleteMember">
     delete from member
     where member_no = #{memberNo}
 </delete>
 
 <!-- 비밀번호 조회 -->
-<select id="findPasswordByMemberNo" parameterType="long" resultType="string">
+<select id="findPasswordByMemberNo" resultType="string">
     select pw
     from member
     where member_no = #{memberNo}
 </select>
 <!-- 회원 수정 -->
-<update id="updateMember" parameterType="MemberDto">
+<update id="updateMember">
     update member
     set
         email = #{email},
@@ -101,23 +101,23 @@
     where member_no = #{memberNo}
 </update>
 <!-- 회원번호로 회원 조회-->
-<select id="selectOneByMemberNo" parameterType="long" resultType="MemberDto">
+<select id="selectOneByMemberNo" resultType="MemberDto">
     select *
     from member
     where member_no = #{memberNo}
 </select>
 <!--비밀번호 변경-->
-<update id="updatePassword" parameterType="map">
+<update id="updatePassword" >
     update member
     set pw = #{memberPw}
     where member_no = #{memberNo}
 </update>
 <!--이메일로 아이디 찾기-->
-<select id="selectOneByEmail" parameterType="string" resultMap="memberResultMap">
+<select id="selectOneByEmail" resultType="MemberFindIdVO">
 select * from member where email = #{email}
 </select>
 <!--이메일과 아이디로 비밀번호 찾기-->
-<select id="selectOneByIdAndEmail" parameterType="map" resultMap="memberResultMap">
+<select id="selectOneByIdAndEmail" resultType="MemberResetPwVO">
 select * from member where id = #{memberId} and email = #{email}
 </select>
 

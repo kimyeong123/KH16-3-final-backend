@@ -21,20 +21,20 @@ import lombok.NoArgsConstructor;
 public class MemberComplexSearchVO {
 
 	// 주소를 분할하여 반환하는 추가 Getter 메소드
-	private String memberId;
-	private String memberNickname;
-	private String memberEmail;
-	private String memberContact;
-	private String memberBirth;
-	private Integer minMemberPoint, maxMemberPoint;
-	private String beginMemberJoin, endMemberJoin;
-	private List<String> memberRoleList;
-	private String memberAddress;
+	private String iId;
+	private String nickname;
+	private String email;
+	private String contact;
+	private String birth;
+	private Integer minPoint, maxPoint;
+	private String beginJoin, endJoin;
+	private List<String> roleList;
+	private String address;
 
 	public Set<String> getAddressTokenList() {
-		if (memberAddress == null)
+		if (address == null)
 			return null;
-		String stripResult = memberAddress.strip();
+		String stripResult = address.strip();
 		if (stripResult.isEmpty())
 			return null;
 
