@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,16 +76,24 @@ public class MessageRestController {
 	/**
 	 * 4. 수신함 목록 조회 (페이지네이션 및 필터링 지원)
 	 * (GET /message/received/page?page=1&size=10&types=GENERAL,SYSTEM_ALERT)
-	 * * 모든 수신함 조회 요청을 이 단일 엔드포인트에서 처리합니다.
 	 */
 	@GetMapping("/received/page")
     public ResponseEntity<PageVO<MessageDto>> getReceivedListByPagingAndFilter(
 			PageVO<MessageDto> pageVO,
 			@RequestParam(required = false) List<String> types,
+			@RequestParam(required = false) String searchType, 
+		    @RequestParam(required = false) String keyword,
 			@RequestAttribute("memberNo") long memberNo) {
 		
-		// Service 호출 시 types 파라미터를 함께 전달해야 합니다.
-		PageVO<MessageDto> resultVO = messageService.getReceivedListByPaging(pageVO, memberNo, types);
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("page", pageVO.getPage());
+	    paramMap.put("size", pageVO.getSize());
+	    paramMap.put("types", types);
+	    paramMap.put("searchType", searchType); // 검색 타입
+	    paramMap.put("keyword", keyword);       // 검색 키워드
+		
+		// Service 호출 시 PageVO 객체를 함께 전달해야 합니다.
+		PageVO<MessageDto> resultVO = messageService.getReceivedListByPaging(pageVO, paramMap, memberNo);
 		
 		return ResponseEntity.ok(resultVO);
 	}
@@ -96,10 +105,18 @@ public class MessageRestController {
     public ResponseEntity<PageVO<MessageDto>> getSentListByPagingAndFilter(
 			PageVO<MessageDto> pageVO,
 			@RequestParam(required = false) List<String> types, // 발신함에도 필터링 필요시 사용
+			@RequestParam(required = false) String searchType, 
+		    @RequestParam(required = false) String keyword,
 			@RequestAttribute("memberNo") long memberNo) {
 		
-		// Service 호출 시 types 파라미터를 함께 전달해야 합니다.
-		PageVO<MessageDto> resultVO = messageService.getSentListByPaging(pageVO, memberNo, types);
+		Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("page", pageVO.getPage());
+	    paramMap.put("size", pageVO.getSize());
+	    paramMap.put("types", types);
+	    paramMap.put("searchType", searchType); // 검색 타입
+	    paramMap.put("keyword", keyword);       // 검색 키워드
+		
+	    PageVO<MessageDto> resultVO = messageService.getSentListByPaging(pageVO, paramMap, memberNo);
 		
 		return ResponseEntity.ok(resultVO);
 	}
@@ -107,12 +124,16 @@ public class MessageRestController {
 	/**
 	 * 6. 수신함에서 쪽지 삭제 (POST /message/delete/receiver/{messageNo})
 	 */
-	@PostMapping("delete/receiver/{messageNo}")
+	@DeleteMapping("delete/receiver/{messageNo}")
 	public ResponseEntity<String> deleteMessageForReceiver(@PathVariable long messageNo) {
-		
 		messageService.deleteMessageByReceiver(messageNo);
-		
 		return ResponseEntity.ok("수신함 쪽지 삭제 성공");
+	}
+	
+	@DeleteMapping("delete/sender/{messageNo}") 
+	public ResponseEntity<String> deleteMessageForSender(@PathVariable long messageNo) {
+	    messageService.deleteMessageBySender(messageNo);
+	    return ResponseEntity.ok("발신함 쪽지 삭제 성공");
 	}
 	
 	/**
