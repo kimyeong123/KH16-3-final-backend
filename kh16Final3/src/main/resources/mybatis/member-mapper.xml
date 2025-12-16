@@ -121,6 +121,31 @@
   select * from member where id = #{id} and email = #{email}
 </select>
 
+<!--관리자가 조회하는 회원 리스트-->
+<select id="selectMemberList" resultType="MemberListVO">
+select member_no as memberNo, id, nickname, role, point, created_time as createdTime from member order by member_no asc
+</select>
+<!--관리자가 검색하는 회원 리스트-->
+<select id="selectMemberListSearch" resultType="MemberListVO">
+  select member_no as memberNo, id, nickname, role, point, created_time AS createdTime
+  from member
+  <where>
+    <choose>
+<when test="type == 'id'">
+  id like '%' || #{keyword} || '%'
+</when>
+<when test="type == 'nickname'">
+  nickname like '%' || #{keyword} || '%'
+</when>
+<otherwise>
+  (id like '%' || #{keyword} || '%'
+   or nickname like '%' || #{keyword} || '%')
+</otherwise>
+    </choose>
+  </where>
+  order by member_no asc
+</select>
+
 
 	<!-- 잔액이 음수가 되는 경우를 방지 및 실행 0건으로 확인 가능 -->
 	<update id="deductMemberPoint"> 
@@ -144,5 +169,6 @@
 			from member
 		where memebr_no = #{memberNo}
 	</select>
+	
 	
 </mapper>
