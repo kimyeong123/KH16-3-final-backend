@@ -115,37 +115,9 @@ public class MessageService {
 	 * 2-2. 미확인 알림 개수 조회 (헤더 알림 아이콘용)
 	 */
 	public int countUnreadAlerts(long memberNo) {
-		return messageDao.countUnreadAlerts(memberNo);
+		Long countResult = messageDao.countUnreadAlerts(memberNo);
+		return countResult != null ? countResult.intValue() : 0;
 	}
-
-//	/**
-//	 * 2-3. 수신함 목록 조회 (일반)
-//	 */
-//	public List<MessageDto> getReceivedList(long memberNo) {
-//		return messageDao.selectReceivedList(memberNo);
-//	}
-//
-//	/**
-//	 * 2-4. 발신함 목록 조회 (일반)
-//	 */
-//	public List<MessageDto> getSentList(long memberNo) {
-//		return messageDao.selectSentList(memberNo);
-//	}
-//
-//	/**
-//	 * 2-5. 타입별 수신함 목록 조회 (필터링)
-//	 */
-//	public List<MessageDto> getReceivedListByTypes(Map<String, Object> paramMap) {
-//		return messageDao.selectReceivedListByTypes(paramMap);
-//	}
-//
-//	/**
-//	 * 2-6. 전체 미확인 쪽지 개수 조회
-//	 * (FaBell 아이콘에 표시될, 모든 타입의 미확인 메시지 개수를 계산)
-//	 */
-//	public int countUnreadAll(long memberNo) {
-//	    return messageDao.countUnreadAll(memberNo);
-//	}
     
     /**
      * 2-3. 헤더 드롭다운용 미확인 쪽지 목록 조회 (최신 5개 등)

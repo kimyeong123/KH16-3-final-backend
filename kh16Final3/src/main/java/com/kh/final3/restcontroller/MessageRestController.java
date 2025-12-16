@@ -46,9 +46,9 @@ public class MessageRestController {
 		return ResponseEntity.ok("쪽지 전송 완료");
 	}
 	
-	/**
-	 * 2. 미확인 알림 개수 조회
-	 */
+
+	 // 2. 미확인 알림 개수 조회 (GET /message/unread/count)
+
 	@GetMapping("/unread/count")
 	public ResponseEntity<Map<String, Object>> getUnreadAlertCount(@RequestAttribute("memberNo") long memberNo) {
 		
@@ -91,7 +91,6 @@ public class MessageRestController {
 	
 	/**
 	 * 5. 발신함 목록 조회 (페이지네이션 및 필터링 지원)
-	 * (GET /message/sent/page?page=1&size=10&types=...)
 	 */
 	@GetMapping("/sent/page")
     public ResponseEntity<PageVO<MessageDto>> getSentListByPagingAndFilter(

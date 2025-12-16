@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.final3.dto.BoardDto;
+import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.BoardService;
 import com.kh.final3.vo.TokenVO;
 
@@ -35,7 +36,7 @@ public class BoardRestController {
 	
 	@PostMapping("/write")
 	public void insert(@ModelAttribute BoardDto boardDto,
-								@RequestPart List<MultipartFile> attachments,
+			@RequestPart(value = "attachments", required = false) List<MultipartFile> attachments,
 								@RequestAttribute TokenVO tokenVO) {
 		String loginLevel = tokenVO.getLoginLevel();
 		long memberNo = tokenVO.getMemberNo();
@@ -47,7 +48,7 @@ public class BoardRestController {
 		return boardService.selectNoticeList(); 
 	}
 	
-	@GetMapping("/detail/{boardNo}")
+	@GetMapping("/{boardNo}")
 	public BoardDto detail(@PathVariable long boardNo,
 										HttpServletRequest request, 
 										HttpServletResponse response) {
@@ -91,10 +92,15 @@ public class BoardRestController {
 		return boardDto; 
 	}
 	
-	@DeleteMapping("/delete/{boardNo}")
+	@DeleteMapping("/{boardNo}")
 	public void delete(@PathVariable long boardNo,
-								@RequestAttribute TokenVO tokenVO
+				@RequestAttribute(required = false) TokenVO tokenVO
 			) {
+		
+		if (tokenVO == null) {
+	        throw new UnauthorizationException("로그인이 필요합니다."); 
+	    }
+		
 		long memberNo = tokenVO.getMemberNo(); 
 	    String loginLevel = tokenVO.getLoginLevel();
 		boardService.delete(boardNo, loginLevel, memberNo);
@@ -102,12 +108,12 @@ public class BoardRestController {
 	
 	@PatchMapping("/edit/{boardNo}")
 	public void edit(@PathVariable long boardNo,
-								@RequestBody BoardDto boardDto,
-								@RequestAttribute TokenVO tokenVO
-								) {
+								@RequestPart BoardDto boardDto,
+								@RequestAttribute TokenVO tokenVO,
+								@RequestPart(required = false) List<MultipartFile> attach) {
         boardDto.setBoardNo(boardNo);
         long memberNo = tokenVO.getMemberNo(); 
 	    String loginLevel = tokenVO.getLoginLevel();
-		boardService.update(boardDto, memberNo, loginLevel); 
+		boardService.update(boardDto, memberNo, loginLevel, attach); 
 	}
 }

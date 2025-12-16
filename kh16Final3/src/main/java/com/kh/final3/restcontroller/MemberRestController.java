@@ -72,7 +72,6 @@ public class MemberRestController {
 	// @GetMapping("/accountId/{accountId}/accountPw/{accountPw}")
 	@PostMapping("/login")
 	public MemberLoginResponseVO login(@RequestBody MemberDto memberDto) {
-		System.out.println(memberDto);
 		MemberDto findDto = memberDao.selectOneByMemberId(memberDto.getId());
 		if (findDto == null) {// 아이디 없음
 			throw new TargetNotfoundException("로그인 정보 오류");

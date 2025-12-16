@@ -56,7 +56,7 @@ public class MessageDao {
 	// ----------------------------------------------------
 
 	// 7. 미확인 시스템 알림 개수 조회 (type='ALERT' & is_read='N')
-	public int countUnreadAlerts(long memberNo) {
+	public Long countUnreadAlerts(long memberNo) {
 		return sqlSession.selectOne(NAMESPACE + ".countUnreadAlerts", memberNo);
 	}
 	

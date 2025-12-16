@@ -5,7 +5,7 @@
 
 <mapper namespace="message">
 
-	<select id="sequence" resultType="int">
+	<select id="sequence" resultType="long">
 		select messages_seq.nextval
 		from dual
 	</select>
@@ -19,7 +19,7 @@
 		)
 	</insert>
 
-	<select id="selectOne" parameterType="int" resultType="MessageDto">
+	<select id="selectOne" parameterType="long" resultType="MessageDto">
 		select
 		message_no,
 		sender_no,
@@ -37,27 +37,27 @@
 		where message_no = #{messageNo}
 	</select>
 
-	<update id="updateReadTime" parameterType="int">
+	<update id="updateReadTime" parameterType="long">
 		update message set
 		is_read = 'Y',
 		read_time = systimestamp
 		where message_no = #{messageNo}
 	</update>
 
-	<update id="updateSenderDelete" parameterType="int">
+	<update id="updateSenderDelete" parameterType="long">
 		update message set
 		sender_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
 
-	<update id="updateReceiverDelete" parameterType="int">
+	<update id="updateReceiverDelete" parameterType="long">
 		update message
 		set
 		receiver_deleted = 'Y'
 		where message_no = #{messageNo}
 	</update>
 
-	<select id="countUnreadAlerts" parameterType="long" resultType="int">
+	<select id="countUnreadAlerts" parameterType="long" resultType="long">
 		select count(*)
 		from message
 		where receiver_no = #{memberNo}
