@@ -32,22 +32,22 @@ public class MessageDao {
 	}
 
 	// 3. 쪽지 상세 조회
-	public MessageDto selectOne(int messageNo) {
+	public MessageDto selectOne(long messageNo) {
 		return sqlSession.selectOne(NAMESPACE + ".selectOne", messageNo);
 	}
 
 	// 4. 쪽지 읽음 처리 (update read_time)
-	public boolean updateReadTime(int messageNo) {
+	public boolean updateReadTime(long messageNo) {
 		return sqlSession.update(NAMESPACE + ".updateReadTime", messageNo) > 0;
 	}
 
 	// 5. 발신자 삭제 처리 (update sender_deleted)
-	public boolean updateSenderDelete(int messageNo) {
+	public boolean updateSenderDelete(long messageNo) {
 		return sqlSession.update(NAMESPACE + ".updateSenderDelete", messageNo) > 0;
 	}
 
 	// 6. 수신자 삭제 처리 (update receiver_deleted)
-	public boolean updateReceiverDelete(int messageNo) {
+	public boolean updateReceiverDelete(long messageNo) {
 		return sqlSession.update(NAMESPACE + ".updateReceiverDelete", messageNo) > 0;
 	}
     

@@ -99,7 +99,7 @@ public class MessageService {
 	 * 2-1. 쪽지 상세 조회 및 읽음 처리 (트랜잭션 포함)
 	 */
 	@Transactional
-	public MessageDto getMessageDetailAndRead(Integer messageNo) {
+	public MessageDto getMessageDetailAndRead(long messageNo) {
 		MessageDto detail = messageDao.selectOne(messageNo);
 
 		// 미확인 상태(N)이고, 수신자에게 해당 메시지가 삭제되지 않았을 경우에만 읽음 처리
@@ -213,14 +213,14 @@ public class MessageService {
 	/**
 	 * 3-1. 수신자 삭제 처리 (실제 DB 삭제 대신 플래그 업데이트)
 	 */
-	public boolean deleteMessageByReceiver(Integer messageNo) {
+	public boolean deleteMessageByReceiver(long messageNo) {
 		return messageDao.updateReceiverDelete(messageNo);
 	}
 
 	/**
 	 * 3-2. 발신자 삭제 처리 (실제 DB 삭제 대신 플래그 업데이트)
 	 */
-	public boolean deleteMessageBySender(Integer messageNo) {
+	public boolean deleteMessageBySender(long messageNo) {
 		return messageDao.updateSenderDelete(messageNo);
 	}
 }

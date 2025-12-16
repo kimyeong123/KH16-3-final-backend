@@ -40,7 +40,6 @@ public class MemberInterceptor implements HandlerInterceptor {
 			//이어지는 컨트롤러에서 사용 가능하도록 넘기겠다
 			//-> 컨트롤러에서는 @RequestAttribute TokenVO tokenVO로 수신 가능
 			request.setAttribute("tokenVO", tokenVO);
-			System.out.println("로그인 상태입니다!");
 			return true;
 		}
 		catch(Exception e) {//Plan B : 비회원, 토큰만료/위변조 상황
