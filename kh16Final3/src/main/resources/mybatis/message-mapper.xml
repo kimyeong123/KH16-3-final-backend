@@ -10,31 +10,47 @@
 		from dual
 	</select>
 
-	<insert id="insert" parameterType="MessageDto">
+	<insert id="insertMessage" parameterType="MessageDto">
 		insert into message (
 		message_no, sender_no, receiver_no, content, type, url, product_no
 		)
 		values (
-		#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type}, #{url}, #{productNo}
+		#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type},
+		#{url}, #{productNo}
 		)
 	</insert>
 
-	<select id="selectOne" parameterType="long" resultType="MessageDto">
+	<insert id="insertReceiver" parameterType="MessageDto">
+		INSERT INTO MESSAGE_RECEIVE (
+		MESSAGE_NO, RECEIVER_NO, IS_READ
+		)
+		VALUES (
+		#{messageNo}, #{receiverNo}, 'N'
+		)
+	</insert>
+
+	<select id="selectOne" parameterType="long"
+		resultType="MessageDto">
 		select
-		message_no,
-		sender_no,
-		receiver_no,
-		content,
-		type,
-		sent_time as sentTime,
-		read_time as readTime,
-		is_read as isRead,
-		sender_deleted as senderDeleted,
-		receiver_deleted as receiverDeleted,
-		url as url,
-		product_no as productNo
-		from message
-		where message_no = #{messageNo}
+		m.message_no,
+		m.sender_no,
+		m.receiver_no,
+		m.content,
+		m.type,
+		m.sent_time as sentTime,
+		m.read_time as readTime,
+		m.is_read as isRead,
+		m.sender_deleted as senderDeleted,
+		m.receiver_deleted as receiverDeleted,
+		m.url as url,
+		m.product_no as productNo,
+		ms.nickname as senderNickname,
+		mr.nickname as receiverNickname
+		from message m
+		join member ms on m.sender_no =
+		ms.member_no
+		join member mr on m.receiver_no = mr.member_no
+		where m.message_no = #{messageNo}
 	</select>
 
 	<update id="updateReadTime" parameterType="long">
@@ -57,110 +73,172 @@
 		where message_no = #{messageNo}
 	</update>
 
-	<select id="countUnreadAlerts" parameterType="long" resultType="long">
+	<select id="countUnreadAlerts" parameterType="long"
+		resultType="long">
 		select count(*)
 		from message
 		where receiver_no = #{memberNo}
 		and is_read = 'N'
-		and type =
-		'ALERT'
+		and type ='SYSTEM_ALERT'
 		and receiver_deleted = 'N'
 	</select>
 
-	<select id="countSent" parameterType="map" resultType="long"> select
-		count(*) from message
-		where sender_no = #{memberNo}
-		and sender_deleted = 'N'
+	<select id="countSent" parameterType="map" resultType="long">
+		select count(*)
+		from message m
+		where m.sender_no = #{memberNo}
+		and m.sender_deleted = 'N'
+
+		<if test="searchType != null and keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'content'">
+					AND m.content LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="searchType == 'nickname'">
+					AND (select nickname from member where member_no =
+					m.receiver_no) LIKE '%' || #{keyword} || '%'
+				</when>
+			</choose>
+		</if>
+
 		<if test="types != null and !types.isEmpty()">
-            AND type IN
-            <foreach collection="types" item="type" open="(" close=")" separator=",">
-                #{type}
-            </foreach>
-        </if>
+			and m.type in
+			<foreach collection="types" item="type" open="(" close=")"
+				separator=",">
+				#{type}
+			</foreach>
+		</if>
 	</select>
 
-	<select id="selectSentListByPaging" parameterType="map" resultType="MessageDto">
-		SELECT * FROM (
-		SELECT ROWNUM AS rn, tmp.* FROM (
-		SELECT
-			M.message_no,
-			M.sender_no,
-			M.receiver_no,
-			M.content,
-			M.type,
-			M.sent_time AS sentTime,
-			M.read_time AS readTime,
-			M.is_read AS isRead,
-			M.sender_deleted AS senderDeleted,
-			M.receiver_deleted AS receiverDeleted,
-			M.url AS url,
-			M.product_no AS productNo,
-			(SELECT nickname FROM member WHERE member_no = M.receiver_no) AS receiverId 
-		FROM message M
-		WHERE M.sender_no = #{memberNo}
-		AND M.sender_deleted = 'N'
-        <if test="types != null and !types.isEmpty()">
-            AND M.type IN
-            <foreach collection="types" item="type" open="(" close=")" separator=",">
-                #{type}
-            </foreach>
-        </if>
-		ORDER BY M.message_no DESC
+	<select id="selectSentListByPaging" parameterType="map"
+		resultType="MessageDto">
+		select * from (
+		select rownum as rn, tmp.* from (
+		select
+		m.message_no,
+		m.sender_no,
+		m.receiver_no,
+		m.content,
+		m.type,
+		m.sent_time as sentTime,
+		m.read_time as readTime,
+		m.is_read as isRead,
+		m.sender_deleted as senderDeleted,
+		m.receiver_deleted as receiverDeleted,
+		m.url as url,
+		m.product_no as productNo,
+		(select nickname from member where member_no = m.receiver_no) as
+		receiverNickname
+		from message m
+		where m.sender_no = #{memberNo}
+		and m.sender_deleted = 'N'
+
+		<if test="searchType != null and keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'content'">
+					AND m.content LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="searchType == 'nickname'">
+					AND (select nickname from member where member_no = m.receiver_no) LIKE
+					'%' || #{keyword} || '%'
+				</when>
+			</choose>
+		</if>
+
+		<if test="types != null and !types.isEmpty()">
+			and m.type in
+			<foreach collection="types" item="type" open="(" close=")"
+				separator=",">
+				#{type}
+			</foreach>
+		</if>
+		order by m.message_no desc
 		) tmp
 		)
-		WHERE rn BETWEEN #{begin} AND #{end}
+		where rn between #{begin} and #{end}
 	</select>
 
-	<select id="countReceived" parameterType="map" resultType="long"> select count(*)
-		from message
-		where receiver_no = #{memberNo}
-		and receiver_deleted = 'N'
+	<select id="countReceived" parameterType="map" resultType="long">
+		select count(*)
+		from message m
+		where m.receiver_no = #{memberNo}
+		and m.receiver_deleted = 'N'
+
+		<if test="searchType != null and keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'content'">
+					AND m.content LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="searchType == 'nickname'">
+					AND (select nickname from member where member_no =
+					m.sender_no) LIKE '%' || #{keyword} || '%'
+				</when>
+			</choose>
+		</if>
+
 		<if test="types != null and !types.isEmpty()">
-            AND type IN
-            <foreach collection="types" item="type" open="(" close=")" separator=",">
-                #{type}
-            </foreach>
-        </if>
+			and m.type in
+			<foreach collection="types" item="type" open="(" close=")"
+				separator=",">
+				#{type}
+			</foreach>
+		</if>
 	</select>
 
-	<select id="selectReceivedListByPaging" parameterType="map" resultType="MessageDto">
-		SELECT * FROM (
-		SELECT ROWNUM AS rn, tmp.* FROM (
-		SELECT
-			M.message_no,
-			M.sender_no,
-			M.receiver_no,
-			M.content,
-			M.type,
-			M.sent_time AS sentTime,
-			M.read_time AS readTime,
-			M.is_read AS isRead,
-			M.sender_deleted AS senderDeleted,
-			M.receiver_deleted AS receiverDeleted,
-			M.url AS url,
-			M.product_no AS productNo,
-			(SELECT nickname FROM member WHERE member_no = M.sender_no) AS senderId
-		FROM message M
-		WHERE M.receiver_no = #{memberNo}
-		AND M.receiver_deleted = 'N'
-        <if test="types != null and !types.isEmpty()">
-            AND M.type IN
-            <foreach collection="types" item="type" open="(" close=")" separator=",">
-                #{type}
-            </foreach>
-        </if>
-		ORDER BY M.message_no DESC
+	<select id="selectReceivedListByPaging" parameterType="map"
+		resultType="MessageDto">
+		select * from (
+		select rownum as rn, tmp.* from (
+		select
+		m.message_no,
+		m.sender_no,
+		m.receiver_no,
+		m.content,
+		m.type,
+		m.sent_time as sentTime,
+		m.read_time as readTime,
+		m.is_read as isRead,
+		m.sender_deleted as senderDeleted,
+		m.receiver_deleted as receiverDeleted,
+		m.url as url,
+		m.product_no as productNo,
+		(select nickname from member where member_no = m.sender_no) as senderNickname
+		from message m
+		where m.receiver_no = #{memberNo}
+		and m.receiver_deleted = 'N'
+
+		<if test="searchType != null and keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'content'">
+					AND m.content LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="searchType == 'nickname'">
+					AND (select nickname from member where member_no = m.sender_no) LIKE
+					'%' || #{keyword} || '%'
+				</when>
+			</choose>
+		</if>
+
+		<if test="types != null and !types.isEmpty()">
+			and m.type in
+			<foreach collection="types" item="type" open="(" close=")"
+				separator=",">
+				#{type}
+			</foreach>
+		</if>
+		order by m.message_no desc
 		) tmp
 		)
-		WHERE rn BETWEEN #{begin} AND #{end}
+		where rn between #{begin} and #{end}
 	</select>
 
 	<select id="selectConversationByProduct" parameterType="map"
 		resultType="MessageDto">
 		select
-		message_no, sender_no, receiver_no, content, type, sent_time as sentTime,
+		message_no, sender_no, receiver_no, content, type,
+		sent_time as sentTime,
 		is_read as isRead, product_no as productNo,
-		(select nickname from member where member_no = sender_no) as sender_nickname
+		(select nickname from member where member_no = sender_no) as senderNickname
 		from message
 		where product_no = #{productNo}
 		and (sender_no = #{memberNo} or receiver_no = #{memberNo})
@@ -170,23 +248,35 @@
 
 	<select id="selectUnreadList" resultType="MessageDto"
 		parameterType="long">
-		SELECT *
-		FROM (
-		SELECT
-		MESSAGE_NO AS messageNo,
-		SENDER_NO AS senderNo,
-		RECEIVER_NO AS receiverNo,
-		CONTENT,
-		SENT_TIME AS sentTime,
-		IS_READ AS isRead,
-		URL
-		FROM MESSAGE
-		WHERE
-		RECEIVER_NO = #{receiverNo}
-		AND IS_READ = 'N'
-		AND RECEIVER_DELETED = 'N'
-		ORDER BY SENT_TIME DESC
+		select *
+		from (
+		select
+		m.message_no as messageNo,
+		m.sender_no as senderNo,
+		m.receiver_no as receiverNo,
+		m.content,
+		m.type as type,
+		m.sent_time as sentTime,
+		m.is_read as isRead,
+		m.url,
+		ms.nickname as senderNickname
+		from message m
+		join member ms on m.sender_no = ms.member_no
+		where
+		m.receiver_no = #{receiverNo}
+		and m.is_read = 'N'
+		and m.receiver_deleted = 'N'
+		order by sent_time desc
 		)
-		WHERE ROWNUM &lt; 6
+		where rownum &lt; 6
+	</select>
+
+	<select id="findMemberNoByNickname" resultType="long">
+		SELECT
+		MEMBER_NO
+		FROM
+		MEMBER
+		WHERE
+		NICKNAME = #{nickname}
 	</select>
 </mapper>

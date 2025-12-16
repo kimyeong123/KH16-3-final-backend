@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,8 +45,10 @@ public class BoardRestController {
 	}
 	
 	@GetMapping("/list")
-	public List<BoardDto> list() {
-		return boardService.selectNoticeList(); 
+	public List<BoardDto> list(
+	    @RequestParam(required = false, defaultValue = "1") int page 
+	) {
+	    return boardService.selectNoticeList();
 	}
 	
 	@GetMapping("/{boardNo}")

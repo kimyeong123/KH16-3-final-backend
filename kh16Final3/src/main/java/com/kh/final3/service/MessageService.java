@@ -36,7 +36,7 @@ public class MessageService {
         messageDto.setMessageNo(messageNo);
 
 		// 2. 쪽지 등록 (DAO의 insert 호출)
-		boolean insertResult = messageDao.insert(messageDto);
+		boolean insertResult = messageDao.insertMessage(messageDto);
 
 		return insertResult;
 	}
@@ -58,7 +58,7 @@ public class MessageService {
 	    long messageNo = messageDao.sequence();
 	    messageDto.setMessageNo(messageNo);
 
-	    boolean insertResult = messageDao.insert(messageDto);
+	    boolean insertResult = messageDao.insertMessage(messageDto);
 
 	    if (!insertResult) {
 	        throw new TargetNotfoundException("판매자 문의 메시지 등록 실패");
@@ -84,7 +84,7 @@ public class MessageService {
 		long messageNo = messageDao.sequence();
 		messageDto.setMessageNo(messageNo);
 
-		boolean insertResult = messageDao.insert(messageDto);
+		boolean insertResult = messageDao.insertMessage(messageDto);
 
 		if (!insertResult) {
 			throw new TargetNotfoundException("시스템 알림 메시지 등록 실패");
@@ -127,55 +127,60 @@ public class MessageService {
 	}
 
 	/**
-	 * 2-4. 수신함 목록 조회 (페이지네이션 + 필터링)
+	 * 2-4. 수신함 목록 조회 (페이지네이션 + 필터링 + 검색)
 	 */
 	@Transactional
-	public PageVO<MessageDto> getReceivedListByPaging(PageVO<MessageDto> pageVO, long memberNo, List<String> types) {
+	public PageVO<MessageDto> getReceivedListByPaging(PageVO<MessageDto> pageVO, Map<String, Object> paramMap, long memberNo) {
 
-		// 1. DAO 호출 파라미터 준비
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("memberNo", memberNo);
-		paramMap.put("types", types); // 필터링 타입 목록
-		
-		// 2. 필터링된 전체 개수 조회 및 PageVO 설정
-		long count = messageDao.countReceived(paramMap); 
-		pageVO.setDataCount((int) count);
+	    // 1. DAO 호출 파라미터 준비: 회원 번호와 페이징 정보 추가
+	    paramMap.put("memberNo", memberNo);
+	    // PageVO의 현재 페이지 정보를 Map에 추가 (DAO는 Map만 받기 때문)
+	    paramMap.put("page", pageVO.getPage()); 
+	    paramMap.put("size", pageVO.getSize()); 
+	    
+	    // 2. 검색 및 필터링된 전체 개수 조회
+	    long count = messageDao.countReceived(paramMap); 
+	    pageVO.setDataCount((int) count);
 
-		// 3. 목록 조회를 위한 페이징 정보 추가
-		paramMap.put("begin", pageVO.getBegin());
-		paramMap.put("end", pageVO.getEnd());
+	    // 3. 목록 조회를 위한 페이징 정보 계산 및 Map에 추가
+	    paramMap.put("begin", pageVO.getBegin());
+	    paramMap.put("end", pageVO.getEnd());
 
-		// 4. 목록 조회 및 PageVO에 설정
-		List<MessageDto> list = messageDao.selectReceivedListByPaging(paramMap);
-		pageVO.setList(list);
+	    // 4. 목록 조회 및 PageVO에 설정
+	    List<MessageDto> list = messageDao.selectReceivedListByPaging(paramMap);
+	    pageVO.setList(list);
 
-		return pageVO;
+	    return pageVO;
 	}
 
+
 	/**
-	 * 2-5. 발신함 목록 조회 (페이지네이션 + 필터링)
+	 * 2-5. 발신함 목록 조회 (페이지네이션 + 필터링 + 검색)
 	 */
+    // 🚨 수정된 부분: PageVO<MessageDto> pageVO 인자 추가
 	@Transactional
-	public PageVO<MessageDto> getSentListByPaging(PageVO<MessageDto> pageVO, long memberNo, List<String> types) {
+	public PageVO<MessageDto> getSentListByPaging(PageVO<MessageDto> pageVO, Map<String, Object> paramMap, long memberNo) { 
 
-		// 1. DAO 호출 파라미터 준비
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("memberNo", memberNo);
-		paramMap.put("types", types); // 필터링 타입 목록
-		
-		// 2. 필터링된 전체 개수 조회 및 PageVO 설정
-		long count = messageDao.countSent(paramMap); //
-		pageVO.setDataCount((int) count);
+	    // 1. DAO 호출 파라미터 준비: 회원 번호와 페이징 정보 추가
+	    paramMap.put("memberNo", memberNo);
+	    // PageVO의 현재 페이지 정보를 Map에 추가
+	    paramMap.put("page", pageVO.getPage()); 
+	    paramMap.put("size", pageVO.getSize()); 
+	    
+	    // 2. 검색 및 필터링된 전체 개수 조회
+	    long count = messageDao.countSent(paramMap); 
+	    pageVO.setDataCount((int) count);
 
-		// 3. 목록 조회를 위한 페이징 정보 추가
-		paramMap.put("begin", pageVO.getBegin());
-		paramMap.put("end", pageVO.getEnd());
+	    // 3. 목록 조회를 위한 페이징 정보 계산 및 Map에 추가
+	    // PageVO의 계산 로직을 통해 begin/end가 설정되었다고 가정
+	    paramMap.put("begin", pageVO.getBegin());
+	    paramMap.put("end", pageVO.getEnd());
 
-		// 4. 목록 조회 및 PageVO에 설정
-		List<MessageDto> list = messageDao.selectSentListByPaging(paramMap);
-		pageVO.setList(list);
+	    // 4. 목록 조회 및 PageVO에 설정
+	    List<MessageDto> list = messageDao.selectSentListByPaging(paramMap);
+	    pageVO.setList(list);
 
-		return pageVO;
+	    return pageVO;
 	}
 	
 	// ----------------------------------------------------
