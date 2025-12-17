@@ -1,18 +1,19 @@
-package com.kh.final3.service;
+package com.kh.final3.helper;
 
 import org.springframework.stereotype.Component;
 
 import com.kh.final3.domain.enums.EscrowStatus;
 import com.kh.final3.domain.enums.PointHistoryReason;
+import com.kh.final3.domain.records.SettlementResult;
 import com.kh.final3.dto.BidDto;
 import com.kh.final3.dto.EscrowLedgerDto;
 import com.kh.final3.dto.OrdersDto;
 import com.kh.final3.dto.PointHistoryDto;
 
 @Component
-public class AuctionHelperService {
+public class AuctionHelper {
 
-	public EscrowLedgerDto createEscrowDto(BidDto bidDto, long escrowLedgerNo , EscrowStatus status) {
+	public EscrowLedgerDto createEscrowDtoByBid(BidDto bidDto, long escrowLedgerNo, EscrowStatus status) {
 		return EscrowLedgerDto.builder()
 				.escrowLedgerNo(escrowLedgerNo)
 				.bidNo(bidDto.getBidNo())
@@ -24,7 +25,7 @@ public class AuctionHelperService {
 				.build();
 	}
 	
-	public PointHistoryDto createPointHistoryDto(BidDto bidDto, long pointHistoryNo,  PointHistoryReason reason) {
+	public PointHistoryDto createPointHistoryDtoByBid(BidDto bidDto, long pointHistoryNo, PointHistoryReason reason) {
 		return	PointHistoryDto.builder()
 				.pointHistoryNo(pointHistoryNo)
 				.memberNo(bidDto.getBidderNo())
@@ -35,7 +36,7 @@ public class AuctionHelperService {
 				.build();
 	}
 	
-    public OrdersDto createOrderDto(BidDto bidDto, long orderNo, long sellerNo) {
+    public OrdersDto createOrderDtoByBid(BidDto bidDto, long orderNo, long sellerNo) {
         return OrdersDto.builder()
         		.orderNo(orderNo)
         		.productNo(bidDto.getProductNo())
@@ -45,4 +46,19 @@ public class AuctionHelperService {
         		.build();
     }
 	
+    public PointHistoryDto createPointHistoryDtoByOrder(
+    		OrdersDto orderDto, long pointHistoryNo, 
+    		SettlementResult settlementResult ,PointHistoryReason reason) {
+    	
+		return	PointHistoryDto.builder()
+				.pointHistoryNo(pointHistoryNo)
+				.memberNo(orderDto.getSellerNo())
+				.type(reason.getType())
+				.amount(settlementResult.amount())
+				.feeAmount(settlementResult.feeAmount())
+				.reason(reason.getReason())
+				.productNo(orderDto.getProductNo())
+				.build();
+	}
+    
 }

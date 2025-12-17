@@ -174,10 +174,21 @@
     	from product
     		where 
 			<![CDATA[
-				end_time < systimestamp
+				end_time <= systimestamp
 			]]>
       			and status = 'BIDDING'
 	</select>
+	
+	<select id="findStartableProductNos" resultType="Long">
+	    select product_no
+	    from product
+	    where
+	        <![CDATA[
+	            start_time <= systimestamp
+	        ]]>
+	        and status = 'REGISTRATION'
+</select>
+	
 	
 	<select id="findSellerNoByProductNo" resultType="long">
 		select seller_no

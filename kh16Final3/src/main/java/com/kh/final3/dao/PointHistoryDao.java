@@ -34,4 +34,8 @@ public class PointHistoryDao {
     public long calculateMemberBalance(int memberNo) {
     	return sqlSession.selectOne(NAMESPACE + "calculateMemberBalance", memberNo);
     }
+    
+    public int insertSettlementHistory(PointHistoryDto pointHistoryDto) {
+    	return sqlSession.insert(NAMESPACE + "insertSettlementHistory", pointHistoryDto);
+    }
 }

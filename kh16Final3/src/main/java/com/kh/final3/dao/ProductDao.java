@@ -60,7 +60,11 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
 	}
 	
-	public long findSellerNoByProductNo(long productNo) {
+	public List<Long> findStartableProductNos(){
+		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
+	}
+	
+	public Long findSellerNoByProductNo(long productNo) {
 		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo");
 	}
 

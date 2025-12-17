@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class OrderTrackingUpdateVO {
     private Long orderNo;
+    private String courier;
     private String trackingNumber;
 }

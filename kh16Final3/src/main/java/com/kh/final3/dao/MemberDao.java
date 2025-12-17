@@ -27,7 +27,7 @@ public class MemberDao {
 		sqlSession.insert(NAMESPACE + "insert", memberDto);
 	}
 	
-	public MemberDto selectOne(String memberNo) {
+	public MemberDto selectOne(long memberNo) {
 		return sqlSession.selectOne(NAMESPACE + "detail", memberNo);
 	}
 	
@@ -121,6 +121,7 @@ public class MemberDao {
     public int updateMember(MemberDto memberDto) {
         return sqlSession.update(NAMESPACE + "updateMember", memberDto);
     }
+    
     public int updatePassword(@Param("memberNo") Long memberNo, @Param("memberPw") String memberPw) {
         Map<String, Object> params = new HashMap<>();
         params.put("memberNo", memberNo);
