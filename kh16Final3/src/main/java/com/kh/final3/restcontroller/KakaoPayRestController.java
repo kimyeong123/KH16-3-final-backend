@@ -68,6 +68,9 @@ public class KakaoPayRestController {
         }
 
         int amount = chargeRequestVO.getAmount();
+        if (amount < 1000 || amount % 1000 != 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT_UNIT");
+        }
         String partnerOrderId = UUID.randomUUID().toString();
 
         // ✅ A안: partnerUserId에 memberNo(숫자 문자열) 저장

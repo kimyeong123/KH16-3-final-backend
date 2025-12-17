@@ -146,6 +146,13 @@ select member_no as memberNo, id, nickname, role, point, created_time as created
   order by member_no asc
 </select>
 
+<!--포인트 구매시 멤버 포인트 증가-->
+<update id="increasePoint">
+  update member
+  set point = nvl(point, 0) + #{amount}
+  where member_no = #{memberNo}
+</update>
+
 
 	<!-- 잔액이 음수가 되는 경우를 방지 및 실행 0건으로 확인 가능 -->
 	<update id="deductMemberPoint"> 
