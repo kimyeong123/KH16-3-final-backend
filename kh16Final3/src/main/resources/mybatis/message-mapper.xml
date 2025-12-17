@@ -47,10 +47,7 @@
 		ms.nickname as senderNickname,
 		mr.nickname as receiverNickname
 		from message m
-		join member ms on m.sender_no =
-		ms.member_no
-		join member mr on m.receiver_no = mr.member_no
-		where m.message_no = #{messageNo}
+    	LEFT JOIN member ms on m.sender_no = ms.member_no  LEFT JOIN member mr on m.receiver_no = mr.member_no where m.message_no = #{messageNo}
 	</select>
 
 	<update id="updateReadTime" parameterType="long">

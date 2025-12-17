@@ -44,13 +44,13 @@ public class ProductDao {
 		return sqlSession.delete(NAMESPACE + "delete", productNo);
 	}
 
-	public boolean update(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-	}
-
-	public boolean updateUnit(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-	}
+//	public boolean update(ProductDto productDto) {
+//		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
+//	}
+//
+//	public boolean updateUnit(ProductDto productDto) {
+//		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
+//	}
 
 	public int updateStatus(long productNo, ProductStatus changeStatus) {
 		Map<String, Object> params = new HashMap<>();

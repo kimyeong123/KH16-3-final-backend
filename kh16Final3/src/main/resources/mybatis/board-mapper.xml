@@ -11,7 +11,8 @@
 
 	<insert id="insert" parameterType="BoardDto">
 		insert into board(
-		board_no , title ,
+		board_no ,
+		title ,
 		writer_no , content ,
 		write_time , edit_time ,
 		read_count , type
@@ -19,7 +20,8 @@
 		values(
 		#{boardNo} , #{title} ,
 		#{writerNo} , #{content} ,
-		systimestamp , null ,
+		systimestamp
+		, null ,
 		0 , #{type}
 		)
 	</insert>
@@ -28,7 +30,8 @@
 		select
 		board_no,
 		title,
-		writer_no as writerNo,
+		writer_no as
+		writerNo,
 		content,
 		write_time as writeTime,
 		edit_time as editTime,
@@ -49,7 +52,8 @@
 		read_count as readCount,
 		type
 		from board
-		where board_no = #{boardNo}
+		where
+		board_no = #{boardNo}
 	</select>
 
 	<select id="listByType" resultType="BoardDto"
@@ -57,7 +61,8 @@
 		select
 		board_no, title, writer_no as writerNo, content,
 		write_time as writeTime, edit_time as editTime,
-		read_count as readCount, type
+		read_count as
+		readCount, type
 		from board
 		where type = #{type} order by board_no desc
 	</select>
@@ -81,7 +86,7 @@
 		where board_no=#{boardNo}
 	</update>
 
-	<update id="updateBoardRead" parameterType="long" >
+	<update id="updateBoardRead" parameterType="long">
 		update board
 		set
 		read_count = read_count + 1
@@ -99,12 +104,14 @@
 		</if>
 	</select>
 
-	<select id="selectList" resultType="BoardDto" parameterType="PageVO">
+	<select id="selectList" resultType="BoardDto"
+		parameterType="PageVO">
 		select *
 		from (
 		select rownum rn, board.*
 		from BOARD board
-		where TYPE = 'QNA'
+		where TYPE =
+		'QNA'
 		<if test="isSearch()">
 			and ${column} like '%' || #{keyword} || '%'
 		</if>
@@ -112,21 +119,43 @@
 		)
 		where rn between #{begin} and #{end}
 	</select>
-	
-	<select id="selectCount" resultType="int" parameterType="String">
-		select count(*) from board where type = #{param1}
+
+	<select id="selectCount" resultType="int" parameterType="map">
+		SELECT count(*) FROM board
+		WHERE type = #{type}
+		<if test="writerNo != null">
+			AND writer_no = #{writerNo}
+		</if>
 	</select>
-	
-	<select id="selectListByPaging" resultType="BoardDto" parameterType="map">
-		SELECT * FROM (
-			SELECT ROWNUM rn, tmp.* FROM (
-				SELECT 
-				    board.*,
-				    member.NICKNAME as writerNickname  FROM board
-				LEFT OUTER JOIN member ON board.WRITER_NO = member.MEMBER_NO WHERE board.type = #{type}
-				ORDER BY board.board_no DESC
-			) tmp
-	    ) 
-	    WHERE rn BETWEEN #{begin} AND #{end}
+
+	<select id="selectListByPaging" parameterType="map" resultType="BoardDto">
+    SELECT *
+    FROM (
+        SELECT ROWNUM rn, T.*
+        FROM (
+            SELECT
+                board_no as boardNo,
+                title,
+                writer_no as writerNo,
+                write_time as writeTime,
+                read_count as readCount,
+                type,
+                (SELECT count(*) FROM COMMENTS WHERE board_no = B.board_no) as replyCount
+            FROM board B
+            WHERE type = #{type}
+            <if test="writerNo != null">
+                AND writer_no = #{writerNo}
+            </if>
+            ORDER BY board_no DESC
+        ) T
+    )
+    WHERE rn BETWEEN #{begin} AND #{end}
+</select>
+
+	<select id="selectCountByMember" resultType="int"
+		parameterType="map">
+		SELECT count(*) FROM board
+		WHERE type = 'QNA' AND
+		writer_no = #{writerNo}
 	</select>
 </mapper>

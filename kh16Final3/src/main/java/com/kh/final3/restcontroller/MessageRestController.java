@@ -142,9 +142,10 @@ public class MessageRestController {
 	@GetMapping("/{messageNo}")
 	public ResponseEntity<MessageDto> getMessageDetail(
 			@PathVariable long messageNo,
+			@RequestAttribute long memberNo,
 	    @RequestAttribute("memberNo") long currentMemberNo) {
 
-	    MessageDto detail = messageService.getMessageDetailAndRead(messageNo);
+	    MessageDto detail = messageService.getMessageDetailAndRead(messageNo, memberNo);
 
 	    if (detail == null) {
 	        throw new TargetNotfoundException("해당 쪽지를 찾을 수 없습니다.");
