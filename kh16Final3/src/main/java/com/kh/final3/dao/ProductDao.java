@@ -84,15 +84,15 @@ public class ProductDao {
 		return n == null ? 0L : n.longValue();
 	}
   
-   /** 상품 정보 수정 */
-    public boolean update(ProductDto productDto) {
-        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-    }
-
-    /** 상품 단위 가격 수정 */
-    public boolean updateUnit(ProductDto productDto) {
-        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-    }
+//   /** 상품 정보 수정 */
+//    public boolean update(ProductDto productDto) {
+//        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
+//    }
+//
+//    /** 상품 단위 가격 수정 */
+//    public boolean updateUnit(ProductDto productDto) {
+//        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
+//    }
 
 	public int count() {
 		return sqlSession.selectOne(NAMESPACE + "countByPaging");
