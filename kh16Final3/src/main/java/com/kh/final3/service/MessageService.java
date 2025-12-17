@@ -30,15 +30,26 @@ public class MessageService {
 	 */
 	@Transactional
 	public boolean sendMessage(MessageDto messageDto) {
+	    
+	    // 1. 닉네임으로 수신자의 MEMBER_NO를 조회
+	    Long receiverMemberNo = messageDao.findMemberNoByNickname(messageDto.getReceiverNickname()); 
 
-		// 1. 시퀀스 번호 발급
-        long messageNo = messageDao.sequence();
-        messageDto.setMessageNo(messageNo);
+	    if (receiverMemberNo == null) {
+	        // 수신자 닉네임을 찾지 못했으므로 쪽지 전송 불가
+	        throw new TargetNotfoundException("수신자 닉네임에 해당하는 회원을 찾을 수 없습니다.");
+	    }
+	    
+	    // 3. DTO에 수신자 번호 설정
+	    messageDto.setReceiverNo(receiverMemberNo); 
+	    
+	    // 4. 시퀀스 번호 발급
+	    long messageNo = messageDao.sequence();
+	    messageDto.setMessageNo(messageNo);
 
-		// 2. 쪽지 등록 (DAO의 insert 호출)
-		boolean insertResult = messageDao.insertMessage(messageDto);
+	    // 5. 쪽지 등록 (RECEIVER_NO가 채워진 상태로 DAO 호출)
+	    boolean insertResult = messageDao.insertMessage(messageDto);
 
-		return insertResult;
+	    return insertResult;
 	}
 	
 	/**
@@ -99,16 +110,33 @@ public class MessageService {
 	 * 2-1. 쪽지 상세 조회 및 읽음 처리 (트랜잭션 포함)
 	 */
 	@Transactional
-	public MessageDto getMessageDetailAndRead(long messageNo) {
-		MessageDto detail = messageDao.selectOne(messageNo);
+	public MessageDto getMessageDetailAndRead(long messageNo, long memberNo) {
+	    
+	    // 1. 상세 조회
+	    MessageDto detail = messageDao.selectOne(messageNo); 
 
-		// 미확인 상태(N)이고, 수신자에게 해당 메시지가 삭제되지 않았을 경우에만 읽음 처리
-        // (주의: Controller에서 수신자/발신자 권한 체크를 수행해야 함)
-		if (detail != null && detail.getIsRead().equals("N")) {
-			messageDao.updateReadTime(messageNo);
-			detail.setIsRead("Y"); // DTO 상태 업데이트
-		}
-		return detail;
+	    // 쪽지 번호 자체가 없거나, Mapper의 LEFT JOIN이 실패한 경우
+	    if (detail == null) {
+	        return null;
+	    }
+	    
+	    // 2. 권한 체크 (NULL-Safe 로직만 사용)
+	    // DTO 필드가 Long 타입임을 전제로, NULL 체크 후 longValue() 비교
+	    boolean isSender = (detail.getSenderNo() != null && detail.getSenderNo().longValue() == memberNo);
+	    boolean isReceiver = (detail.getReceiverNo() != null && detail.getReceiverNo().longValue() == memberNo);
+
+	    if (!isSender && !isReceiver) {
+	        return null;
+	    }
+	    
+	    // 3. 읽음 처리: 쪽지가 미확인(N) 상태이고, 현재 사용자가 '수신자'일 경우에만 처리
+	    if (detail.getIsRead().equals("N") && isReceiver) {
+	        messageDao.updateReadTime(messageNo); 
+	        detail.setIsRead("Y"); 
+	    }
+	    
+	    // 발신자/수신자 권한을 가진 사용자에게만 detail 반환
+	    return detail;
 	}
 
 	/**

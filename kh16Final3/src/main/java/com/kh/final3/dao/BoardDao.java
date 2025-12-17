@@ -56,22 +56,15 @@ public class BoardDao {
 		return sqlSession.selectList("board.listByType", type);
 	}
 	
-	// 9. 전체 개수 조회
-	public int selectCount(String type) {
-		return sqlSession.selectOne("board.selectCount", type);
+	// 9. 전체 개수 조회 (Service에서 type을 "NOTICE"로 전달 가정)
+	public int selectCountByType(Map<String, Object> params) {
+	    return sqlSession.selectOne("board.selectCount", params);
 	}
-	
-	// 10. 페이징된 목록 조회
-	public List<BoardDto> selectListByPaging(String type, int begin, int end) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("type", type);
-		params.put("begin",  begin);
-		params.put("end",  end);
-		
-		return sqlSession.selectList("board.selectListByPaging", params);
-		
-	}
-	
-	
+
+	// 10. 페이징된 목록 조회 
+		public List<BoardDto> selectListByPaging(Map<String, Object> params) {
+		    return sqlSession.selectList("board.selectListByPaging", params);
+		}
+
 	
 }
