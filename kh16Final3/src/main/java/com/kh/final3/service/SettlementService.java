@@ -60,9 +60,12 @@ public class SettlementService {
 	    pointHistoryService.settlePointsForOrder(order);
 
 	    // 5. 주문 상태 확정
-	    ordersDao.updateStatus(orderNo, OrderStatus.COMPLETED);
-	    log.info("[SETTLEMENT] Order status updated. orderNo={}, DELIVERED → COMPLETED",
-	             orderNo);
+	    int updatedCount = ordersDao.completeOrder(orderNo);
+
+	    if (updatedCount == 0) {
+	        log.debug("[SETTLEMENT] Order already completed or invalid status. orderNo={}", orderNo);
+	        return;
+	    }
 	    
 	    // 6. 상품 상태 확정
 	    productDao.updateStatus(product.getProductNo(), ProductStatus.COMPLETED);

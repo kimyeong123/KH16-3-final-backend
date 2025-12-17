@@ -47,7 +47,7 @@
         order by created_time desc
     </select>
     
-	<select id="calculateMemberBalance" resultType="long" parameterType="int">
+	<select id="calculateMemberBalance" resultType="long">
 	 	select nvl(
 	    	sum(case
 	      		when type = 'ADD' then amount
@@ -58,4 +58,5 @@
 	  		from point_history
 	  	where member_no = #{memberNo}
 	</select>
+	
 </mapper>

@@ -167,7 +167,7 @@ select member_no as memberNo, id, nickname, role, point, created_time as created
 	<select id="findMemberPoint" resultType="long">
 		select point
 			from member
-		where memebr_no = #{memberNo}
+		where member_no = #{memberNo}
 	</select>
 	
 	
