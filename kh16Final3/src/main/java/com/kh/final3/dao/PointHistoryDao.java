@@ -38,4 +38,8 @@ public class PointHistoryDao {
     public int insertSettlementHistory(PointHistoryDto pointHistoryDto) {
     	return sqlSession.insert(NAMESPACE + "insertSettlementHistory", pointHistoryDto);
     }
+
+    public int insertCharge(PointHistoryDto dto) {
+        return sqlSession.insert(NAMESPACE + "insertCharge", dto);
+    }
 }
