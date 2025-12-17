@@ -72,4 +72,9 @@ public class OrdersDao {
     	return sqlSession.update(NAMESPACE + "updateShippingInfo", shippingRequestVO);
     }
     
+    // 정산 대상 찾기(pk 리스트 반환)
+    public List<Long> findSettlementTargets(int days){
+    	return sqlSession.selectList(NAMESPACE + "findSettlementTargets", days);
+    }
+    
 }

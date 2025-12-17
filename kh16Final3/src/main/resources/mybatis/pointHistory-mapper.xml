@@ -20,6 +20,17 @@
               #{amount}, #{reason}, #{productNo}
         )
     </insert>
+    <!-- 포인트 충전용 -->
+    <insert id="insertCharge">
+    insert into point_history(
+    point_history_no, member_no, amount,
+    type, reason, fee_amount
+  ) values (
+    point_history_seq.nextval, #{memberNo}, #{amount},
+     #{type}, #{reason}, #{feeAmount}
+  )
+    </insert>
+
     
     <insert id="insertSettlementHistory">
         insert into 
@@ -47,7 +58,7 @@
         order by created_time desc
     </select>
     
-	<select id="calculateMemberBalance" resultType="long" parameterType="int">
+	<select id="calculateMemberBalance" resultType="long">
 	 	select nvl(
 	    	sum(case
 	      		when type = 'ADD' then amount
@@ -58,4 +69,5 @@
 	  		from point_history
 	  	where member_no = #{memberNo}
 	</select>
+	
 </mapper>

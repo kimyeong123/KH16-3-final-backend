@@ -79,9 +79,10 @@
             completed_time = systimestamp,
             updated_time = systimestamp
         where order_no = #{orderNo}
+        	and status = 'DELIVERED'
     </update>
     
-    <update id="updateShippingInfo" parameterType="orderShippingRequestVO">
+    <update id="updateShippingInfo">
 	    update orders
 	    set
 	        receiver_name = #{receiverName},
@@ -92,5 +93,15 @@
 	        updated_time = systimestamp
 	    where order_no = #{orderNo}
 	</update>
+	
+	<select id="findSettlementTargets" resultType="long">
+	    select order_no
+	    from orders
+	    where status = 'DELIVERED'
+	      and 
+	       <![CDATA[
+	      delivered_time <= SYSTIMESTAMP - #{days}
+			]]>
+	</select>
 
 </mapper>

@@ -200,4 +200,17 @@ public class MemberService {
         }
         return memberDao.selectMemberListSearch(type, keyword.trim());
     }
+    //회원 포인트 증가
+    @Transactional
+    public void addPoint(Long memberNo, Long amount) {
+        if (amount == null || amount < 1) {
+            throw new IllegalArgumentException("amount must be >= 1");
+        }
+
+        int result = memberDao.increasePoint(memberNo, amount);
+        if (result == 0) {
+            throw new IllegalStateException("member not found");
+        }
+    }
+
 }

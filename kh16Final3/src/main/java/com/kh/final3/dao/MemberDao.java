@@ -142,5 +142,16 @@ public class MemberDao {
 		params.put("keyword", keyword);
 		return sqlSession.selectList(NAMESPACE + "selectMemberListSearch", params);
 	}
+	// 포인트 증가
+	public int increasePoint(Long memberNo, Long amount) {
+	    Map<String, Object> param = new HashMap<>();
+	    param.put("memberNo", memberNo);
+	    param.put("amount", amount);
+
+	    return sqlSession.update(NAMESPACE + "increasePoint", param);
+	}
+
+
+
 
 }

@@ -24,6 +24,14 @@ public class AuctionScheduleService {
     public void processExpiredAuctions() {
         List<Long> expiredProductNos = productDao.findExpiredProductNos();
 
+        if (expiredProductNos.isEmpty()) {
+            log.debug("[AUCTION-SCHEDULE] No expired auctions");
+            return;
+        }
+
+        log.info("[AUCTION-SCHEDULE] Expired auctions found. count={}",
+                 expiredProductNos.size());
+        
         List<Long> failedNos = new ArrayList<>();
         
         for (Long productNo : expiredProductNos) {
@@ -31,15 +39,23 @@ public class AuctionScheduleService {
                 auctionService.handleSingleAuctionEnd(productNo); // endAuction or noBidAuction
             } catch (Exception e) {
                 failedNos.add(productNo); // 실패한 번호 기록
+                log.warn("[AUCTION-SCHEDULE] End auction failed (1st). productNo={}",
+                        productNo, e);
             }
         }
 
+        if (!failedNos.isEmpty()) {
+            log.info("[AUCTION-SCHEDULE] Retry expired auctions. retryCount={}",
+                     failedNos.size());
+        }
+        
         // 실패한 상품 재시도 1회
         for (Long failedNo : failedNos) {
             try {
             	auctionService.handleSingleAuctionEnd(failedNo);
             } catch (Exception e) {
-            	log.warn("경매 종료 처리 실패 (두 번 실패): productNo={}", failedNo, e);
+            	log.error("[AUCTION-SCHEDULE] End auction failed twice. productNo={}",
+                        failedNo, e);
             }
         }
     }
@@ -47,6 +63,14 @@ public class AuctionScheduleService {
     public void processStartableAuctions() {
         List<Long> startableProductNos = productDao.findStartableProductNos();
 
+        if (startableProductNos.isEmpty()) {
+            log.debug("[AUCTION-SCHEDULE] No startable auctions");
+            return;
+        }
+        
+        log.info("[AUCTION-SCHEDULE] Startable auctions found. count={}",
+                startableProductNos.size());
+        
         List<Long> failedNos = new ArrayList<>();
 
         for (Long productNo : startableProductNos) {
@@ -54,7 +78,14 @@ public class AuctionScheduleService {
             	auctionService.handleSingleAuctionStart(productNo);
             } catch (Exception e) {
                 failedNos.add(productNo);
+                log.warn("[AUCTION-SCHEDULE] Start auction failed (1st). productNo={}",
+                        productNo, e);
             }
+        }
+        
+        if (!failedNos.isEmpty()) {
+            log.info("[AUCTION-SCHEDULE] Retry start auctions. retryCount={}",
+                     failedNos.size());
         }
         
         // 실패 재시도 1회
@@ -62,7 +93,8 @@ public class AuctionScheduleService {
             try {
             	auctionService.handleSingleAuctionStart(failedNo);
             } catch (Exception e) {
-                log.warn("경매 시작 처리 실패 (두 번 실패): productNo={}", failedNo, e);
+            	log.error("[AUCTION-SCHEDULE] Start auction failed twice. productNo={}",
+                        failedNo, e);
             }
         }
     }
