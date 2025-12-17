@@ -31,9 +31,9 @@ import com.kh.final3.vo.TokenVO;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/product")
-@CrossOrigin
 public class ProductRestController {
 
 	@Autowired

@@ -7,13 +7,11 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
-import com.kh.final3.vo.ProductListVO;
 
 @Repository
 public class ProductDao {
@@ -44,14 +42,6 @@ public class ProductDao {
 		return sqlSession.delete(NAMESPACE + "delete", productNo);
 	}
 
-	public boolean update(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-	}
-
-	public boolean updateUnit(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-	}
-
 	public int updateStatus(long productNo, ProductStatus changeStatus) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("productNo", productNo);
@@ -59,8 +49,8 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "updateStatus", params);
 	}
 
-	public int updateEndedAuction(AuctionEndRequestVO endRequestVO) {
-		return sqlSession.update(NAMESPACE + "updateEndedAuction", endRequestVO);
+	public int updateProductOnAuctionEnd(AuctionEndRequestVO endRequestVO) {
+		return sqlSession.update(NAMESPACE + "updateProductOnAuctionEnd", endRequestVO);
 	}
 
 	public ProductDto selectOneForUpdate(long productNo) {
@@ -77,22 +67,26 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
 	}
   
-	public long findSellerNoByProductNo(long productNo) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("productNo", productNo);
-		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
-		return n == null ? 0L : n.longValue();
-	}
+//	public long findSellerNoByProductNo(long productNo) {
+//		Map<String, Object> params = new HashMap<>();
+//		params.put("productNo", productNo);
+//		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
+//		return n == null ? 0L : n.longValue();
+//	}
   
-//   /** 상품 정보 수정 */
-//    public boolean update(ProductDto productDto) {
-//        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-//    }
-//
-//    /** 상품 단위 가격 수정 */
-//    public boolean updateUnit(ProductDto productDto) {
-//        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-//    }
+	public Long findSellerNoByProductNo(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
+	}
+	
+   /** 상품 정보 수정 */
+    public boolean update(ProductDto productDto) {
+        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
+    }
+
+    /** 상품 단위 가격 수정 */
+    public boolean updateUnit(ProductDto productDto) {
+        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
+    }
 
 	public int count() {
 		return sqlSession.selectOne(NAMESPACE + "countByPaging");

@@ -81,7 +81,7 @@ public class AuctionService {
     }
     
 	public void closeAuction(AuctionEndRequestVO endRequestVO, long bidNo) {
-		productDao.updateEndedAuction(endRequestVO);
+		productDao.updateProductOnAuctionEnd(endRequestVO);
 		escrowLedgerService.updateEscrowForBid(bidNo, EscrowStatus.PENDING_SETTLEMENT);
 	}
     
