@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.kh.final3.domain.enums.OrderStatus;
 import com.kh.final3.dto.OrdersDto;
 import com.kh.final3.vo.OrderShippingRequestVO;
+import com.kh.final3.vo.OrderTrackingUpdateVO;
 
 @Repository
 public class OrdersDao {
@@ -32,7 +33,12 @@ public class OrdersDao {
     public OrdersDto selectOne(long orderNo) {
         return sqlSession.selectOne(NAMESPACE + "selectOne", orderNo);
     }
-
+    
+    // 수정 용 조회(lock)
+    public OrdersDto selectOneForUpdate(long orderNo) {
+        return sqlSession.selectOne(NAMESPACE + "selectOneForUpdate", orderNo);
+    }
+    
     // 구매자 기준 주문 목록 조회
     public List<OrdersDto> selectByBuyer(long buyerNo) {
         return sqlSession.selectList(NAMESPACE + "selectByBuyer", buyerNo);
@@ -44,8 +50,8 @@ public class OrdersDao {
     }
 
     // 송장 번호 업데이트 + 상태 변경
-    public int updateTrackingNumber(OrdersDto dto) {
-        return sqlSession.update(NAMESPACE + "updateTrackingNumber", dto);
+    public int updateTrackingInfo(OrderTrackingUpdateVO trackingUpdateVO) {
+        return sqlSession.update(NAMESPACE + "updateTrackingInfo", trackingUpdateVO);
     }
 
     // 상태 업데이트

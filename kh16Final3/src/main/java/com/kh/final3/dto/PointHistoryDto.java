@@ -11,7 +11,8 @@ public class PointHistoryDto {
     private Long pointHistoryNo;
     private Long memberNo;
     private String type;
-    private Long amount; 
+    private Long amount;
+    private Long feeAmount;
     private String reason;
     private Long productNo;
     private Timestamp createdTime;

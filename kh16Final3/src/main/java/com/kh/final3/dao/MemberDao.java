@@ -25,8 +25,8 @@ public class MemberDao {
 	public void insert(MemberDto memberDto) {
 		sqlSession.insert(NAMESPACE + "insert", memberDto);
 	}
-
-	public MemberDto selectOne(String memberNo) {
+	
+	public MemberDto selectOne(long memberNo) {
 		return sqlSession.selectOne(NAMESPACE + "detail", memberNo);
 	}
 

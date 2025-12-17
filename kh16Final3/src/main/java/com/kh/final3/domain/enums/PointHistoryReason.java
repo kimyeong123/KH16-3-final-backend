@@ -14,9 +14,7 @@ public enum PointHistoryReason {
     // 입찰 보증금 환불 (유찰, 취소 등으로 묶였던 포인트 반환) 
 	BID_REFUNDED("BID_REFUNDED", "ADD"),
 
-	SETTLEMENT_RECEIVED("SETTLEMENT_RECEIVED", "ADD"), // 판매자
-    
-	SETTLEMENT_PAID("SETTLEMENT_PAID", "DEDUCT"); // 구매자
+	SETTLEMENT("SETTLEMENT", "ADD"); // 판매자 정산
     
     private final String reason;
     private final String type;

@@ -20,6 +20,17 @@
               #{amount}, #{reason}, #{productNo}
         )
     </insert>
+    
+    <insert id="insertSettlementHistory">
+        insert into 
+        	point_history(
+            	point_history_no, member_no, type, 
+              	amount, fee_amount, reason, product_no
+        ) values(
+              #{pointHistoryNo}, #{memberNo}, #{type}, 
+              #{amount}, #{feeAmount}, #{reason}, #{productNo}
+        )
+    </insert>
 
     <select id="detail" resultType="PointHistoryDto">
         select *
@@ -36,15 +47,15 @@
         order by created_time desc
     </select>
     
-<select id="calculateMemberBalance" resultType="long" parameterType="int">
-  select nvl(
-    sum(case
-      when type = 'ADD' then amount
-      when type = 'DEDUCT' then -amount
-      else 0
-    end), 0
-  ) as current_point_balance
-  from point_history
-  where member_no = #{memberNo}
-</select>
+	<select id="calculateMemberBalance" resultType="long" parameterType="int">
+	 	select nvl(
+	    	sum(case
+	      		when type = 'ADD' then amount
+	      		when type = 'DEDUCT' then -amount
+	      		else 0
+	    		end), 0
+	  			) as current_point_balance
+	  		from point_history
+	  	where member_no = #{memberNo}
+	</select>
 </mapper>

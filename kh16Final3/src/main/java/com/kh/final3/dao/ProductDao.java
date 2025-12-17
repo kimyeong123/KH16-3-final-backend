@@ -73,12 +73,26 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
 	}
 
+  public List<Long> findStartableProductNos(){
+		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
+	}
+  
 	public long findSellerNoByProductNo(long productNo) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("productNo", productNo);
 		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
 		return n == null ? 0L : n.longValue();
 	}
+  
+   /** 상품 정보 수정 */
+    public boolean update(ProductDto productDto) {
+        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
+    }
+
+    /** 상품 단위 가격 수정 */
+    public boolean updateUnit(ProductDto productDto) {
+        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
+    }
 
 	public int count() {
 		return sqlSession.selectOne(NAMESPACE + "countByPaging");

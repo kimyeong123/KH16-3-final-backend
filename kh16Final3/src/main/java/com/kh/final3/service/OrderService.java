@@ -9,6 +9,8 @@ import com.kh.final3.dao.ProductDao;
 import com.kh.final3.domain.enums.OrderStatus;
 import com.kh.final3.dto.BidDto;
 import com.kh.final3.dto.OrdersDto;
+import com.kh.final3.error.TargetNotfoundException;
+import com.kh.final3.helper.AuctionHelper;
 import com.kh.final3.vo.OrderShippingRequestVO;
 
 @Service
@@ -21,15 +23,18 @@ public class OrderService {
     private ProductDao productDao;
 
     @Autowired
-    private AuctionHelperService auctionHelperService;
+    private AuctionHelper auctionHelperService;
 
      // 경매 종료 시 주문 생성 (배송지 없음, CREATED 상태)
     @Transactional
-    public OrdersDto createOrderFromBid(BidDto winningBid) {
+    public OrdersDto createOrderForWinningBid(BidDto winningBid) {
         long orderNo = ordersDao.sequence();
-        long sellerNo = productDao.findSellerNoByProductNo(winningBid.getProductNo());
+        Long sellerNo = productDao.findSellerNoByProductNo(winningBid.getProductNo());
+        if(sellerNo == null)
+        	throw new TargetNotfoundException();
+        
         OrdersDto ordersDto = 
-        		auctionHelperService.createOrderDto(winningBid, orderNo, sellerNo);
+        		auctionHelperService.createOrderDtoByBid(winningBid, orderNo, sellerNo);
         ordersDao.insert(ordersDto);
         return ordersDto;
     }

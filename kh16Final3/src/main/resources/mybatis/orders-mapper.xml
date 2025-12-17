@@ -24,6 +24,13 @@
     </insert>
 
     <!-- 주문 단건 조회 -->
+    <select id="selectOneForUpdate" resultType="ordersDto">
+        select *
+        from orders
+        where order_no = #{orderNo}
+    </select>
+    
+    <!-- 주문 단건 조회 -->
     <select id="selectOne" resultType="ordersDto">
         select *
         from orders
@@ -47,9 +54,11 @@
     </select>
 
     <!-- 송장 번호 업데이트 -->
-    <update id="updateTrackingNumber" >
+    <update id="updateTrackingInfo" >
         update orders
-        set tracking_number = #{trackingNumber},
+        set 
+        	courier = #{courier},
+        	tracking_number = #{trackingNumber},
             status = 'SHIPPING',
             updated_time = systimestamp
         where order_no = #{orderNo}

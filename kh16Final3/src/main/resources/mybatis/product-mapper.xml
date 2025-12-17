@@ -137,17 +137,29 @@
 		where product_no = #{productNo}
 		for update nowait
 	</select>
-
-	<select id="findExpiredProductNos" resultType="long">
-		select product_no
-		from product
-		where
-		<![CDATA[
-			end_time < systimestamp
-		]]>
-		and status = 'BIDDING'
+	
+	<!-- null일 수도 있어서 wrapper 클래스 사용 -->
+	<select id="findExpiredProductNos" resultType="Long">
+   		select product_no
+    	from product
+    		where 
+			<![CDATA[
+				end_time <= systimestamp
+			]]>
+      			and status = 'BIDDING'
 	</select>
-
+	
+	<select id="findStartableProductNos" resultType="Long">
+	    select product_no
+	    from product
+	    where
+	        <![CDATA[
+	            start_time <= systimestamp
+	        ]]>
+	        and status = 'REGISTRATION'
+</select>
+	
+	
 	<select id="findSellerNoByProductNo" resultType="long">
 		select seller_no
 		from product
