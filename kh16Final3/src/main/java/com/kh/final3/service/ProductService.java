@@ -6,68 +6,98 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import com.kh.final3.dao.ProductDao;
 import com.kh.final3.dto.ProductDto;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
 
 @Service
 public class ProductService {
 
-  @Autowired private ProductDao productDao;
+	@Autowired
+	private ProductDao productDao;
 
-  public ProductDto create(ProductDto productDto, Long loginMemberNo) {
+	@Transactional
+	public ProductDto create(ProductDto productDto, Long loginMemberNo) {
+		long productNo = productDao.sequence();
+		productDto.setProductNo(productNo);
+		productDto.setSellerNo(loginMemberNo);
+		productDao.insert(productDto);
+		return productDto;
+	}
 
-    // 1) PK 세팅 (필수)
-    long productNo = productDao.sequence();
-    productDto.setProductNo(productNo);
+	@Transactional(readOnly = true)
+	public ProductDto get(Long productNo) {
+		return productDao.selectOne(productNo);
+	}
 
-    // 2) seller_no 세팅 (토큰에서 받은 값)
-    productDto.setSellerNo(loginMemberNo);
+	@Transactional(readOnly = true)
+	public long getSellerNo(long productNo) {
+		return productDao.findSellerNoByProductNo(productNo);
+	}
 
-    // 3) insert
-    productDao.insert(productDto);
+	@Transactional
+	public void delete(Long productNo) {
+		productDao.delete(productNo);
+	}
 
-    return productDto; // 또는 selectOne(productNo)로 다시 조회해서 반환
-  }
+	@Transactional
+	public void edit(Long productNo, ProductDto productDto) {
+		productDto.setProductNo(productNo);
+		productDao.update(productDto);
+	}
 
+	@Transactional
+	public void patch(Long productNo, ProductDto productDto) {
+		productDto.setProductNo(productNo);
+		productDao.updateUnit(productDto);
+	}
 
+	@Transactional(readOnly = true)
+	public ProductListVO getMyPaged(int page, long sellerNo) {
+		int count = productDao.countBySeller(sellerNo);
 
-    /** 전체 목록 */
-    @Transactional(readOnly = true)
-    public List<ProductDto> getList() {
-        return productDao.selectList();
-    }
+		PageVO pageVO = new PageVO();
+		pageVO.setPage(page);
+		pageVO.setDataCount(count);
 
-    /** 상세 조회 */
-    @Transactional(readOnly = true)
-    public ProductDto get(Long productNo) {
-        return productDao.selectOne(productNo);
-    }
+		List<ProductDto> list = productDao.selectListBySeller(pageVO, sellerNo);
 
-    /** 삭제 */
-    @Transactional
-    public void delete(Long productNo) {
-        productDao.delete(productNo);
-    }
+		boolean last = pageVO.getPage() >= pageVO.getTotalPage();
 
-    /** 전체 수정 */
-    @Transactional
-    public void edit(Long productNo, ProductDto productDto) {
-        productDto.setProductNo(productNo);
-        productDao.update(productDto);
-    }
+		return ProductListVO.builder()
+				.page(pageVO.getPage())
+				.count(count)
+				.size(pageVO.getSize())
+				.begin(pageVO.getBegin())
+				.end(pageVO.getEnd())
+				.last(last)
+				.list(list)
+				.build();
+	}
 
-    /** 부분 수정 */
-    @Transactional
-    public void patch(Long productNo, ProductDto productDto) {
-        productDto.setProductNo(productNo);
-        productDao.updateUnit(productDto); // 필요에 맞게 update / updateUnit 선택
-    }
+	@Transactional(readOnly = true)
+	public ProductListVO getAuctionPaged(int page) {
+		int count = productDao.countByBidding();
 
-    /** 페이징 목록 (너가 쓰던 로직에 맞게 구현) */
-    @Transactional(readOnly = true)
-    public ProductListVO getPaged(int page) {
-        // PageVO 만들어서 Dao 호출하는 기존 코드 넣으면 됨
-        return null;
-    }
+		PageVO pageVO = new PageVO();
+		pageVO.setPage(page);
+		pageVO.setDataCount(count);
+
+		List<ProductDto> list = productDao.selectListByBidding(pageVO);
+
+		boolean last = pageVO.getPage() >= pageVO.getTotalPage();
+
+		return ProductListVO.builder()
+				.page(pageVO.getPage())
+				.count(count)
+				.size(pageVO.getSize())
+				.begin(pageVO.getBegin())
+				.end(pageVO.getEnd())
+				.last(last)
+				.list(list)
+				.build();
+	}
+	
 }

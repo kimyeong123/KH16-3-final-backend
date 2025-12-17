@@ -148,14 +148,12 @@ public class AttachmentService {
 	 * 💡 [수정] DB에 저장된 상대 경로(path)를 사용하여 물리적 파일을 찾습니다.
 	 */
 	private File buildTargetFile(String path, String storedName) {
-		// path는 "final3_uploads/BOARD" 형태입니다.
-		// path에서 "final3_uploads" (UPLOAD_ROOT_DIR_NAME) 부분을 제거하고 나머지 (category: /BOARD)를 uploadRoot와 조합합니다.
-		
-		String categoryPath = path.substring(UPLOAD_ROOT_DIR_NAME.length()); // /BOARD만 남김
-		
-		File parentDir = new File(uploadRoot, categoryPath);
-		return new File(parentDir, storedName);
+	    // path 예: "final3_uploads/PRODUCT"
+	    // home + path =>  ~/final3_uploads/PRODUCT
+	    File parentDir = new File(home, path);
+	    return new File(parentDir, storedName);
 	}
+
 
 	// 여러 개의 파일을 받아서 순차적으로 저장하는 외부 호출용 메서드
 	@Transactional 

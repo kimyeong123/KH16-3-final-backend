@@ -22,34 +22,40 @@ public class MessageDao {
 	// ----------------------------------------------------
 	
 	// 1. 시퀀스 번호 발급
-	public int sequence() {
-		return sqlSession.selectOne(NAMESPACE + ".sequence");
-	}
+		public Long sequence() {
+			return sqlSession.selectOne(NAMESPACE + ".sequence");
+		}
 
-	// 2. 쪽지/알림 등록
-	public boolean insert(MessageDto messageDto) {
-		return sqlSession.insert(NAMESPACE + ".insert", messageDto) > 0;
-	}
+	    // 닉네임을 이용해 회원 번호 조회 (Service에서 사용)
+		public Long findMemberNoByNickname(String nickname) {
+			return sqlSession.selectOne(NAMESPACE + ".findMemberNoByNickname", nickname);
+		}
+	    
+		// 2-1. 쪽지 메인 등록
+		public boolean insertMessage(MessageDto messageDto) {
+			return sqlSession.insert(NAMESPACE + ".insertMessage", messageDto) > 0;
+		}
+	    
 
-	// 3. 쪽지 상세 조회
-	public MessageDto selectOne(long messageNo) {
-		return sqlSession.selectOne(NAMESPACE + ".selectOne", messageNo);
-	}
+		// 3. 쪽지 상세 조회
+		public MessageDto selectOne(long messageNo) {
+			return sqlSession.selectOne(NAMESPACE + ".selectOne", messageNo);
+		}
 
-	// 4. 쪽지 읽음 처리 (update read_time)
-	public boolean updateReadTime(long messageNo) {
-		return sqlSession.update(NAMESPACE + ".updateReadTime", messageNo) > 0;
-	}
+		// 4. 쪽지 읽음 처리 (update read_time)
+		public boolean updateReadTime(long messageNo) {
+			return sqlSession.update(NAMESPACE + ".updateReadTime", messageNo) > 0;
+		}
 
-	// 5. 발신자 삭제 처리 (update sender_deleted)
-	public boolean updateSenderDelete(long messageNo) {
-		return sqlSession.update(NAMESPACE + ".updateSenderDelete", messageNo) > 0;
-	}
+		// 5. 발신자 삭제 처리 (update sender_deleted)
+		public boolean updateSenderDelete(long messageNo) {
+			return sqlSession.update(NAMESPACE + ".updateSenderDelete", messageNo) > 0;
+		}
 
-	// 6. 수신자 삭제 처리 (update receiver_deleted)
-	public boolean updateReceiverDelete(long messageNo) {
-		return sqlSession.update(NAMESPACE + ".updateReceiverDelete", messageNo) > 0;
-	}
+		// 6. 수신자 삭제 처리 (update receiver_deleted)
+		public boolean updateReceiverDelete(long messageNo) {
+			return sqlSession.update(NAMESPACE + ".updateReceiverDelete", messageNo) > 0;
+		}
     
 	// ----------------------------------------------------
 	// 2. 카운트 및 미확인 목록 기능

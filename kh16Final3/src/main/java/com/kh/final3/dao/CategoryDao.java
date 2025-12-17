@@ -25,4 +25,5 @@ public class CategoryDao {
     public List<CategoryDto> selectListByParent(long parentCode) {
         return sqlSession.selectList("category.listByParent", parentCode);
     }
+    
 }

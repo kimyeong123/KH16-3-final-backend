@@ -5,10 +5,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +31,6 @@ public class MemberDto {
     @NotBlank(message = "아이디는 필수 항목입니다.")
     @Pattern(regexp = "^[a-z][a-z0-9]{4,19}$")
     private String id;
-
     @NotBlank
     @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[\\!\\@\\#\\$])[A-Za-z0-9\\!\\@\\#\\$]{8,16}$")
     private String pw;
