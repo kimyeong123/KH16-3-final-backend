@@ -105,7 +105,7 @@ public class MemberRestController {
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("아이디 찾기 처리 중 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("아이디 찾기 처리 	 오류가 발생했습니다.");
 		}
 	}
 
@@ -158,7 +158,17 @@ public class MemberRestController {
 	public List<MemberDto> search(@RequestBody MemberComplexSearchVO vo) {
 		return memberDao.selectList(vo);
 	}
+	//일반회원이 본인상세
+	@GetMapping("/mypage")
+	public MemberDto mypage(@RequestHeader("Authorization") String bearerToken) {
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    Long memberNo = tokenVO.getMemberNo();
 
+	    MemberDto dto = memberDao.selectOneByMemberNo(memberNo);
+	    if (dto == null) throw new TargetNotfoundException("대상 회원이 없습니다.");
+	    return dto;
+	}	
+	// 관리자가 회원상세
 	@GetMapping("/admin-detail/{memberNo}")
 	public MemberDto adminDetail(@PathVariable Long memberNo, @RequestHeader("Authorization") String bearerToken) {
 
