@@ -69,5 +69,14 @@
 	  		from point_history
 	  	where member_no = #{memberNo}
 	</select>
+	<select id="listChargeHistoryByMember"
+        resultType="PointChargeHistoryVO">
+		select
+		point_history_no AS pointHistoryNo, type, amount, reason, created_time
+		AS createdTime
+		from point_charge_history
+		where member_no = #{memberNo}
+		order by created_time desc
+     </select>
 	
 </mapper>

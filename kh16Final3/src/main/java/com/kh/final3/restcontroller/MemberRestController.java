@@ -7,17 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.kh.final3.dao.MemberDao;
+import com.kh.final3.dao.PointHistoryDao;
 import com.kh.final3.dao.TokenDao;
 import com.kh.final3.dto.MemberDto;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
 import com.kh.final3.service.TokenService;
+import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.TokenVO;
 import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
@@ -45,6 +46,8 @@ public class MemberRestController {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private TokenService tokenService;
+	@Autowired
+	private PointHistoryDao pointHistoryDao;
 
 	// 회원가입
 	@PostMapping("/register")
@@ -314,12 +317,23 @@ public class MemberRestController {
 		}
 	}
 
+	//회원검색
 	@GetMapping("/list")
 	public List<MemberListVO> list(
 	    @RequestParam(required = false) String type,
 	    @RequestParam(required = false) String keyword
 	) {
 	    return memberService.getMemberList(type, keyword);
+	}
+
+	//포인트 충전 내역
+	@GetMapping("/point/charged-history")
+	public List<PointChargeHistoryVO> myChargeHistory(
+	        @RequestHeader("Authorization") String bearerToken
+	) {
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    long memberNo = tokenVO.getMemberNo();
+	    return pointHistoryDao.listChargeHistoryByMember(memberNo);
 	}
 
 
