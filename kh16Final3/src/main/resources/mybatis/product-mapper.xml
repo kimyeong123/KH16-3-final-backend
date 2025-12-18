@@ -112,11 +112,11 @@
 	    where <![CDATA[ start_time <= systimestamp ]]> and status = 'REGISTRATION'
     </select>
 	
-	<select id="findSellerNoByProductNo" resultType="long">
-		select seller_no from product where product_no = #{productNo}
-	    select product_no
-	    from product
-	    where
+	<select id="findSellerByRegProductNo" resultType="long">
+		select seller_no 
+		from product 
+		where 
+			product_no = #{productNo} and
 	        <![CDATA[
 	            start_time <= systimestamp
 	        ]]>
@@ -220,26 +220,5 @@
     <delete id="deleteReview"> delete from review where product_no = #{productNo} </delete>
     <delete id="deleteMessage"> delete from message where product_no = #{productNo} </delete>
     <delete id="deleteOrders"> delete from orders where product_no = #{productNo} </delete>
-
-</mapper>
-	<!-- productMapper.xml (추가) -->
-
-	<select id="countAuction" resultType="int">
-	  select count(*)
-	  from product
-	  where status = 'BIDDING'
-	    and end_time > systimestamp
-	</select>
-	
-	<select id="listAuctionByPaging" resultType="ProductDto">
-	  select *
-	  from (
-	    select TMP.*, row_number() over(order by end_time asc) rn
-	    from product TMP
-	    where TMP.status = 'BIDDING'
-	      and TMP.end_time > systimestamp
-	  )
-	  where rn between #{begin} and #{end}
-	</select>
 
 </mapper>
