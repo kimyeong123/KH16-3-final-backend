@@ -24,17 +24,22 @@ public class AttachmentRestController {
     private final AttachmentService attachmentService;
 
     @GetMapping("/{attachmentNo}")
-    public ResponseEntity<ByteArrayResource> download(@PathVariable int attachmentNo) throws IOException {
-        AttachmentDto dto = attachmentService.get(attachmentNo);
-        ByteArrayResource resource = attachmentService.load(attachmentNo);
+    public ResponseEntity<ByteArrayResource> download(@PathVariable int attachmentNo) {
+        try {
+            AttachmentDto dto = attachmentService.get(attachmentNo);
+            ByteArrayResource resource = attachmentService.load(attachmentNo);
 
-        String contentType = dto.getMediaType() != null ? dto.getMediaType() : "application/octet-stream";
-        String encodedName = URLEncoder.encode(dto.getOriginalName(), StandardCharsets.UTF_8);
+            String contentType = dto.getMediaType() != null ? dto.getMediaType() : "application/octet-stream";
+            String encodedName = URLEncoder.encode(dto.getOriginalName(), StandardCharsets.UTF_8);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedName + "\"")
-                .contentLength(dto.getFileSize())
-                .body(resource);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedName + "\"")
+                    .contentLength(dto.getFileSize())
+                    .body(resource);
+        } catch (Exception e) {
+            // [수정] 파일이 없거나 에러 발생 시 500 대신 404 반환
+            return ResponseEntity.notFound().build();
+        }
     }
 }

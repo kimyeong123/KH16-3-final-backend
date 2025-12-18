@@ -73,4 +73,11 @@ public class BidDao {
         
         return sqlSession.selectList(NAMESPACE + "selectListByProductNoPaging", params);
     }
+
+ public boolean deleteByProductNo(long productNo) {
+     // "product." 은 product-mapper.xml의 namespace입니다.
+     // "deleteBidByProductNo"는 xml에 적은 id입니다. (id 확인 필수!)
+     return sqlSession.delete("product.deleteBidByProductNo", productNo) > 0;
+ }
+   
 }

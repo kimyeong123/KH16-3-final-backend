@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import com.kh.final3.dao.ProductDao;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.PageVO;
@@ -39,17 +38,46 @@ public class ProductService {
 
 	@Transactional
 	public void delete(Long productNo) {
+        ProductDto product = productDao.selectOne(productNo);
+        if (product == null) throw new RuntimeException("존재하지 않는 상품입니다.");
+
+        String status = product.getStatus();
+        if ("BIDDING".equals(status) || "ENDED".equals(status) || "CLOSED".equals(status)) {
+            throw new RuntimeException("입찰이 진행 중이거나 종료된 경매는 삭제할 수 없습니다.");
+        }
+        
+        productDao.deleteEscrow(productNo);
+        productDao.deleteBid(productNo);           
+        productDao.deletePointHistory(productNo);  
+        productDao.deleteReview(productNo);
+        productDao.deleteMessage(productNo);
+        productDao.deleteOrders(productNo);
+
 		productDao.delete(productNo);
 	}
 
 	@Transactional
 	public void edit(Long productNo, ProductDto productDto) {
+        ProductDto origin = productDao.selectOne(productNo);
+        if (origin == null) throw new RuntimeException("존재하지 않는 상품입니다.");
+
+        if ("BIDDING".equals(origin.getStatus())) {
+            throw new RuntimeException("입찰이 진행 중인 상품은 정보를 수정할 수 없습니다.");
+        }
+
 		productDto.setProductNo(productNo);
 		productDao.update(productDto);
 	}
 
 	@Transactional
 	public void patch(Long productNo, ProductDto productDto) {
+        ProductDto origin = productDao.selectOne(productNo);
+        if (origin == null) throw new RuntimeException("존재하지 않는 상품입니다.");
+
+        if ("BIDDING".equals(origin.getStatus())) {
+            throw new RuntimeException("입찰이 진행 중인 상품은 정보를 수정할 수 없습니다.");
+        }
+
 		productDto.setProductNo(productNo);
 		productDao.updateUnit(productDto);
 	}
@@ -77,15 +105,20 @@ public class ProductService {
 				.build();
 	}
 
+	// ========================================================
+	// [핵심] 검색 필터가 적용된 경매 리스트 조회
+	// ========================================================
 	@Transactional(readOnly = true)
-	public ProductListVO getAuctionPaged(int page) {
-		int count = productDao.countByBidding();
+	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+		// 검색 조건에 맞는 개수 조회
+		int count = productDao.countAuction(q, category, minPrice, maxPrice);
 
 		PageVO pageVO = new PageVO();
 		pageVO.setPage(page);
 		pageVO.setDataCount(count);
 
-		List<ProductDto> list = productDao.selectListByBidding(pageVO);
+		// 검색 조건에 맞는 리스트 조회
+		List<ProductDto> list = productDao.selectAuctionListByPaging(pageVO, q, category, sort, minPrice, maxPrice);
 
 		boolean last = pageVO.getPage() >= pageVO.getTotalPage();
 
@@ -99,5 +132,4 @@ public class ProductService {
 				.list(list)
 				.build();
 	}
-	
 }
