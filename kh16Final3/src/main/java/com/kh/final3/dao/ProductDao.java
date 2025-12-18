@@ -41,14 +41,6 @@ public class ProductDao {
 		return sqlSession.delete(NAMESPACE + "delete", productNo);
 	}
 
-	public boolean update(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-	}
-
-	public boolean updateUnit(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-	}
-
 	public int updateStatus(long productNo, ProductStatus changeStatus) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("productNo", productNo);
@@ -56,8 +48,8 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "updateStatus", params);
 	}
 
-	public int updateEndedAuction(AuctionEndRequestVO endRequestVO) {
-		return sqlSession.update(NAMESPACE + "updateEndedAuction", endRequestVO);
+	public int updateProductOnAuctionEnd(AuctionEndRequestVO endRequestVO) {
+		return sqlSession.update(NAMESPACE + "updateProductOnAuctionEnd", endRequestVO);
 	}
 
 	public ProductDto selectOneForUpdate(long productNo) {
@@ -79,6 +71,23 @@ public class ProductDao {
 		params.put("productNo", productNo);
 		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
 		return n == null ? 0L : n.longValue();
+	}
+	public List<Long> findStartableProductNos(){
+		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
+	}
+  
+	public Long findSellerNoByProductNo(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
+	}
+	
+	/** 상품 정보 수정 */
+	public boolean update(ProductDto productDto) {
+		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
+	}
+
+	/** 상품 단위 가격 수정 */
+	public boolean updateUnit(ProductDto productDto) {
+		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
 	}
 
 	public int count() {
@@ -162,4 +171,14 @@ public class ProductDao {
     public int deleteReview(long productNo) { return sqlSession.delete(NAMESPACE + "deleteReview", productNo); }
     public int deleteMessage(long productNo) { return sqlSession.delete(NAMESPACE + "deleteMessage", productNo); }
     public int deleteOrders(long productNo) { return sqlSession.delete(NAMESPACE + "deleteOrders", productNo); }
+	public int countAuction() {
+	    return sqlSession.selectOne("product.countAuction");
+	}
+
+	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO) {
+	    Map<String, Integer> params = new HashMap<>();
+	    params.put("begin", pageVO.getBegin());
+	    params.put("end", pageVO.getEnd());
+	    return sqlSession.selectList("product.listAuctionByPaging", params);
+	}
 }

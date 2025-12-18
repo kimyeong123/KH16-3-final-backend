@@ -13,6 +13,15 @@ import com.kh.final3.dto.PointHistoryDto;
 @Component
 public class AuctionHelper {
 
+	public BidDto createBidDto(long bidNo, long memberNo, long productNo, long amount) {
+		return BidDto.builder()
+				.bidNo(bidNo)
+				.productNo(productNo)
+				.bidderNo(memberNo)
+				.amount(amount)
+				.build();
+	}
+	
 	public EscrowLedgerDto createEscrowDtoByBid(BidDto bidDto, long escrowLedgerNo, EscrowStatus status) {
 		return EscrowLedgerDto.builder()
 				.escrowLedgerNo(escrowLedgerNo)

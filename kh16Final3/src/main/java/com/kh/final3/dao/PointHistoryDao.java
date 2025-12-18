@@ -41,5 +41,8 @@ public class PointHistoryDao {
  // PointHistoryDao.java 에 추가
     public int deleteByProductNo(long productNo) {
         return sqlSession.delete(NAMESPACE + "deleteByProductNo", productNo);
+
+    public int insertCharge(PointHistoryDto dto) {
+        return sqlSession.insert(NAMESPACE + "insertCharge", dto);
     }
 }

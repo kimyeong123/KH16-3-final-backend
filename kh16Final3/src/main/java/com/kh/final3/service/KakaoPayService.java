@@ -28,6 +28,8 @@ private WebClient webClient;
 @Autowired
 private KakaoPayProperties kakaoPayProperties;
 
+
+
 public KakaoPayReadyResponseVO ready(KakaoPayReadyRequestVO requestVO) {
 
 	Map<String, String> body =new HashMap<>();

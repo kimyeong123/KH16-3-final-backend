@@ -1,6 +1,7 @@
 package com.kh.final3.restcontroller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.final3.dto.BoardDto;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.BoardService;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.TokenVO;
 
 import jakarta.servlet.http.Cookie;
@@ -45,10 +47,11 @@ public class BoardRestController {
 	}
 	
 	@GetMapping("/list")
-	public List<BoardDto> list(
-	    @RequestParam(required = false, defaultValue = "1") int page 
+	public PageVO<BoardDto> list(
+	    @RequestParam(required = false, defaultValue = "1") int page,
+	    @RequestParam(required = false, defaultValue = "10") int size
 	) {
-	    return boardService.selectNoticeList();
+	    return boardService.selectNoticeList(page, size); 
 	}
 	
 	@GetMapping("/{boardNo}")

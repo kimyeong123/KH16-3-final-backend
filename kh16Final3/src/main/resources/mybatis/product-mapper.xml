@@ -92,7 +92,7 @@
 		update product set status = #{changeStatus} where product_no = #{productNo}
 	</update>
 
-	<update id="updateEndedAuction">
+	<update id="updateProductOnAuctionEnd">
 		update product
 		set status = 'ENDED', final_price = #{finalPrice}, buyer_no = #{buyerNo}, ended_time = systimestamp
 		where product_no = #{productNo}
@@ -114,6 +114,19 @@
 	
 	<select id="findSellerNoByProductNo" resultType="long">
 		select seller_no from product where product_no = #{productNo}
+	    select product_no
+	    from product
+	    where
+	        <![CDATA[
+	            start_time <= systimestamp
+	        ]]>
+	        and status = 'REGISTRATION'
+	</select>
+	
+	<select id="findSellerNoByProductNo" resultType="Long">
+		select seller_no
+		from product
+		where product_no = #{productNo}
 	</select>
 
 	<select id="countBySeller" resultType="int">
@@ -207,5 +220,26 @@
     <delete id="deleteReview"> delete from review where product_no = #{productNo} </delete>
     <delete id="deleteMessage"> delete from message where product_no = #{productNo} </delete>
     <delete id="deleteOrders"> delete from orders where product_no = #{productNo} </delete>
+
+</mapper>
+	<!-- productMapper.xml (추가) -->
+
+	<select id="countAuction" resultType="int">
+	  select count(*)
+	  from product
+	  where status = 'BIDDING'
+	    and end_time > systimestamp
+	</select>
+	
+	<select id="listAuctionByPaging" resultType="ProductDto">
+	  select *
+	  from (
+	    select TMP.*, row_number() over(order by end_time asc) rn
+	    from product TMP
+	    where TMP.status = 'BIDDING'
+	      and TMP.end_time > systimestamp
+	  )
+	  where rn between #{begin} and #{end}
+	</select>
 
 </mapper>

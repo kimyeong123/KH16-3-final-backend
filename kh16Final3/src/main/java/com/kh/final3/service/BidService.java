@@ -10,21 +10,24 @@ import com.kh.final3.dao.ProductDao;
 import com.kh.final3.domain.enums.EscrowStatus;
 import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.BidDto;
+import com.kh.final3.dto.MemberDto;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.error.BidLowerThanHighestException;
+import com.kh.final3.error.InvalidAmountException;
 import com.kh.final3.error.InvalidOrderStateException;
 import com.kh.final3.error.PointNotSufficientException;
 import com.kh.final3.error.TargetNotfoundException;
+import com.kh.final3.helper.AuctionHelper;
 import com.kh.final3.vo.AuctionEndRequestVO;
 
 @Service
 public class BidService {
+
+	@Autowired
+	private MemberDao memberDao;
 	
 	@Autowired
 	private BidDao bidDao;
-	
-	@Autowired
-	private MemberDao memberDao;
 	
 	@Autowired
 	private ProductDao productDao; 
@@ -38,44 +41,60 @@ public class BidService {
 	@Autowired
 	private AuctionService auctionService;
 	
+	@Autowired
+	private AuctionHelper auctionHelper;
+	
 	@Transactional
-	public void placeBid(BidDto incomingBid) {
-		// 1. 동시성 처리. 상품 로우를 잠가서 경매 상태와 최고가 업데이트를 보호. 해당 로우에 대한 변경(Update, Delete)을 방지
-	    ProductDto currentProduct = productDao.selectOneForUpdate(incomingBid.getProductNo());
+	public void placeBid(long memberNo, long productNo, long amount) {
+		// 1. 회원 정보 확인
+		MemberDto bidder = memberDao.selectOne(memberNo);
+		if(bidder == null)
+			throw new TargetNotfoundException("존재하지 않는 회원입니다.");
+		
+		// 2. 입찰금이 음수가 아닌지 확인
+		if(amount <= 0) 
+			throw new InvalidAmountException("입찰금은 0원보다 커야 합니다.");
+		
+		// 3. 동시성 처리. 상품 로우를 잠가서 경매 상태와 최고가 업데이트를 보호. 해당 로우에 대한 변경(Update, Delete)을 방지
+	    ProductDto currentProduct = productDao.selectOneForUpdate(productNo);
 		if(currentProduct == null)
-			throw new TargetNotfoundException();
+			throw new TargetNotfoundException("존재하지 않는 상품입니다.");
+		
+		// 4. 시퀀스 조회 및 BidDto빌드
+		long bidNo = bidDao.sequence();
+		BidDto incomingBid = auctionHelper.createBidDto(bidNo, memberNo, productNo, amount);
 	    
-		// 2. 입찰 상품이 현재 경매 진행중인지 확인
+		// 5. 입찰 상품이 현재 경매 진행중인지 확인
 		String currentProductStatus = currentProduct.getStatus();
 		if(!currentProductStatus.equals(ProductStatus.BIDDING.getStatus()))
-			throw new InvalidOrderStateException();
+			throw new InvalidOrderStateException("진행중인 경매 상품이 아닙니다.");
 		
-		// 3. 입찰 금액이 현재 포인트보다 큰지 확인
+		// 6. 입찰 금액이 현재 포인트보다 큰지 확인
 		if(incomingBid.getAmount() > memberDao.findMemberPoint(incomingBid.getBidderNo()))
-			throw new PointNotSufficientException();
+			throw new PointNotSufficientException("보유 포인트가 부족합니다.");
 		
-		// 4. 최고 입찰 가져오기
+		// 7. 최고 입찰 가져오기
 		BidDto previousHighestBid = bidDao.findHighestBid(currentProduct.getProductNo());
 		
-		// 5. 즉시 구매가 가져오기
+		// 8. 즉시 구매가 가져오기
 		Long instantPrice = currentProduct.getInstantPrice();
 		
-		// 6. 입찰 금액이 즉시 구매가 이상일 경우 로직 처리 후 경매 종료
+		// 9. 입찰 금액이 즉시 구매가 이상일 경우 로직 처리 후 경매 종료
 		if(instantPrice != null && incomingBid.getAmount() >= instantPrice) {
 			processInstantBuy(incomingBid, previousHighestBid);
 	        return;
 	    }
 		
 		if(previousHighestBid != null) {
-			// 7. 입찰 금액이 현재 가장 높은 입찰금보다 높은지 확인
+			// 10. 입찰 금액이 현재 가장 높은 입찰금보다 높은지 확인
 			if(previousHighestBid.getAmount() >= incomingBid.getAmount()) 
-				throw new BidLowerThanHighestException();
+				throw new BidLowerThanHighestException("입찰금은 현재 최고가보다 높아야 합니다.");
 			
-			// 8. 최고 입찰 내역의 해당 에스크로 상태 수정 및 포인트 반환/포인트 내역 기록 
+			// 11. 최고 입찰 내역의 해당 에스크로 상태 수정 및 포인트 반환/포인트 내역 기록 
 			refundPreviousBid(previousHighestBid);
 		}
 		
-		// 9. 입찰 기록
+		// 12. 입찰 기록
 		insertBid(incomingBid);
 	}
 
