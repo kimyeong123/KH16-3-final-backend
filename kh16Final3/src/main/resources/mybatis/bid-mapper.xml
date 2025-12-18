@@ -90,5 +90,9 @@
       			and product_no = #{productNo}
     	order by bid_no desc
 	</select>
+	
+	<delete id="deleteBidByProductNo">
+    delete from bid where product_no = #{productNo}
+</delete>
   
  </mapper>

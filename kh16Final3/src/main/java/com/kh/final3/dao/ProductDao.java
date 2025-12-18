@@ -7,13 +7,11 @@ import java.util.Map;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
-import com.kh.final3.vo.ProductListVO;
 
 @Repository
 public class ProductDao {
@@ -24,8 +22,7 @@ public class ProductDao {
 	private static final String NAMESPACE = "product.";
 
 	public long sequence() {
-		Number n = sqlSession.selectOne(NAMESPACE + "sequence");
-		return n.longValue();
+		return sqlSession.selectOne(NAMESPACE + "sequence");
 	}
 
 	public int insert(ProductDto productDto) {
@@ -73,26 +70,16 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
 	}
 
-  public List<Long> findStartableProductNos(){
+	public List<Long> findStartableProductNos() {
 		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
 	}
-  
+
 	public long findSellerNoByProductNo(long productNo) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("productNo", productNo);
 		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
 		return n == null ? 0L : n.longValue();
 	}
-  
-   /** 상품 정보 수정 */
-    public boolean update(ProductDto productDto) {
-        return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-    }
-
-    /** 상품 단위 가격 수정 */
-    public boolean updateUnit(ProductDto productDto) {
-        return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-    }
 
 	public int count() {
 		return sqlSession.selectOne(NAMESPACE + "countByPaging");
@@ -142,15 +129,37 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "closeAuction", productNo) > 0;
 	}
 	
-	// ProductDao.java (추가)
-	public int countAuction() {
-	    return sqlSession.selectOne("product.countAuction");
+	// ========================================================
+	// [핵심] 검색 조건이 추가된 카운트 및 목록 조회
+	// ========================================================
+	public int countAuction(String q, Long category, Integer minPrice, Integer maxPrice) {
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("q", q);
+	    params.put("category", category);
+	    params.put("minPrice", minPrice);
+	    params.put("maxPrice", maxPrice);
+	    return sqlSession.selectOne(NAMESPACE + "countAuction", params);
 	}
 
-	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO) {
-	    Map<String, Integer> params = new HashMap<>();
+	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+	    Map<String, Object> params = new HashMap<>();
 	    params.put("begin", pageVO.getBegin());
 	    params.put("end", pageVO.getEnd());
-	    return sqlSession.selectList("product.listAuctionByPaging", params);
+	    
+	    params.put("q", q);
+	    params.put("category", category);
+	    params.put("sort", sort);
+	    params.put("minPrice", minPrice);
+	    params.put("maxPrice", maxPrice);
+	    
+	    return sqlSession.selectList(NAMESPACE + "listAuctionByPaging", params);
 	}
+
+    // 자식 테이블 삭제 메소드들
+    public int deleteEscrow(long productNo) { return sqlSession.delete(NAMESPACE + "deleteEscrow", productNo); }
+    public int deleteBid(long productNo) { return sqlSession.delete(NAMESPACE + "deleteBid", productNo); }
+    public int deletePointHistory(long productNo) { return sqlSession.delete(NAMESPACE + "deletePointHistory", productNo); }
+    public int deleteReview(long productNo) { return sqlSession.delete(NAMESPACE + "deleteReview", productNo); }
+    public int deleteMessage(long productNo) { return sqlSession.delete(NAMESPACE + "deleteMessage", productNo); }
+    public int deleteOrders(long productNo) { return sqlSession.delete(NAMESPACE + "deleteOrders", productNo); }
 }

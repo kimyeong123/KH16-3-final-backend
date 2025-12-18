@@ -58,4 +58,8 @@
 	  		from point_history
 	  	where member_no = #{memberNo}
 	</select>
+	
+	<delete id="deleteByProductNo">
+    DELETE FROM point_history WHERE product_no = #{productNo}
+</delete>
 </mapper>

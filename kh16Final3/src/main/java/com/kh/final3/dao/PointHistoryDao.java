@@ -38,4 +38,8 @@ public class PointHistoryDao {
     public int insertSettlementHistory(PointHistoryDto pointHistoryDto) {
     	return sqlSession.insert(NAMESPACE + "insertSettlementHistory", pointHistoryDto);
     }
+ // PointHistoryDao.java 에 추가
+    public int deleteByProductNo(long productNo) {
+        return sqlSession.delete(NAMESPACE + "deleteByProductNo", productNo);
+    }
 }

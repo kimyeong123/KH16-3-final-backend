@@ -6,64 +6,44 @@
 <mapper namespace="product">
 
 	<select id="sequence" resultType="long">
-		select product_seq.nextval
-		from dual
+		select product_seq.nextval from dual
 	</select>
 
 	<insert id="add">
 		insert into product(
-			  product_no
-			, seller_no
-			, name
-			, category_code
-			, description
-			, start_price
-			, instant_price
-			, start_time
-			, end_time
+			  product_no, seller_no, name, category_code, description
+			, start_price, instant_price, start_time, end_time
 		) values (
-			  #{productNo}
-			, #{sellerNo}
-			, #{name}
-			, #{categoryCode}
-			, #{description}
-			, #{startPrice}
-			, #{instantPrice}
-			, #{startTime}
-			, #{endTime}
+			  #{productNo}, #{sellerNo}, #{name}, #{categoryCode}, #{description}
+			, #{startPrice}, #{instantPrice}, #{startTime}, #{endTime}
 		)
 	</insert>
 
 	<select id="list" resultType="ProductDto">
-		select *
-		from product
-		order by product_no desc
+		select * from product order by product_no desc
 	</select>
 
 	<select id="detail" resultType="ProductDto">
-		select *
-		from product
-		where product_no = #{productNo}
+		select * from product where product_no = #{productNo}
 	</select>
 
 	<delete id="delete">
-		delete from product
-		where product_no = #{productNo}
+		delete from product where product_no = #{productNo}
 	</delete>
 
 	<update id="update">
 		update product
 		set
-			  name          = #{name}
+			  name = #{name}
 			, category_code = #{categoryCode}
-			, description   = #{description}
-			, start_price   = #{startPrice}
-			, final_price   = #{finalPrice}
+			, description = #{description}
+			, start_price = #{startPrice}
+			, final_price = #{finalPrice}
 			, instant_price = #{instantPrice}
-			, start_time    = #{startTime}
-			, end_time      = #{endTime}
-			, status        = #{status}
-			, buyer_no      = #{buyerNo}
+			, start_time = #{startTime}
+			, end_time = #{endTime}
+			, status = #{status}
+			, buyer_no = #{buyerNo}
 		where product_no = #{productNo}
 	</update>
 
@@ -85,13 +65,11 @@
 	</update>
 
 	<select id="countByPaging" resultType="int">
-		select count(*)
-		from product
+		select count(*) from product
 	</select>
 
 	<select id="listByPaging" resultType="ProductDto">
-		select *
-		from (
+		select * from (
 			select TMP.*, row_number() over(order by product_no desc) rn
 			from product TMP
 		)
@@ -100,70 +78,42 @@
 
 	<update id="updateOnBid">
 		update product
-		set
-			  final_price = #{bidAmount}
-			, buyer_no = #{bidMemberNo}
-			, status = 'BIDDING'
+		set final_price = #{bidAmount}, buyer_no = #{bidMemberNo}, status = 'BIDDING'
 		where product_no = #{productNo}
 	</update>
 
 	<update id="closeAuction">
 		update product
-		set
-			  status = 'CLOSED'
-			, ended_time = systimestamp
+		set status = 'CLOSED', ended_time = systimestamp
 		where product_no = #{productNo}
 	</update>
 
 	<update id="updateStatus">
-		update product
-		set status = #{changeStatus}
-		where product_no = #{productNo}
+		update product set status = #{changeStatus} where product_no = #{productNo}
 	</update>
 
 	<update id="updateEndedAuction">
 		update product
-		set
-			status = 'ENDED',
-			final_price = #{finalPrice},
-			buyer_no = #{buyerNo},
-			ended_time = systimestamp
+		set status = 'ENDED', final_price = #{finalPrice}, buyer_no = #{buyerNo}, ended_time = systimestamp
 		where product_no = #{productNo}
 	</update>
 
 	<select id="selectOneForUpdate" resultType="ProductDto">
-		select *
-		from product
-		where product_no = #{productNo}
-		for update nowait
+		select * from product where product_no = #{productNo} for update nowait
 	</select>
 	
-	<!-- null일 수도 있어서 wrapper 클래스 사용 -->
 	<select id="findExpiredProductNos" resultType="Long">
-   		select product_no
-    	from product
-    		where 
-			<![CDATA[
-				end_time <= systimestamp
-			]]>
-      			and status = 'BIDDING'
+   		select product_no from product
+    	where <![CDATA[ end_time <= systimestamp ]]> and status = 'BIDDING'
 	</select>
 	
 	<select id="findStartableProductNos" resultType="Long">
-	    select product_no
-	    from product
-	    where
-	        <![CDATA[
-	            start_time <= systimestamp
-	        ]]>
-	        and status = 'REGISTRATION'
-</select>
-	
+	    select product_no from product
+	    where <![CDATA[ start_time <= systimestamp ]]> and status = 'REGISTRATION'
+    </select>
 	
 	<select id="findSellerNoByProductNo" resultType="long">
-		select seller_no
-		from product
-		where product_no = #{productNo}
+		select seller_no from product where product_no = #{productNo}
 	</select>
 
 	<select id="countBySeller" resultType="int">
@@ -183,9 +133,7 @@
 	</select>
 
 	<select id="countByBidding" resultType="int">
-		select count(*)
-		from product
-		where status = 'BIDDING'
+		select count(*) from product where status = 'BIDDING'
 	</select>
 
 	<select id="listByBiddingPaging" resultType="ProductDto">
@@ -198,24 +146,66 @@
 		where rn between #{begin} and #{end}
 	</select>
 	
-	<!-- productMapper.xml (추가) -->
+    <sql id="auctionSearch">
+        WHERE status = 'BIDDING' AND end_time > systimestamp
+        
+        <if test="q != null and q != ''">
+            AND name LIKE '%' || #{q} || '%'
+        </if>
+        
+        <if test="category != null">
+            AND (
+                category_code = #{category} 
+                OR 
+                category_code IN (SELECT category_code FROM category WHERE parent_code = #{category})
+            )
+        </if>
+        
+        <if test="minPrice != null">
+            AND (final_price &gt;= #{minPrice} OR start_price &gt;= #{minPrice})
+        </if>
+        <if test="maxPrice != null">
+            AND (final_price &lt;= #{maxPrice} OR start_price &lt;= #{maxPrice})
+        </if>
+    </sql>
 
-<select id="countAuction" resultType="int">
-  select count(*)
-  from product
-  where status = 'BIDDING'
-    and end_time > systimestamp
-</select>
+    <select id="countAuction" resultType="int">
+      select count(*)
+      from product
+      <include refid="auctionSearch"/>
+    </select>
+    
+    <select id="listAuctionByPaging" resultType="ProductDto">
+      select *
+      from (
+        select TMP.*, row_number() over(
+            ORDER BY 
+            <choose>
+                <when test="sort == 'PRICE_DESC'"> 
+                    COALESCE(final_price, start_price) DESC 
+                </when>
+                <when test="sort == 'PRICE_ASC'"> 
+                    COALESCE(final_price, start_price) ASC 
+                </when>
+                <when test="sort == 'NEW'"> 
+                    start_time DESC 
+                </when>
+                <otherwise> 
+                    end_time ASC 
+                </otherwise>
+            </choose>
+        ) rn
+        from product TMP
+        <include refid="auctionSearch"/>
+      )
+      where rn between #{begin} and #{end}
+    </select>
 
-<select id="listAuctionByPaging" resultType="ProductDto">
-  select *
-  from (
-    select TMP.*, row_number() over(order by end_time asc) rn
-    from product TMP
-    where TMP.status = 'BIDDING'
-      and TMP.end_time > systimestamp
-  )
-  where rn between #{begin} and #{end}
-</select>
+    <delete id="deleteEscrow"> delete from escrow_ledger where product_no = #{productNo} </delete>
+    <delete id="deleteBid"> delete from bid where product_no = #{productNo} </delete>
+    <delete id="deletePointHistory"> delete from point_history where product_no = #{productNo} </delete>
+    <delete id="deleteReview"> delete from review where product_no = #{productNo} </delete>
+    <delete id="deleteMessage"> delete from message where product_no = #{productNo} </delete>
+    <delete id="deleteOrders"> delete from orders where product_no = #{productNo} </delete>
 
 </mapper>

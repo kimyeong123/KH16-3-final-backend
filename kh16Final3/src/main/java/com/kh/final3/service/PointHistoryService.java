@@ -63,4 +63,6 @@ public class PointHistoryService {
 		pointHistoryDao.insertSettlementHistory(pointHistoryDto);
 	}
 	
+	
+	
 }
