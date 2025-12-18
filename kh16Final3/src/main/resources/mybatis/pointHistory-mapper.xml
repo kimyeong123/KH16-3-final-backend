@@ -85,6 +85,7 @@
   select
     x.product_no    as productNo,
     p.name          as productName,
+    p.status         as status,
     x.amount        as lastBidAmount,
     x.created_time  as lastBidTime
   from (
