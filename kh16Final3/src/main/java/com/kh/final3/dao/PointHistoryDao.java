@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.PointHistoryDto;
 import com.kh.final3.vo.PointChargeHistoryVO;
+import com.kh.final3.vo.member.MemberBidHistoryVO;
 
 @Repository
 public class PointHistoryDao {
@@ -43,8 +44,17 @@ public class PointHistoryDao {
     public int insertCharge(PointHistoryDto dto) {
         return sqlSession.insert(NAMESPACE + "insertCharge", dto);
     }
+    //회원 충전내역
     public List<PointChargeHistoryVO> listChargeHistoryByMember(long memberNo) {
         return sqlSession.selectList(NAMESPACE + "listChargeHistoryByMember", memberNo);
     }
+    //회원 입찰내역
+    public List<MemberBidHistoryVO> listMemberBidHistory(long memberNo) {
+        return sqlSession.selectList(
+            NAMESPACE + "listMemberBidHistory",
+            memberNo
+        );
+    }
+
     	
 }

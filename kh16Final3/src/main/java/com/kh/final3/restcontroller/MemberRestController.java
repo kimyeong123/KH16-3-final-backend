@@ -20,6 +20,7 @@ import com.kh.final3.service.MemberService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.TokenVO;
+import com.kh.final3.vo.member.MemberBidHistoryVO;
 import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
 import com.kh.final3.vo.member.MemberFindIdVO;
@@ -335,6 +336,15 @@ public class MemberRestController {
 	    long memberNo = tokenVO.getMemberNo();
 	    return pointHistoryDao.listChargeHistoryByMember(memberNo);
 	}
+	//입찰 내역
+	@GetMapping("/bid/history")
+	public List<MemberBidHistoryVO> memberBidHistory(
+	        @RequestHeader("Authorization") String bearerToken
+	) {
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
+	}
+
 
 
 
