@@ -172,7 +172,7 @@ public class MemberRestController {
 	    if (dto == null) throw new TargetNotfoundException("대상 회원이 없습니다.");
 	    return dto;
 	}	
-	// 관리자가 회원상세
+	// 관리자가 회원상세	
 	@GetMapping("/admin-detail/{memberNo}")
 	public MemberDto adminDetail(@PathVariable Long memberNo, @RequestHeader("Authorization") String bearerToken) {
 
