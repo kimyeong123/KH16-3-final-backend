@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.BoardDto;
+import com.kh.final3.vo.PageVO;
 
 @Repository
 public class BoardDao {
@@ -64,6 +65,14 @@ public class BoardDao {
 	// 10. 페이징된 목록 조회 
 		public List<BoardDto> selectListByPaging(Map<String, Object> params) {
 		    return sqlSession.selectList("board.selectListByPaging", params);
+		}
+		
+		public int count(PageVO pageVO) {
+		    return sqlSession.selectOne("board.count", pageVO);
+		}
+
+		public List<BoardDto> selectList(PageVO pageVO) {
+		    return sqlSession.selectList("board.selectList", pageVO);
 		}
 
 	

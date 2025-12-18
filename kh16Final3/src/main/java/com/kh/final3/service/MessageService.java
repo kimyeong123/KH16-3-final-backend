@@ -1,6 +1,5 @@
 package com.kh.final3.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +60,7 @@ public class MessageService {
 	        .senderNo(senderNo)
 	        .receiverNo(receiverNo)
 	        .content(content)
-	        .type("INQUIRY")         
+	        .type("SELLER_QNA")         
 	        .productNo(productNo)
 	        .build();
 
@@ -79,7 +78,7 @@ public class MessageService {
 	}
 
 	/**
-	 * 1-3. 시스템 알림 전송 (type: ALERT)
+	 * 1-3. 시스템 알림 전송 (type: SYSTEM_ALERT)
 	 */
 	@Transactional
 	public void sendNotification(long receiverNo, String content, String url) {
@@ -87,7 +86,7 @@ public class MessageService {
 				.receiverNo(receiverNo)
 				.senderNo(SYSTEM_SENDER_NO)
 				.content(content)
-				.type("ALERT")
+				.type("SYSTEM_ALERT") // // "ALERT"에서 "SYSTEM_ALERT"로 수정
 				.url(url)
 				.build();
 
