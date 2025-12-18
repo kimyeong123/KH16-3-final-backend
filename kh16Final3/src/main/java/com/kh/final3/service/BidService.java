@@ -1,6 +1,7 @@
 package com.kh.final3.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,11 +13,12 @@ import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.BidDto;
 import com.kh.final3.dto.MemberDto;
 import com.kh.final3.dto.ProductDto;
-import com.kh.final3.error.BidLowerThanHighestException;
+import com.kh.final3.error.InsufficientBidAmountException;
 import com.kh.final3.error.InvalidAmountException;
 import com.kh.final3.error.InvalidOrderStateException;
 import com.kh.final3.error.PointNotSufficientException;
 import com.kh.final3.error.TargetNotfoundException;
+import com.kh.final3.event.BidPlacedEvent;
 import com.kh.final3.helper.AuctionHelper;
 import com.kh.final3.vo.AuctionEndRequestVO;
 
@@ -43,6 +45,10 @@ public class BidService {
 	
 	@Autowired
 	private AuctionHelper auctionHelper;
+	
+	// 스프링에 존재
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
 	
 	@Transactional
 	public void placeBid(long memberNo, long productNo, long amount) {
@@ -76,33 +82,46 @@ public class BidService {
 		// 7. 최고 입찰 가져오기
 		BidDto previousHighestBid = bidDao.findHighestBid(currentProduct.getProductNo());
 		
-		// 8. 즉시 구매가 가져오기
+		// 8. 첫번째 입찰일 경우 시작가와 비교
+		if (previousHighestBid == null) {
+		    Long startPrice = currentProduct.getStartPrice();
+		    if (startPrice != null && incomingBid.getAmount() < startPrice) 
+		        throw new InsufficientBidAmountException("입찰금은 시작가 이상이어야 합니다.");
+		}
+		
+		// 9. 즉시 구매가 가져오기
 		Long instantPrice = currentProduct.getInstantPrice();
 		
-		// 9. 입찰 금액이 즉시 구매가 이상일 경우 로직 처리 후 경매 종료
+		// 10. 입찰 금액이 즉시 구매가 이상일 경우 로직 처리 후 경매 종료
 		if(instantPrice != null && incomingBid.getAmount() >= instantPrice) {
 			processInstantBuy(incomingBid, previousHighestBid);
 	        return;
 	    }
 		
+		// 11. 입찰 금액이 현재 가장 높은 입찰금보다 높은지 확인
 		if(previousHighestBid != null) {
-			// 10. 입찰 금액이 현재 가장 높은 입찰금보다 높은지 확인
 			if(previousHighestBid.getAmount() >= incomingBid.getAmount()) 
-				throw new BidLowerThanHighestException("입찰금은 현재 최고가보다 높아야 합니다.");
+				throw new InsufficientBidAmountException("입찰금은 현재 최고가보다 높아야 합니다.");
 			
-			// 11. 최고 입찰 내역의 해당 에스크로 상태 수정 및 포인트 반환/포인트 내역 기록 
+			// 12. 최고 입찰 내역의 해당 에스크로 상태 수정 및 포인트 반환/포인트 내역 기록 
 			refundPreviousBid(previousHighestBid);
 		}
 		
-		// 12. 입찰 기록
+		// 13. 입찰 기록
 		insertBid(incomingBid);
+		
+		// 14. 커밋 이후 처리를 위한 이벤트 발행
+		// applicationContext.publishEvent(event); 실질적인 구현체
+		// BidPlacedEvent 타입의 이벤트를 발행
+		// 실제 처리는 AFTER_COMMIT 리스너에서 수행됨
+		// ‘입찰이 발생했다’는 사건을 객체로 표현하여 이벤트 생성(표현 객체)
+		eventPublisher.publishEvent(new BidPlacedEvent(incomingBid));
 	}
 
 	// private 메소드에서는 Transactional이 작동하지않음
 	// 단독 호출 되는 경우가 현재까지는 없음
 	private void insertBid(BidDto incomingBid) {
 		// 입찰 등록
-		incomingBid.setBidNo(bidDao.sequence()); // 시퀀스 설정
 		bidDao.insert(incomingBid);
 		// 에스크로 정보 등록
 		escrowLedgerService.registerEscrowForBid(incomingBid);
@@ -136,5 +155,5 @@ public class BidService {
 	    // 경매 종료 처리 및 에스크로 상태 정산대기로 변경 
 	    auctionService.closeAuction(auctionEndRequestVO, incomingBid.getBidNo());
 	}
-	
+
 }

@@ -34,5 +34,4 @@ public class BidRestController {
 		bidService.placeBid(memberNo, productNo, bidRequestVO.getAmount());
 	}
 	
-	
 }
