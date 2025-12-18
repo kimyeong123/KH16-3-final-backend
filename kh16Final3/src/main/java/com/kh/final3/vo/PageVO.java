@@ -14,6 +14,10 @@ public class PageVO<T> {
     private Integer dataCount;    // 총 데이터 수
     private Integer blockSize = 10;// 표시할 블록 개수(10개)
     
+    private String type;
+    private long loginNo;
+    private String loginLevel;
+    
     // 2. 조회된 데이터를 담을 필드를 추가합니다.
     private List<T> list;         // 조회된 데이터 리스트 (BoardDto 등)
     
@@ -76,4 +80,5 @@ public class PageVO<T> {
     public Integer getNextPage() {
         return getBlockFinish() + 1;
     }
+
 }

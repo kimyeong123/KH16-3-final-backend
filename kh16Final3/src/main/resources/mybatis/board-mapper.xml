@@ -93,32 +93,55 @@
 		where board_no = #{boardNo}
 	</update>
 
-	<select id="count" resultType="int">
-		select count(*) from board
-	</select>
+	<select id="count" resultType="int" parameterType="PageVO">
+    select count(*) from board
+    where type = #{type}
+    
+    <if test="loginLevel != 'ADMIN'">
+        <if test="type == 'QNA'">
+            and writer_no = #{loginNo}
+        </if>
+    </if>
+    
+    <if test="column != null and keyword != null">
+        and ${column} like '%' || #{keyword} || '%'
+    </if>
+</select>
 
 	<select id="countQna" resultType="long" parameterType="PageVO">
-		select count(*) from BOARD where TYPE = 'QNA'
-		<if test="isSearch()">
+		select count(*) from BOARD where TYPE = #{type}
+		<if test="column != null and keyword != null">
 			and ${column} like '%' || #{keyword} || '%'
 		</if>
 	</select>
 
-	<select id="selectList" resultType="BoardDto"
-		parameterType="PageVO">
-		select *
-		from (
-		select rownum rn, board.*
-		from BOARD board
-		where TYPE =
-		'QNA'
-		<if test="isSearch()">
-			and ${column} like '%' || #{keyword} || '%'
-		</if>
-		order by board_no desc
-		)
-		where rn between #{begin} and #{end}
-	</select>
+	<select id="selectList" resultType="BoardDto" parameterType="PageVO">
+    select * from (
+        select rownum rn, tmp.* from (
+            select 
+                B.board_no as boardNo, 
+                B.title,
+                B.content as Content, 
+                B.writer_no as writerNo,
+                B.write_time as writeTime, 
+                B.type,
+                (select count(*) from comments where board_no = B.board_no) as replyCount
+            from board B
+            where type = #{type}
+            
+            <if test="loginLevel != 'ADMIN'">
+                <if test="type == 'QNA'">
+                    and B.writer_no = #{loginNo}
+                </if>
+            </if>
+            
+            <if test="column != null and keyword != null">
+                and ${column} like '%' || #{keyword} || '%'
+            </if>
+            order by board_no desc
+        ) tmp
+    ) where rn between #{begin} and #{end}
+</select>
 
 	<select id="selectCount" resultType="int" parameterType="map">
 		SELECT count(*) FROM board
@@ -128,34 +151,39 @@
 		</if>
 	</select>
 
-	<select id="selectListByPaging" parameterType="map" resultType="BoardDto">
-    SELECT *
-    FROM (
-        SELECT ROWNUM rn, T.*
-        FROM (
-            SELECT
-                board_no as boardNo,
-                title,
-                writer_no as writerNo,
-                write_time as writeTime,
-                read_count as readCount,
-                type,
-                (SELECT count(*) FROM COMMENTS WHERE board_no = B.board_no) as replyCount
-            FROM board B
-            WHERE type = #{type}
-            <if test="writerNo != null">
-                AND writer_no = #{writerNo}
-            </if>
-            ORDER BY board_no DESC
-        ) T
-    )
-    WHERE rn BETWEEN #{begin} AND #{end}
-</select>
+	<select id="selectListByPaging" parameterType="map"
+		resultType="BoardDto">
+		SELECT *
+		FROM (
+		SELECT ROWNUM rn, T.*
+		FROM (
+		SELECT
+		board_no as boardNo,
+		title,
+		content,
+		writer_no as writerNo,
+		write_time as writeTime,
+		read_count as
+		readCount,
+		type,
+		(SELECT count(*) FROM COMMENTS WHERE
+		board_no =
+		B.board_no) as replyCount
+		FROM board B
+		WHERE type = #{type}
+		<if test="writerNo != null">
+			AND writer_no = #{writerNo}
+		</if>
+		ORDER BY board_no DESC
+		) T
+		)
+		WHERE rn BETWEEN #{begin} AND #{end}
+	</select>
 
 	<select id="selectCountByMember" resultType="int"
 		parameterType="map">
 		SELECT count(*) FROM board
-		WHERE type = 'QNA' AND
+		WHERE type = #{type} AND
 		writer_no = #{writerNo}
 	</select>
 </mapper>

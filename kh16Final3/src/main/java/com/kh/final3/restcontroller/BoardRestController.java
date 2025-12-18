@@ -116,10 +116,11 @@ public class BoardRestController {
 	public void edit(@PathVariable long boardNo,
 								@RequestPart BoardDto boardDto,
 								@RequestAttribute TokenVO tokenVO,
-								@RequestPart(required = false) List<MultipartFile> attach) {
+								@RequestPart(required = false) List<MultipartFile> attach,
+								@RequestParam(required = false) List<Integer> deleteList) {
         boardDto.setBoardNo(boardNo);
         long memberNo = tokenVO.getMemberNo(); 
 	    String loginLevel = tokenVO.getLoginLevel();
-		boardService.update(boardDto, memberNo, loginLevel, attach); 
+		boardService.update(boardDto, memberNo, loginLevel, attach, deleteList); 
 	}
 }
