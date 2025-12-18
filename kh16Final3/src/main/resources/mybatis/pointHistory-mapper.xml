@@ -69,6 +69,45 @@
 	  		from point_history
 	  	where member_no = #{memberNo}
 	</select>
+	<!--마이페이지에서 충전내역-->
+	<select id="listChargeHistoryByMember"
+        resultType="PointChargeHistoryVO">
+		select
+		point_history_no AS pointHistoryNo, type, amount, reason, created_time
+		AS createdTime
+		from point_charge_history
+		where member_no = #{memberNo}
+		order by created_time desc
+     </select>
+     <!--마이페이지에서 입찰내역-->
+     <select id="listMemberBidHistory"
+        resultType="MemberBidHistoryVO">
+  select
+    x.product_no    as productNo,
+    p.name          as productName,
+    x.amount        as lastBidAmount,
+    x.created_time  as lastBidTime
+  from (
+    select
+      ph.product_no,
+      ph.amount,
+      ph.created_time,
+      ph.point_history_no,
+      row_number() over (
+        partition by ph.product_no
+        order by ph.created_time desc, ph.point_history_no desc
+      ) rn
+    from point_history ph
+    where ph.member_no = #{memberNo}
+      and upper(ph.reason) = 'BID_LOCKED'
+      and ph.product_no is not null
+  ) x
+  join product p
+    on p.product_no = x.product_no
+  where x.rn = 1
+  order by x.created_time desc
+</select>
+
 	
 	<delete id="deleteByProductNo">
     DELETE FROM point_history WHERE product_no = #{productNo}
