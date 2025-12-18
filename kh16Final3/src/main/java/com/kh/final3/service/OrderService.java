@@ -27,7 +27,7 @@ public class OrderService {
     @Transactional
     public OrdersDto createOrderForWinningBid(BidDto winningBid) {
         long orderNo = ordersDao.sequence();
-        Long sellerNo = productDao.findSellerNoByProductNo(winningBid.getProductNo());
+        Long sellerNo = productDao.findSellerByRegProductNo(winningBid.getProductNo());
         
         if(sellerNo == null)
         	throw new TargetNotfoundException();

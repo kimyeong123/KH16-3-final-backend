@@ -62,20 +62,14 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
 	}
 
-	public List<Long> findStartableProductNos() {
-		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
-	}
-
-	public long findSellerNoByProductNo(long productNo) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("productNo", productNo);
-		Number n = sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", params);
-		return n == null ? 0L : n.longValue();
-	}
 	public List<Long> findStartableProductNos(){
 		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
 	}
   
+	public Long findSellerByRegProductNo(long productNo) {
+		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
+	}
+	
 	public Long findSellerNoByProductNo(long productNo) {
 		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
 	}
