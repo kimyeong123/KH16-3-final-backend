@@ -20,10 +20,9 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer{
 	
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		// 사용자가 메세지를 보낼 수 있는 창구를 개설
-		registry.setApplicationDestinationPrefixes("/topic");
-		
-		// 사용자가 메세지를 받을 수 있는 구독 채널을 개설
-		registry.enableSimpleBroker("/app");
+		// 클라이언트 → 서버 (필요하면 나중에 @MessageMapping용)
+	    registry.setApplicationDestinationPrefixes("/app");
+	    // 서버 → 클라이언트 (구독 채널)
+	    registry.enableSimpleBroker("/topic");
 	}
 }

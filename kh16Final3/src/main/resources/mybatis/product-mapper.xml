@@ -12,10 +12,10 @@
 	<insert id="add">
 		insert into product(
 			  product_no, seller_no, name, category_code, description
-			, start_price, instant_price, start_time, end_time
+			, start_price, current_price, instant_price, start_time, end_time
 		) values (
 			  #{productNo}, #{sellerNo}, #{name}, #{categoryCode}, #{description}
-			, #{startPrice}, #{instantPrice}, #{startTime}, #{endTime}
+			, #{startPrice},  #{currentPrice}, #{instantPrice}, #{startTime}, #{endTime}
 		)
 	</insert>
 
@@ -91,6 +91,13 @@
 	<update id="updateStatus">
 		update product set status = #{changeStatus} where product_no = #{productNo}
 	</update>
+	
+	<update id ="updateCurrentPrice">
+		update product 
+		set
+			current_price = #{currentPrice}
+		where product_no = #{productNo}
+	</update>
 
 	<update id="updateProductOnAuctionEnd">
 		update product
@@ -128,7 +135,7 @@
 		from product
 		where product_no = #{productNo}
 	</select>
-
+	
 	<select id="countBySeller" resultType="int">
 		select count(*)
 		from product

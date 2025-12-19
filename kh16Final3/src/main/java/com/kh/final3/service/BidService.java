@@ -22,6 +22,9 @@ import com.kh.final3.event.BidPlacedEvent;
 import com.kh.final3.helper.AuctionHelper;
 import com.kh.final3.vo.AuctionEndRequestVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class BidService {
 
@@ -125,6 +128,8 @@ public class BidService {
 		bidDao.insert(incomingBid);
 		// 에스크로 정보 등록
 		escrowLedgerService.registerEscrowForBid(incomingBid);
+		// 상품 현재가 갱신
+		productDao.updateCurrentPrice(incomingBid.getProductNo(), incomingBid.getAmount());
 		// 회원 포인트 차감 및 로그 기록
 		pointHistoryService.lockPointsForBid(incomingBid);
 	}

@@ -9,7 +9,9 @@ import com.kh.final3.dto.BidDto;
 import com.kh.final3.vo.BidUpdateMessageVO;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor // 필수 필드만 받은 생성자 생성
 @Component
 public class BidEventListener {
@@ -34,5 +36,9 @@ public class BidEventListener {
             "/topic/products/" + bidDto.getProductNo() + "/bid",
             message
         );
+        
+        log.warn("STOMP SEND productNo={}, price={}",
+                bidDto.getProductNo(),
+                bidDto.getAmount());
     }
 }

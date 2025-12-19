@@ -62,6 +62,7 @@
         update escrow_ledger
         	set 
         		status = #{changeStatus},
+        		description = #{statusDescription},
            		updated_time = systimestamp
         	where 
         		escrow_ledger_no = #{escrowLedgerNo}

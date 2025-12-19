@@ -25,7 +25,7 @@ public class PointHistoryService {
 	private MemberDao memberDao;
 	
 	@Autowired
-	private AuctionHelper auctionHelperService;
+	private AuctionHelper auctionHelper;
 	
 	@Autowired
 	private SettlementProperties settlementProperties;
@@ -55,7 +55,7 @@ public class PointHistoryService {
 		
 		long pointHistoryNo = pointHistoryDao.sequence();
 		PointHistoryDto pointHistoryDto = 
-				auctionHelperService.createPointHistoryDtoByBid(bidDto, pointHistoryNo, PointHistoryReason.BID_LOCKED);
+				auctionHelper.createPointHistoryDtoByBid(bidDto, pointHistoryNo, PointHistoryReason.BID_LOCKED);
 		
 		pointHistoryDao.insert(pointHistoryDto);
 	}
@@ -65,7 +65,7 @@ public class PointHistoryService {
 		
 		long pointHistoryNo = pointHistoryDao.sequence();
 		PointHistoryDto pointHistoryDto = 
-				auctionHelperService.createPointHistoryDtoByBid(bidDto, pointHistoryNo, PointHistoryReason.BID_REFUNDED);
+				auctionHelper.createPointHistoryDtoByBid(bidDto, pointHistoryNo, PointHistoryReason.BID_REFUNDED);
 		
 		pointHistoryDao.insert(pointHistoryDto);
 	}
@@ -77,7 +77,7 @@ public class PointHistoryService {
 		
 		long pointHistoryNo = pointHistoryDao.sequence();
 		PointHistoryDto pointHistoryDto = 
-				auctionHelperService.createPointHistoryDtoByOrder(
+				auctionHelper.createPointHistoryDtoByOrder(
 						orderDto, pointHistoryNo, 
 						settlementResult, PointHistoryReason.SETTLEMENT);
 		

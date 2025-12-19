@@ -78,7 +78,8 @@ public class EscrowLedgerDao {
     public int updateStatusByEscrowNo(long escrowLedgerNo, EscrowStatus changeStatus) {
         Map<String, Object> params = new HashMap<>();
         params.put("escrowLedgerNo", escrowLedgerNo);
-        params.put("changeStatus", changeStatus.name()); 
+        params.put("changeStatus", changeStatus.getStatus());
+        params.put("statusDescription", changeStatus.getDescription());
         
         return sqlSession.update(NAMESPACE + "updateStatusByEscrowNo", params);
     }

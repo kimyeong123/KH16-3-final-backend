@@ -17,6 +17,7 @@ public class ProductDto {
     private Long categoryCode;
     private String description;
     private Long startPrice; 
+    private Long currentPrice;
     private Long finalPrice;
     private Long instantPrice; 
     private Timestamp startTime; 

@@ -1,6 +1,7 @@
 package com.kh.final3.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import com.kh.final3.domain.enums.EscrowStatus;
 import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.BidDto;
 import com.kh.final3.dto.ProductDto;
+import com.kh.final3.event.AuctionEndedEvent;
 import com.kh.final3.vo.AuctionEndRequestVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ public class AuctionService {
     
     @Autowired
     private EscrowLedgerService escrowLedgerService;
+    
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     
     /*
     	상태 전이의 결정권을 가진 Aggregate Root에 row lock을 걸면,
@@ -83,10 +88,23 @@ public class AuctionService {
 	public void closeAuction(AuctionEndRequestVO endRequestVO, long bidNo) {
 		productDao.updateProductOnAuctionEnd(endRequestVO);
 		escrowLedgerService.updateEscrowForBid(bidNo, EscrowStatus.PENDING_SETTLEMENT);
+		
+		// 이벤트 발행
+		eventPublisher.publishEvent(
+		        new AuctionEndedEvent(
+		            endRequestVO.getProductNo(),
+		            endRequestVO.getFinalPrice(),
+		            endRequestVO.getBuyerNo()
+		        )
+		    );
 	}
     
     public void noBidAuction(long productNo) {
     	productDao.updateStatus(productNo, ProductStatus.ENDED);
+    	
+    	eventPublisher.publishEvent(
+    	        new AuctionEndedEvent(productNo, 0L, 0L)
+    	    );
     }
     
 }
