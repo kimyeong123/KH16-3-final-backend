@@ -10,6 +10,7 @@ import com.kh.final3.dao.ProductDao;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
+import com.kh.final3.vo.member.MemberGetProductVO;
 
 @Service
 public class ProductService {
@@ -131,5 +132,8 @@ public class ProductService {
 				.last(last)
 				.list(list)
 				.build();
+	}
+	public List<MemberGetProductVO> getMyEndedProducts(int memberNo) {
+	    return productDao.selectGetProductList(memberNo);
 	}
 }

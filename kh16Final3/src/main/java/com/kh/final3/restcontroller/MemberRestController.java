@@ -13,18 +13,22 @@ import org.springframework.web.bind.annotation.*;
 import com.kh.final3.dao.MemberDao;
 import com.kh.final3.dao.PointHistoryDao;
 import com.kh.final3.dao.TokenDao;
+import com.kh.final3.dao.WithdrawDao;
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.dto.PointWithdrawDto;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
+import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
+import com.kh.final3.service.WithdrawService;
 import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.TokenVO;
 import com.kh.final3.vo.member.MemberBidHistoryVO;
 import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
 import com.kh.final3.vo.member.MemberFindIdVO;
-import com.kh.final3.vo.member.MemberListVO;
+import com.kh.final3.vo.member.MemberGetProductVO;
 import com.kh.final3.vo.member.MemberLoginResponseVO;
 import com.kh.final3.vo.member.MemberRefreshVO;
 import com.kh.final3.vo.member.MemberRequestVO;
@@ -49,6 +53,12 @@ public class MemberRestController {
 	private TokenService tokenService;
 	@Autowired
 	private PointHistoryDao pointHistoryDao;
+	@Autowired
+	private ProductService productService;
+	@Autowired
+	private WithdrawService withdrawService;
+	@Autowired 
+	private WithdrawDao withdrawDao;
 
 	// 회원가입
 	@PostMapping("/register")
@@ -336,8 +346,44 @@ public class MemberRestController {
 	    TokenVO tokenVO = tokenService.parse(bearerToken);
 	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
 	}
+	@GetMapping("/win-products/history")
+	public List<MemberGetProductVO> myWinProductList(
+	        @RequestHeader("Authorization") String bearerToken
+	) {
+		bearerToken = bearerToken.trim().replace("\n", "").replace("\r", "");
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    long memberNo = tokenVO.getMemberNo();
+	    return productService.getMyEndedProducts((int) memberNo);
+	}
 
+    // 환전 요청
+    @PostMapping("/withdraw")
+    public long requestWithdraw(
+            @RequestHeader("Authorization") String bearerToken,
+            @RequestBody PointWithdrawDto dto
+    ) {
+        TokenVO tokenVO = tokenService.parse(bearerToken);
+        long memberNo = tokenVO.getMemberNo();
 
+        // body의 memberNo는 신뢰하지 않고 토큰 기준으로 덮어쓰기
+        dto.setMemberNo(memberNo);
+
+        return withdrawService.request(dto);
+    }
+
+    // 내 환전 내역 조회
+    @GetMapping("/withdraw/history")
+    public List<PointWithdrawDto> myWithdrawHistory(
+            @RequestHeader("Authorization") String bearerToken
+    ) {
+        TokenVO tokenVO = tokenService.parse(bearerToken);
+        return withdrawDao.listByMember(tokenVO.getMemberNo());
+    }
+    @GetMapping("/point/balance")
+    public long pointBalance(@RequestHeader("Authorization") String bearerToken) {
+        TokenVO tokenVO = tokenService.parse(bearerToken);
+        return pointHistoryDao.calculateMemberBalance(tokenVO.getMemberNo());
+    }
 
 
 }

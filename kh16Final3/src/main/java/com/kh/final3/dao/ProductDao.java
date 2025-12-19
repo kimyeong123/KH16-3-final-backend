@@ -12,6 +12,7 @@ import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
+import com.kh.final3.vo.member.MemberGetProductVO;
 
 @Repository
 public class ProductDao {
@@ -183,4 +184,14 @@ public class ProductDao {
 	    params.put("end", pageVO.getEnd());
 	    return sqlSession.selectList("product.listAuctionByPaging", params);
 	}
+	//마이페이지 목록용
+	public List<MemberGetProductVO> selectGetProductList(int memberNo) {
+	    return sqlSession.selectList(
+	        NAMESPACE + "selectGetProductList",
+	        memberNo
+	    );
+	}
+
+	
+
 }
