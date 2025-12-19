@@ -63,12 +63,12 @@ public class SanctionService {
             throw new TargetNotfoundException("제재 정보 등록 실패: Sanction DB INSERT 오류"); 
         }
 
-//        // 3. 💡 회원 테이블의 ROLE 컬럼을 'SUSPENDED'로 업데이트
-//        memberDao.updateMemberStatus(memberNo, "SUSPENDED");
+//        // 3. 회원 테이블의 ROLE 컬럼을 'SUSPENDED'로 업데이트
+        memberDao.updateMemberStatus(memberNo, "SUSPENDED");
         
         // 4. MessageService를 이용해 제재 알림 전송
         String endDateString = (endTime != null) ? endTime.toString() : "영구 정지";
-        String alertContent = String.format("📢 제재 안내: 귀하의 계정이 [%s] 사유로 [%s] 처리되었습니다. 종료 예정일: %s", 
+        String alertContent = String.format("[운영알림] 귀하의 계정이 활동 정지 처리되었습니다.\n사유: %s\n종료 예정일: %s",
                                             reason, type, endDateString);
         
         messageService.sendNotification(memberNo, alertContent, null);
@@ -101,7 +101,10 @@ public class SanctionService {
         }
         
         // 3.  회원 상태를 'DEFAULT'로 업데이트 (ROLE 변경)
-        //memberDao.updateMemberStatus(detail.getMemberNo(), "DEFAULT");
+        memberDao.updateMemberStatus(detail.getMemberNo(), "DEFAULT");
+        
+        String alertContent = "[운영알림] 귀하의 활동 정지 처분이 해제되었습니다. 이제 정상적으로 서비스를 이용하실 수 있습니다.";
+        messageService.sendNotification(detail.getMemberNo(), alertContent, null);
         
         return true;
     }

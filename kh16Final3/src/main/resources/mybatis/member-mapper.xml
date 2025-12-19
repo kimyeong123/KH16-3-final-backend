@@ -146,10 +146,7 @@
 </select>
 
 <!-- 관리자가 검색하는 회원 리스트(페이징) -->
-<select id="selectMemberListSearch"
-        parameterType="PageVO"
-        resultType="MemberListVO">
-
+<select id="selectMemberListSearch" parameterType="PageVO" resultType="MemberListVO">
   select *
   from (
     select rownum rn, t.*
@@ -163,6 +160,47 @@
         created_time as createdTime
       from member
       <where>
+        <if test="role == 'MEMBER_ONLY'">
+          AND role != 'ADMIN'
+        </if>
+        
+        <if test="keyword != null and keyword != ''">
+          AND (
+            <choose>
+              <when test="type == 'id'">
+                id like '%' || #{keyword} || '%'
+              </when>
+              <when test="type == 'nickname'">
+                nickname like '%' || #{keyword} || '%'
+              </when>
+              <otherwise>
+                id like '%' || #{keyword} || '%'
+                or nickname like '%' || #{keyword} || '%'
+              </otherwise>
+            </choose>
+          )
+        </if>
+      </where>
+      order by member_no desc
+    ) t
+  )
+  where rn between #{begin} and #{end}
+</select>
+<!-- 관리자 회원 전체 개수 -->
+<select id="countMemberList" resultType="int">
+  select count(*)
+  from member
+</select>
+<!-- 관리자 회원 검색 개수 -->
+<select id="countMemberListSearch" parameterType="PageVO" resultType="int">
+  select count(*)
+  from member
+  <where>
+    <if test="role == 'MEMBER_ONLY'">
+      AND role != 'ADMIN'
+    </if>
+    <if test="keyword != null and keyword != ''">
+      AND (
         <choose>
           <when test="type == 'id'">
             id like '%' || #{keyword} || '%'
@@ -175,37 +213,8 @@
             or nickname like '%' || #{keyword} || '%'
           </otherwise>
         </choose>
-      </where>
-      order by member_no asc
-    ) t
-  )
-  where rn between #{begin} and #{end}
-
-</select>
-<!-- 관리자 회원 전체 개수 -->
-<select id="countMemberList" resultType="int">
-  select count(*)
-  from member
-</select>
-<!-- 관리자 회원 검색 개수 -->
-<select id="countMemberListSearch"
-        parameterType="PageVO"
-        resultType="int">
-  select count(*)
-  from member
-  <where>
-    <choose>
-      <when test="type == 'id'">
-        id like '%' || #{keyword} || '%'
-      </when>
-      <when test="type == 'nickname'">
-        nickname like '%' || #{keyword} || '%'
-      </when>
-      <otherwise>
-        id like '%' || #{keyword} || '%'
-        or nickname like '%' || #{keyword} || '%'
-      </otherwise>
-    </choose>
+      )
+    </if>
   </where>
 </select>
 	
@@ -241,6 +250,26 @@
 			from member
 		where member_no = #{memberNo}
 	</select>
+	
+	<select id="selectMemberDetail" parameterType="int" resultType="MemberDto">
+    select 
+        member_no as memberNo,
+        id, 
+        nickname, 
+        email, 
+        role, 
+        point, 
+        created_time as createdTime,
+        last_login as lastLogin
+    from member
+    where member_no = #{memberNo}
+</select>
+
+<update id="updateMemberRole" parameterType="MemberDto">
+    update member 
+    set role = #{role} 
+    where member_no = #{memberNo}
+</update>
 	
 	
 </mapper>
