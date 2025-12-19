@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.kh.final3.dao.MemberDao;
 import com.kh.final3.dao.TokenDao;
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.member.MemberListVO;
 import com.kh.final3.vo.member.MemberRequestVO;
 import com.kh.final3.vo.member.MemberUpdateVO;
@@ -190,16 +191,29 @@ public class MemberService {
 	}
 
     //전체 목록
-    public List<MemberListVO> getMemberList() {
-        return memberDao.selectMemberList();
-    }
-    //검색용 목록
-    public List<MemberListVO> getMemberList(String type, String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return getMemberList(); // 전체 목록으로 fallback
+    public PageVO<MemberListVO> getMemberList(PageVO<MemberListVO> vo) {
+
+        if (vo.getKeyword() == null || vo.getKeyword().trim().isEmpty()) {
+            vo.setKeyword(null);
+            vo.setType(null);
+        } else {
+            vo.setKeyword(vo.getKeyword().trim());
         }
-        return memberDao.selectMemberListSearch(type, keyword.trim());
+        // 1) 총 개수
+        int count = vo.isSearch()
+                ? memberDao.countMemberListSearch(vo)
+                : memberDao.countMemberList();
+
+        vo.setDataCount(count);
+        // 2) 페이지 데이터 (10명 단위)
+        List<MemberListVO> list = vo.isSearch()
+                ? memberDao.selectMemberListSearch(vo)
+                : memberDao.selectMemberList(vo);
+
+        vo.setList(list);
+        return vo;
     }
+   
     //회원 포인트 증가
     @Transactional
     public void addPoint(Long memberNo, Long amount) {

@@ -318,14 +318,6 @@ public class MemberRestController {
 		}
 	}
 
-	//회원검색
-	@GetMapping("/list")
-	public List<MemberListVO> list(
-	    @RequestParam(required = false) String type,
-	    @RequestParam(required = false) String keyword
-	) {
-	    return memberService.getMemberList(type, keyword);
-	}
 
 	//포인트 충전 내역
 	@GetMapping("/point/charged-history")

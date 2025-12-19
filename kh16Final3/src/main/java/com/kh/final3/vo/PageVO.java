@@ -9,7 +9,7 @@ public class PageVO<T> {
     
     // 필드에 페이징에 필요한 데이터들을 배치
     private Integer page = 1;     // 현재 페이지 번호
-    private Integer size = 10;    // 한 페이지에 표시할 데이터 수
+    private Integer size = 3;    // 한 페이지에 표시할 데이터 수
     private String column, keyword;// 검색항목, 검색어
     private Integer dataCount;    // 총 데이터 수
     private Integer blockSize = 10;// 표시할 블록 개수(10개)
@@ -24,25 +24,42 @@ public class PageVO<T> {
     // 계산이 가능하도록 Getter 메소드 추가 생성
     
     public boolean isSearch() {
-        return column != null && keyword != null;
+        // 기존 검색(column)
+        boolean columnSearch =
+            column != null &&
+            keyword != null &&
+            !keyword.trim().isEmpty();
+
+        // 관리자 검색(type)
+        boolean typeSearch =
+            type != null &&
+            keyword != null &&
+            !keyword.trim().isEmpty();
+
+        return columnSearch || typeSearch;
     }
-    
+
+
     public boolean isList() {
-        return column == null || keyword == null;
+        return !isSearch();
     }
-    
-    public String getSearchParams() {//목록 or 검색 여부에 따라 주소에 추가될 파라미터를 반환
-        if(isSearch()) {
-            return "size="+size+"&column="+column+"&keyword="+keyword;
+
+    public String getSearchParams() {
+        if (type != null && keyword != null && !keyword.trim().isEmpty()) {
+            return "size=" + size + "&type=" + type + "&keyword=" + keyword;
+        }
+        else if (column != null && keyword != null && !keyword.trim().isEmpty()) {
+            return "size=" + size + "&column=" + column + "&keyword=" + keyword;
         }
         else {
-            return "size="+size;
+            return "size=" + size;
         }
     }
-    
+
+
     public Integer getBlockStart() {//블록 시작번호
         return (page-1) / blockSize * blockSize + 1;
-    }
+    }		
     
     public Integer getBlockFinish() {//블록 종료번호
         int number = (page-1) / blockSize * blockSize + blockSize;
