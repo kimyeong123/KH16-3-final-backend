@@ -1,17 +1,15 @@
 package com.kh.final3.dto;
 
-import java.sql.Timestamp;
-
+import java.time.LocalDateTime; // 변경
+import com.fasterxml.jackson.annotation.JsonFormat; // 추가
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class ProductDto {
-	private Long productNo;
+    private Long productNo;
     private Long sellerNo;
     private String name;
     private Long categoryCode;
@@ -20,10 +18,21 @@ public class ProductDto {
     private Long currentPrice;
     private Long finalPrice;
     private Long instantPrice; 
-    private Timestamp startTime; 
-    private Timestamp endTime; // 경매 마감 예정 시각 (최초 설정 시각 또는 연장 시 갱신되는 시각)
+
+    // [핵심 수정] pattern에 'T'가 포함되어야 프론트엔드의 datetime-local 값을 인식합니다.
+    // timezone을 Asia/Seoul로 고정하여 9시간 오차를 원천 봉쇄합니다.
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime startTime; 
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime endTime;
+
     private String status;
     private Long buyerNo;        
-    private Timestamp registrationTime;
-    private Timestamp endedTime; // 경매 최종 종료 (status가 'ENDED'로 변경되는 시점 기록)
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime registrationTime;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime endedTime;
 }
