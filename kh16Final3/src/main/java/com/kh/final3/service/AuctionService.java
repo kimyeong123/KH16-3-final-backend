@@ -30,6 +30,9 @@ public class AuctionService {
     private EscrowLedgerService escrowLedgerService;
     
     @Autowired
+    private OrderService orderService;
+    
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
     
     /*
@@ -58,14 +61,7 @@ public class AuctionService {
         } else {
         	log.info("[AUCTION-END] productNo={} | BIDDING → ENDED | bidNo={} | buyerNo={} | price={}",
         	         productNo, winningBid.getBidNo(), winningBid.getBidderNo(), winningBid.getAmount());
-        	closeAuction(
-                AuctionEndRequestVO.builder()
-                    .productNo(productNo)
-                    .buyerNo(winningBid.getBidderNo())
-                    .finalPrice(winningBid.getAmount())
-                    .build(), 
-                    winningBid.getBidNo()
-            );
+        	closeAuction(winningBid);
         }
     }
     
@@ -85,9 +81,18 @@ public class AuctionService {
         log.info("[AUCTION-START] Auction started. productNo={}", productNo);
     }
     
-	public void closeAuction(AuctionEndRequestVO endRequestVO, long bidNo) {
+	public void closeAuction(BidDto winningBid) {
+		AuctionEndRequestVO endRequestVO = 
+					AuctionEndRequestVO
+					.builder()
+					.productNo(winningBid.getProductNo())
+					.buyerNo(winningBid.getBidderNo())
+					.finalPrice(winningBid.getAmount())
+					.build();
+					
 		productDao.updateProductOnAuctionEnd(endRequestVO);
-		escrowLedgerService.updateEscrowForBid(bidNo, EscrowStatus.PENDING_SETTLEMENT);
+		escrowLedgerService.updateEscrowForBid(winningBid.getBidNo(), EscrowStatus.PENDING_SETTLEMENT);
+		orderService.createOrderForWinningBid(winningBid);
 		
 		// 이벤트 발행
 		eventPublisher.publishEvent(
@@ -99,7 +104,7 @@ public class AuctionService {
 		    );
 	}
     
-    public void noBidAuction(long productNo) {
+	public void noBidAuction(long productNo) {
     	productDao.updateStatus(productNo, ProductStatus.ENDED);
     	
     	eventPublisher.publishEvent(

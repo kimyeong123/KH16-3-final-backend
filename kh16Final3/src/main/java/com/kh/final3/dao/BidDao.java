@@ -25,6 +25,10 @@ public class BidDao {
         return sqlSession.insert(NAMESPACE + "insert", bidDto);
     }
     
+    public BidDto selectOne(long bidNo) {
+    	return sqlSession.selectOne(NAMESPACE + "selectOne", bidNo);
+    }
+    
     // 상품별 입찰 랭킹 목록 조회(금액 1순위, 입찰순서 2순위)
     public List<BidDto> findBidRankingByProduct(long productNo) { 
         return sqlSession.selectList(NAMESPACE + "selectListBidByProductNo", productNo);

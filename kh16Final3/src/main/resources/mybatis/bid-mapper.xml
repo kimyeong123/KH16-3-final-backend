@@ -16,6 +16,10 @@
 	    )
     </insert>
     
+    <select id="selectOne">
+    	select * from bid where bid_no = #{bidNo}
+    </select>
+    
     <select id="selectListBidByProductNo" resultType="BidDto">
     	select * 
     	from bid

@@ -25,15 +25,15 @@ public class PointHistoryDao {
         return sqlSession.insert(NAMESPACE + "insert", pointHistoryDto);
     }
 
-    public PointHistoryDto selectOne(int pointHistoryNo) {
+    public PointHistoryDto selectOne(long pointHistoryNo) {
         return sqlSession.selectOne(NAMESPACE + "detail", pointHistoryNo);
     }
 
-    public List<PointHistoryDto> selectListByMember(int memberNo) {
+    public List<PointHistoryDto> selectListByMember(long memberNo) {
         return sqlSession.selectList(NAMESPACE + "listByMember", memberNo);
     }
     
-    public long calculateMemberBalance(int memberNo) {
+    public long calculateMemberBalance(long memberNo) {
     	return sqlSession.selectOne(NAMESPACE + "calculateMemberBalance", memberNo);
     }
     
