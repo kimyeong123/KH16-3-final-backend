@@ -24,7 +24,7 @@ public class AttachmentRestController {
     private final AttachmentService attachmentService;
 
     @GetMapping("/{attachmentNo}")
-    public ResponseEntity<ByteArrayResource> download(@PathVariable int attachmentNo) {
+    public ResponseEntity<ByteArrayResource> download(@PathVariable long attachmentNo) {
         try {
             AttachmentDto dto = attachmentService.get(attachmentNo);
             ByteArrayResource resource = attachmentService.load(attachmentNo);

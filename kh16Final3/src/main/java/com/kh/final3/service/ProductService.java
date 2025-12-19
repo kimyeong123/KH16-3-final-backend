@@ -109,7 +109,7 @@ public class ProductService {
 	// [핵심] 검색 필터가 적용된 경매 리스트 조회
 	// ========================================================
 	@Transactional(readOnly = true)
-	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Long minPrice, Long maxPrice) {
 		// 검색 조건에 맞는 개수 조회
 		int count = productDao.countAuction(q, category, minPrice, maxPrice);
 
