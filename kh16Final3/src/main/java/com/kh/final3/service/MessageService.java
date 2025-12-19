@@ -137,6 +137,12 @@ public class MessageService {
 	    // 발신자/수신자 권한을 가진 사용자에게만 detail 반환
 	    return detail;
 	}
+	
+	//모두 읽기
+	@Transactional
+	public void readAllMessages(long receiverNo) {
+	    messageDao.updateAllReadTime(receiverNo);
+	}
 
 	/**
 	 * 2-2. 미확인 알림 개수 조회 (헤더 알림 아이콘용)
@@ -184,7 +190,6 @@ public class MessageService {
 	/**
 	 * 2-5. 발신함 목록 조회 (페이지네이션 + 필터링 + 검색)
 	 */
-    // 🚨 수정된 부분: PageVO<MessageDto> pageVO 인자 추가
 	@Transactional
 	public PageVO<MessageDto> getSentListByPaging(PageVO<MessageDto> pageVO, Map<String, Object> paramMap, long memberNo) { 
 

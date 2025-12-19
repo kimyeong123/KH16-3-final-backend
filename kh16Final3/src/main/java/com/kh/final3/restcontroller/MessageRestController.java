@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -71,6 +72,16 @@ public class MessageRestController {
 	) {
 	    List<MessageDto> list = messageService.getUnreadListForHeader(memberNo); 
 	    return ResponseEntity.ok(list);
+	}
+	
+//	모든 알림 읽음 처리
+	@PatchMapping("/read-all")
+	public ResponseEntity<String> readAllMessages(@RequestAttribute(value="memberNo", required=false) Long memberNo) {
+	    if (memberNo == null) {
+	        return ResponseEntity.status(401).body("로그인이 필요합니다.");
+	    }
+	    messageService.readAllMessages(memberNo);
+	    return ResponseEntity.ok("성공");
 	}
 	
 	/**
@@ -142,8 +153,8 @@ public class MessageRestController {
 	@GetMapping("/{messageNo}")
 	public ResponseEntity<MessageDto> getMessageDetail(
 			@PathVariable long messageNo,
-			@RequestAttribute long memberNo,
-	    @RequestAttribute("memberNo") long currentMemberNo) {
+			@RequestAttribute long memberNo
+	    ) {
 
 	    MessageDto detail = messageService.getMessageDetailAndRead(messageNo, memberNo);
 
@@ -152,9 +163,9 @@ public class MessageRestController {
 	    }
 	        
         // 쪽지 수신자 또는 발신자가 현재 로그인한 사용자가 아니면 권한 없음
-        if (detail.getReceiverNo() != currentMemberNo && detail.getSenderNo() != currentMemberNo) {
+	    if (detail.getReceiverNo() != memberNo && detail.getSenderNo() != memberNo) {
 	        throw new UnauthorizationException("해당 쪽지를 조회할 권한이 없습니다.");
-        }
+	    }
 
 	    return ResponseEntity.ok(detail);
 	}

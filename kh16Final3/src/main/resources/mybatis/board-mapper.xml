@@ -125,7 +125,7 @@
                 B.writer_no as writerNo,
                 B.write_time as writeTime, 
                 B.type,
-                (select count(*) from comments where board_no = B.board_no) as replyCount
+                (select count(*) from comments where board_no = B.board_no) as commentCount
             from board B
             where type = #{type}
             
@@ -168,7 +168,7 @@
 		type,
 		(SELECT count(*) FROM COMMENTS WHERE
 		board_no =
-		B.board_no) as replyCount
+		B.board_no) as commentCount
 		FROM board B
 		WHERE type = #{type}
 		<if test="writerNo != null">

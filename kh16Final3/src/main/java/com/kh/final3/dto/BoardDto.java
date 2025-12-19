@@ -26,4 +26,7 @@ public class BoardDto {
     
     // 파일 목록 담을 필드 추가
     private List<AttachmentDto> attachmentList;
+    
+    //댓글 수 세기
+    private Long commentCount;
 }
