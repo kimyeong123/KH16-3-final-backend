@@ -52,7 +52,7 @@ public class MessageService {
 	}
 	
 	/**
-	 * 1-2. 상품 문의/답변 전송 (type: INQUIRY)
+	 * 1-2. 상품 문의/답변 전송
 	 */
 	@Transactional
 	public boolean sendQnaToSeller(long senderNo, long receiverNo, String content, long productNo) {	

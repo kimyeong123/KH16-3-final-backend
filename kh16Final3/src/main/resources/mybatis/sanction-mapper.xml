@@ -6,86 +6,87 @@
 <mapper namespace="sanction">
     
     <select id="sequence" resultType="long">
-        select sanction_seq.nextval from dual
+        SELECT sanction_seq.NEXTVAL FROM DUAL
     </select>
     
     <insert id="insert" parameterType="SanctionDto">
-        insert into sanction (
+        INSERT INTO sanction (
             sanction_no, member_no, type, duration_day,
             start_time, end_time, reason, status
         )
-        values (
+        VALUES (
             #{sanctionNo}, #{memberNo}, #{type}, #{durationDay}, 
             #{startTime}, #{endTime}, #{reason}, #{status}
         )
     </insert>
     
     <select id="selectOne" parameterType="long" resultType="SanctionDto">
-        select 
-            sanction_no as sanctionNo,
-            member_no as memberNo,
+        SELECT 
+            sanction_no AS sanctionNo,
+            member_no AS memberNo,
             type,
-            duration_day as durationDay,
-            start_time as startTime,
-            end_time as endTime,
+            duration_day AS durationDay,
+            start_time AS startTime,
+            end_time AS endTime,
             reason,
             status
-        from sanction
-        where sanction_no = #{sanctionNo}
+        FROM sanction
+        WHERE sanction_no = #{sanctionNo}
     </select>
     
-    <select id="selectActiveSanctions" parameterType="long" resultType="SanctionDto">
-        select 
-            sanction_no as sanctionNo,
-            member_no as memberNo,
+    <select id="selectValidSanctionsByMember" parameterType="long" resultType="SanctionDto">
+        SELECT 
+            sanction_no AS sanctionNo,
+            member_no AS memberNo,
             type,
-            duration_day as durationDay,
-            start_time as startTime,
-            end_time as endTime,
+            duration_day AS durationDay,
+            start_time AS startTime,
+            end_time AS endTime,
             reason,
             status
-        from sanction
-        where member_no = #{memberNo}
-        and status = 'Y'
-        and end_time > systimestamp  
-        order by start_time desc
+        FROM sanction
+        WHERE member_no = #{memberNo}
+        AND status = 'Y'
+        AND end_time > SYSTIMESTAMP  
+        ORDER BY start_time DESC
     </select>
     
-    <update id="updateStatus" parameterType="SanctionDto"> update sanction
-        set status = #{status}
-        where sanction_no = #{sanctionNo}
+    <update id="updateStatus" parameterType="SanctionDto">
+        UPDATE sanction
+        SET status = #{status}
+        WHERE sanction_no = #{sanctionNo}
     </update>
     
     <delete id="delete" parameterType="long">
-        delete from sanction
-        where sanction_no = #{sanctionNo}
+        DELETE FROM sanction
+        WHERE sanction_no = #{sanctionNo}
     </delete>
     
     <select id="count" resultType="int">
-        select count(*) from sanction
+        SELECT COUNT(*) FROM sanction
     </select>
     
     <select id="selectHistoryWithPaging" parameterType="map" resultType="SanctionDto">
-        select *
-        from (
-            select rownum rn, tmp.*
-            from (
-                select 
-                    s.sanction_no as sanctionNo,
-                    s.member_no as memberNo,
+        SELECT *
+        FROM (
+            SELECT rownum rn, tmp.*
+            FROM (
+                SELECT 
+                    s.sanction_no AS sanctionNo,
+                    s.member_no AS memberNo,
                     s.type,
-                    s.duration_day as durationDay,
-                    s.start_time as startTime,
-                    s.end_time as endTime,
+                    s.duration_day AS durationDay,
+                    s.start_time AS startTime,
+                    s.end_time AS endTime,
                     s.reason,
                     s.status,
-                    m.member_nickname as memberNickname
-                from sanction s
-                left outer join member m on s.member_no = m.member_no
-                order by s.sanction_no desc
+                    m.member_nickname AS memberNickname
+                FROM sanction s
+                LEFT OUTER JOIN member m ON s.member_no = m.member_no
+                ORDER BY s.sanction_no DESC
             ) tmp
         )
-        where rn between #{begin} and #{end}
+        WHERE rn BETWEEN #{begin} AND #{end}
     </select>
 
 </mapper>
