@@ -125,7 +125,8 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
-	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Long minPrice, Long maxPrice) {
+		// 검색 조건에 맞는 개수 조회
 		int count = productDao.countAuction(q, category, minPrice, maxPrice);
 
 		PageVO pageVO = new PageVO();

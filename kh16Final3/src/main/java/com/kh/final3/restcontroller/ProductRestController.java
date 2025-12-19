@@ -103,8 +103,8 @@ public class ProductRestController {
         @RequestParam(required = false) String q,
         @RequestParam(required = false) Long category,
         @RequestParam(required = false) String sort,
-        @RequestParam(required = false) Integer minPrice,
-        @RequestParam(required = false) Integer maxPrice
+        @RequestParam(required = false) Long minPrice,
+        @RequestParam(required = false) Long maxPrice
     ) {
         // 모든 검색 조건을 서비스로 전달
         return productService.getAuctionPaged(page, q, category, sort, minPrice, maxPrice);
@@ -118,7 +118,7 @@ public class ProductRestController {
     @DeleteMapping("/{productNo}")
     public void delete(@PathVariable long productNo, @RequestHeader(value="Authorization", required=false) String authorization) {
         requireOwner(productNo, authorization);
-        attachmentService.deleteByParent(CAT_PRODUCT, (int)productNo);
+        attachmentService.deleteByParent(CAT_PRODUCT, productNo);
         productService.delete(productNo);
     }
 
@@ -136,7 +136,7 @@ public class ProductRestController {
 
     @GetMapping("/{productNo}/attachments")
     public List<AttachmentDto> attachmentList(@PathVariable long productNo) {
-        return attachmentService.listByParent(CAT_PRODUCT, (int)productNo);
+        return attachmentService.listByParent(CAT_PRODUCT, productNo);
     }
 
     @PostMapping(value="/{productNo}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -161,7 +161,7 @@ public class ProductRestController {
         @RequestHeader(value="Authorization", required=false) String authorization
     ) throws Exception {
         requireOwner(productNo, authorization);
-        attachmentService.deleteByParent(CAT_PRODUCT, (int)productNo);
+        attachmentService.deleteByParent(CAT_PRODUCT, productNo);
         List<AttachmentDto> result = new ArrayList<>();
         for (MultipartFile f : files) {
             if (f == null || f.isEmpty()) continue;
@@ -171,8 +171,13 @@ public class ProductRestController {
     }
     
     @DeleteMapping("/{productNo}/attachments/{attachmentNo}")
-    public void deleteAttachment(@PathVariable long productNo, @PathVariable int attachmentNo, @RequestHeader(value="Authorization", required=false) String authorization) {
+    public void deleteAttachment(@PathVariable long productNo, @PathVariable long attachmentNo, @RequestHeader(value="Authorization", required=false) String authorization) {
         requireOwner(productNo, authorization);
         attachmentService.delete(attachmentNo);
+    }
+    
+    @GetMapping("/{productNo}/image")
+    public Long productThumbnail(@PathVariable long productNo) {
+        return attachmentService.findProductThumbnailAttachmentNo(productNo);
     }
 }

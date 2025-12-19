@@ -106,4 +106,8 @@ public class MessageDao {
 	public List<MessageDto> selectReceivedListByPaging(Map<String, Object> paramMap) {
 		return sqlSession.selectList(NAMESPACE + ".selectReceivedListByPaging", paramMap);
 	}
+
+	public void updateAllReadTime(long receiverNo) {
+	    sqlSession.update(NAMESPACE + ".updateAllReadTime", receiverNo); 
+	}
 }

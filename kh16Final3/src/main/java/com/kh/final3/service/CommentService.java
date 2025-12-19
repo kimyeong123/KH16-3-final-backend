@@ -122,7 +122,6 @@ public class CommentService {
         if (originDto == null) throw new TargetNotfoundException("존재하지 않는 댓글입니다.");
         
         // 2. 권한 체크 (본인 또는 관리자만 삭제 가능)
-        // DTO 필드명: writerNo 사용
         // a. 관리자 권한
         if (loginLevel.equals("ADMIN")) {
             // 통과

@@ -44,7 +44,7 @@ public class AttachmentService {
         }
 
         category = category.trim().toUpperCase();
-        int seq = attachmentDao.sequence();
+        long seq = attachmentDao.sequence();
         long attachmentNo = seq;
 
         File categoryDir = new File(uploadRoot, category); 
@@ -78,7 +78,7 @@ public class AttachmentService {
         }
     }
 
-    public ByteArrayResource load(int attachmentNo) throws IOException {
+    public ByteArrayResource load(long attachmentNo) throws IOException {
         AttachmentDto dto = attachmentDao.selectOne(attachmentNo);
         if (dto == null) throw new IllegalArgumentException("존재하지 않는 첨부파일");
 
@@ -92,18 +92,18 @@ public class AttachmentService {
         return new ByteArrayResource(data);
     }
 
-    public AttachmentDto get(int attachmentNo) {
+    public AttachmentDto get(long attachmentNo) {
         AttachmentDto dto = attachmentDao.selectOne(attachmentNo);
         if (dto == null) throw new IllegalArgumentException("존재하지 않는 첨부파일");
         return dto;
     }
 
-    public List<AttachmentDto> listByParent(String category, int parentPkNo) {
+    public List<AttachmentDto> listByParent(String category, long parentPkNo) {
         return attachmentDao.selectListByParent(category.trim().toUpperCase(), parentPkNo);
     }
 
     @Transactional
-    public boolean delete(int attachmentNo) {
+    public boolean delete(long attachmentNo) {
         AttachmentDto dto = attachmentDao.selectOne(attachmentNo);
         if (dto == null) return false;
 
@@ -116,7 +116,7 @@ public class AttachmentService {
     }
 
     @Transactional
-    public boolean deleteByParent(String category, int parentPkNo) {
+    public boolean deleteByParent(String category, long parentPkNo) {
         var list = attachmentDao.selectListByParent(category.trim().toUpperCase(), parentPkNo);
 
         for (AttachmentDto dto : list) {
@@ -148,5 +148,9 @@ public class AttachmentService {
                 }
             }
         }
+    }
+    
+    public Long findProductThumbnailAttachmentNo(long productNo) {
+        return attachmentDao.findFirstAttachmentNoByProduct(productNo);
     }
 }

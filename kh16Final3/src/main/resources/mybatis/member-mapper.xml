@@ -121,32 +121,97 @@
   select * from member where id = #{id} and email = #{email}
 </select>
 
-<!--관리자가 조회하는 회원 리스트-->
-<select id="selectMemberList" resultType="MemberListVO">
-select member_no as memberNo, id, nickname, role, point, created_time as createdTime from member order by member_no asc
+<!-- 관리자가 조회하는 회원 리스트(페이징) -->
+<select id="selectMemberList"
+        parameterType="PageVO"
+        resultType="MemberListVO">
+
+  select *
+  from (
+    select rownum rn, t.*
+    from (
+      select
+        member_no as memberNo,
+        id,
+        nickname,
+        role,
+        point,
+        created_time as createdTime
+      from member
+      order by member_no asc
+    ) t
+  )
+  where rn between #{begin} and #{end}
+
 </select>
-<!--관리자가 검색하는 회원 리스트-->
-<select id="selectMemberListSearch" resultType="MemberListVO">
-  select member_no as memberNo, id, nickname, role, point, created_time AS createdTime
+
+<!-- 관리자가 검색하는 회원 리스트(페이징) -->
+<select id="selectMemberListSearch"
+        parameterType="PageVO"
+        resultType="MemberListVO">
+
+  select *
+  from (
+    select rownum rn, t.*
+    from (
+      select
+        member_no as memberNo,
+        id,
+        nickname,
+        role,
+        point,
+        created_time as createdTime
+      from member
+      <where>
+        <choose>
+          <when test="type == 'id'">
+            id like '%' || #{keyword} || '%'
+          </when>
+          <when test="type == 'nickname'">
+            nickname like '%' || #{keyword} || '%'
+          </when>
+          <otherwise>
+            id like '%' || #{keyword} || '%'
+            or nickname like '%' || #{keyword} || '%'
+          </otherwise>
+        </choose>
+      </where>
+      order by member_no asc
+    ) t
+  )
+  where rn between #{begin} and #{end}
+
+</select>
+<!-- 관리자 회원 전체 개수 -->
+<select id="countMemberList" resultType="int">
+  select count(*)
+  from member
+</select>
+<!-- 관리자 회원 검색 개수 -->
+<select id="countMemberListSearch"
+        parameterType="PageVO"
+        resultType="int">
+  select count(*)
   from member
   <where>
     <choose>
-<when test="type == 'id'">
-  id like '%' || #{keyword} || '%'
-</when>
-<when test="type == 'nickname'">
-  nickname like '%' || #{keyword} || '%'
-</when>
-<otherwise>
-  (id like '%' || #{keyword} || '%'
-   or nickname like '%' || #{keyword} || '%')
-</otherwise>
+      <when test="type == 'id'">
+        id like '%' || #{keyword} || '%'
+      </when>
+      <when test="type == 'nickname'">
+        nickname like '%' || #{keyword} || '%'
+      </when>
+      <otherwise>
+        id like '%' || #{keyword} || '%'
+        or nickname like '%' || #{keyword} || '%'
+      </otherwise>
     </choose>
   </where>
-  order by member_no asc
 </select>
+	
 
-<!--포인트 구매시 멤버 포인트 증가-->
+
+	<!--포인트 구매시 멤버 포인트 증가-->
 <update id="increasePoint">
   update member
   set point = nvl(point, 0) + #{amount}

@@ -144,7 +144,7 @@ public class ProductDao {
 	// ========================================================
 	// [핵심] 검색 조건이 추가된 카운트 및 목록 조회
 	// ========================================================
-	public int countAuction(String q, Long category, Integer minPrice, Integer maxPrice) {
+	public int countAuction(String q, Long category, Long minPrice, Long maxPrice) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("q", q);
 	    params.put("category", category);
@@ -153,7 +153,7 @@ public class ProductDao {
 	    return sqlSession.selectOne(NAMESPACE + "countAuction", params);
 	}
 
-	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO, String q, Long category, String sort, Long minPrice, Long maxPrice) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("begin", pageVO.getBegin());
 	    params.put("end", pageVO.getEnd());
