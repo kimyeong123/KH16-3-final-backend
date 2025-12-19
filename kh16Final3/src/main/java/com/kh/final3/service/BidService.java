@@ -20,7 +20,6 @@ import com.kh.final3.error.PointNotSufficientException;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.event.BidPlacedEvent;
 import com.kh.final3.helper.AuctionHelper;
-import com.kh.final3.vo.AuctionEndRequestVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -149,16 +148,8 @@ public class BidService {
 		// 새 입찰 등록 (즉시구매 입찰)
 	   insertBid(incomingBid);
 	    
-	    // 경매종료 변경
-	    AuctionEndRequestVO auctionEndRequestVO = 
-	    		AuctionEndRequestVO.builder()
-	    			.productNo(incomingBid.getProductNo())
-	    			.buyerNo(incomingBid.getBidderNo())
-	    			.finalPrice(incomingBid.getAmount())
-	    			.build();
-	    
 	    // 경매 종료 처리 및 에스크로 상태 정산대기로 변경 
-	    auctionService.closeAuction(auctionEndRequestVO, incomingBid.getBidNo());
+	    auctionService.closeAuction(incomingBid);
 	}
 
 }

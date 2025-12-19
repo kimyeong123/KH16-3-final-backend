@@ -5,7 +5,7 @@
 
 <mapper namespace="orders">
 
-	<select id="">
+	<select id="sequence" resultType="long">
 		select order_seq.nextval
         from dual
 	</select>
