@@ -70,6 +70,9 @@ public class ProductRestController {
 
     @PostMapping("/")
     public ProductDto insert(@RequestBody ProductDto productDto, @RequestHeader(value="Authorization", required=false) String authorization) {
+    	if (productDto.getCurrentPrice() == null) 
+    	    productDto.setCurrentPrice(productDto.getStartPrice());
+    	
         TokenVO tokenVO = requireToken(authorization);
         return productService.create(productDto, tokenVO.getMemberNo());
     }

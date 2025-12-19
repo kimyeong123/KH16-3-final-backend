@@ -78,6 +78,14 @@ public class ProductDao {
 	public boolean update(ProductDto productDto) {
 		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
 	}
+	
+	// 상품 현재가 업데이트
+	public int updateCurrentPrice(long productNo, long currentPrice) {
+		Map<String, Long> params = new HashMap<>();
+		params.put("productNo", productNo);
+		params.put("currentPrice", currentPrice);
+		return sqlSession.update(NAMESPACE + "updateCurrentPrice", params);
+	}
 
 	/** 상품 단위 가격 수정 */
 	public boolean updateUnit(ProductDto productDto) {

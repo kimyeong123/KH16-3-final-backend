@@ -30,7 +30,7 @@ public class EscrowLedgerService {
 	public void updateEscrowForBid(long bidNo, EscrowStatus status) {
 		Long escrowNo = escrowLedgerDao.findEscrowNoByBidNo(bidNo);
 		if(escrowNo == null)
-			throw new TargetNotfoundException();
+			throw new TargetNotfoundException("존재하지 않는 에스크로 입니다.");
 		
 		escrowLedgerDao.updateStatusByEscrowNo(escrowNo, status);
 	}
