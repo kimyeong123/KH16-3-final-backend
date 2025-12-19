@@ -12,6 +12,7 @@ import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
+import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO import
 
 @Repository
 public class ProductDao {
@@ -173,6 +174,7 @@ public class ProductDao {
     public int deleteReview(long productNo) { return sqlSession.delete(NAMESPACE + "deleteReview", productNo); }
     public int deleteMessage(long productNo) { return sqlSession.delete(NAMESPACE + "deleteMessage", productNo); }
     public int deleteOrders(long productNo) { return sqlSession.delete(NAMESPACE + "deleteOrders", productNo); }
+	
 	public int countAuction() {
 	    return sqlSession.selectOne("product.countAuction");
 	}
@@ -182,5 +184,12 @@ public class ProductDao {
 	    params.put("begin", pageVO.getBegin());
 	    params.put("end", pageVO.getEnd());
 	    return sqlSession.selectList("product.listAuctionByPaging", params);
+	}
+
+	// ========================================================
+	// [추가됨] 내 구매/입찰 내역 조회 (React 구매관리용)
+	// ========================================================
+	public List<PurchaseListVO> selectPurchaseList(long memberNo) {
+		return sqlSession.selectList(NAMESPACE + "selectPurchaseList", memberNo);
 	}
 }

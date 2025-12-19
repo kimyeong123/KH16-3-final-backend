@@ -76,6 +76,46 @@
 		where rn between #{begin} and #{end}
 	</select>
 
+<select id="selectPurchaseList" parameterType="long" resultType="PurchaseListVO">
+    SELECT 
+        P.PRODUCT_NO,
+        P.NAME AS PRODUCT_NAME,          -- P.PRODUCT_NAME -> P.NAME 수정
+        M.NICKNAME AS SELLER_NICKNAME,   -- M.MEMBER_NICKNAME -> M.NICKNAME 수정
+        
+        -- 대표 이미지 번호 가져오기
+        COALESCE(
+            (SELECT MIN(ATTACHMENT_NO) 
+             FROM ATTACHMENT 
+             WHERE PARENT_PK_NO = P.PRODUCT_NO AND CATEGORY = 'PRODUCT'), 0
+        ) AS ATTACHMENT_NO,              -- TARGET_NO -> PARENT_PK_NO 수정
+        
+        -- 내가 이 상품에 입찰한 금액 중 가장 높은 금액
+        MAX(B.AMOUNT) AS MY_BID_PRICE,    -- B.BID_PRICE -> B.AMOUNT 수정
+        
+        -- 상품의 현재 가격 (최고가)
+        P.CURRENT_PRICE AS FINAL_PRICE,
+        
+        P.STATUS AS STATUS,              -- P.PRODUCT_STATUS -> P.STATUS 수정
+        P.END_TIME AS END_TIME,          -- P.PRODUCT_CLOSE_DT -> P.END_TIME 수정
+        
+        -- 주문 테이블에서 결제 상태 확인 (없으면 NULL)
+        (SELECT STATUS FROM ORDERS WHERE PRODUCT_NO = P.PRODUCT_NO AND ROWNUM = 1) AS PAYMENT_STATUS
+        
+    FROM PRODUCT P
+    -- 입찰 내역 조인 (내가 입찰한 기록)
+    JOIN BID B ON P.PRODUCT_NO = B.PRODUCT_NO
+    -- 판매자 정보 조인
+    JOIN MEMBER M ON P.SELLER_NO = M.MEMBER_NO
+    
+    WHERE B.BIDDER_NO = #{memberNo}      -- B.MEMBER_NO -> B.BIDDER_NO 수정
+    
+    GROUP BY 
+        P.PRODUCT_NO, P.NAME, M.NICKNAME, 
+        P.CURRENT_PRICE, P.STATUS, P.END_TIME
+        
+    ORDER BY P.END_TIME DESC
+</select>
+
 	<update id="updateOnBid">
 		update product
 		set final_price = #{bidAmount}, buyer_no = #{bidMemberNo}, status = 'BIDDING'
