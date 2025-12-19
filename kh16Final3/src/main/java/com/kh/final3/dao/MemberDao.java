@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
 import com.kh.final3.vo.member.MemberListVO;
 
@@ -25,7 +26,7 @@ public class MemberDao {
 	public void insert(MemberDto memberDto) {
 		sqlSession.insert(NAMESPACE + "insert", memberDto);
 	}
-	
+
 	public MemberDto selectOne(long memberNo) {
 		return sqlSession.selectOne(NAMESPACE + "detail", memberNo);
 	}
@@ -130,28 +131,33 @@ public class MemberDao {
 		return sqlSession.update("member.updatePassword", params);
 	}
 
-	// 관리자 회원 목록 조회
-	public List<MemberListVO> selectMemberList() {
-		return sqlSession.selectList(NAMESPACE + "selectMemberList");
+	// 관리자 회원 목록 조회(페이징)
+	public List<MemberListVO> selectMemberList(PageVO<?> vo) {
+		return sqlSession.selectList(NAMESPACE + "selectMemberList", vo);
 	}
 
-	// 관리자 회원 목록 검색
-	public List<MemberListVO> selectMemberListSearch(String type, String keyword) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("type", type);
-		params.put("keyword", keyword);
-		return sqlSession.selectList(NAMESPACE + "selectMemberListSearch", params);
+	// 관리자 회원 목록 검색(페이징)
+	public List<MemberListVO> selectMemberListSearch(PageVO<?> vo) {
+		return sqlSession.selectList(NAMESPACE + "selectMemberListSearch", vo);
 	}
+
+	// 전체 개수
+	public int countMemberList() {
+		return sqlSession.selectOne(NAMESPACE + "countMemberList");
+	}
+
+	// 검색 개수
+	public int countMemberListSearch(PageVO<?> vo) {
+		return sqlSession.selectOne(NAMESPACE + "countMemberListSearch", vo);
+	}
+
 	// 포인트 증가
 	public int increasePoint(Long memberNo, Long amount) {
-	    Map<String, Object> param = new HashMap<>();
-	    param.put("memberNo", memberNo);
-	    param.put("amount", amount);
+		Map<String, Object> param = new HashMap<>();
+		param.put("memberNo", memberNo);
+		param.put("amount", amount);
 
-	    return sqlSession.update(NAMESPACE + "increasePoint", param);
+		return sqlSession.update(NAMESPACE + "increasePoint", param);
 	}
-
-
-
 
 }
