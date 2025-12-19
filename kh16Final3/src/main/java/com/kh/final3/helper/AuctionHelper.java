@@ -3,6 +3,7 @@ package com.kh.final3.helper;
 import org.springframework.stereotype.Component;
 
 import com.kh.final3.domain.enums.EscrowStatus;
+import com.kh.final3.domain.enums.OrderStatus;
 import com.kh.final3.domain.enums.PointHistoryReason;
 import com.kh.final3.domain.records.SettlementResult;
 import com.kh.final3.dto.BidDto;
@@ -52,6 +53,7 @@ public class AuctionHelper {
         		.buyerNo(bidDto.getBidderNo())
         		.sellerNo(sellerNo)
         		.finalPrice(bidDto.getAmount())
+        		.status(OrderStatus.CREATED.getStatus())
         		.build();
     }
 	

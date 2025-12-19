@@ -13,6 +13,7 @@ import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.member.MemberGetProductVO;
+import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO import
 
 @Repository
 public class ProductDao {
@@ -144,7 +145,7 @@ public class ProductDao {
 	// ========================================================
 	// [핵심] 검색 조건이 추가된 카운트 및 목록 조회
 	// ========================================================
-	public int countAuction(String q, Long category, Integer minPrice, Integer maxPrice) {
+	public int countAuction(String q, Long category, Long minPrice, Long maxPrice) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("q", q);
 	    params.put("category", category);
@@ -153,7 +154,8 @@ public class ProductDao {
 	    return sqlSession.selectOne(NAMESPACE + "countAuction", params);
 	}
 
-	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO, String q, Long category, String sort, Integer minPrice, Integer maxPrice) {
+	public List<ProductDto> selectAuctionListByPaging(
+			PageVO pageVO, String q, Long category, String sort, Long minPrice, Long maxPrice) {
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("begin", pageVO.getBegin());
 	    params.put("end", pageVO.getEnd());
@@ -174,6 +176,7 @@ public class ProductDao {
     public int deleteReview(long productNo) { return sqlSession.delete(NAMESPACE + "deleteReview", productNo); }
     public int deleteMessage(long productNo) { return sqlSession.delete(NAMESPACE + "deleteMessage", productNo); }
     public int deleteOrders(long productNo) { return sqlSession.delete(NAMESPACE + "deleteOrders", productNo); }
+	
 	public int countAuction() {
 	    return sqlSession.selectOne("product.countAuction");
 	}
@@ -184,14 +187,11 @@ public class ProductDao {
 	    params.put("end", pageVO.getEnd());
 	    return sqlSession.selectList("product.listAuctionByPaging", params);
 	}
-	//마이페이지 목록용
-	public List<MemberGetProductVO> selectGetProductList(int memberNo) {
-	    return sqlSession.selectList(
-	        NAMESPACE + "selectGetProductList",
-	        memberNo
-	    );
+
+	// ========================================================
+	// [추가됨] 내 구매/입찰 내역 조회 (React 구매관리용)
+	// ========================================================
+	public List<PurchaseListVO> selectPurchaseList(long memberNo) {
+		return sqlSession.selectList(NAMESPACE + "selectPurchaseList", memberNo);
 	}
-
-	
-
 }

@@ -191,28 +191,25 @@ public class MemberService {
 	}
 
     //전체 목록
-    public PageVO<MemberListVO> getMemberList(PageVO<MemberListVO> vo) {
+	public PageVO<MemberListVO> getMemberList(PageVO<MemberListVO> vo) {
+	    // // 1. 키워드 정제
+	    if (vo.getKeyword() == null || vo.getKeyword().trim().isEmpty()) {
+	        vo.setKeyword(null);
+	        vo.setType(null);
+	    } else {
+	        vo.setKeyword(vo.getKeyword().trim());
+	    }
 
-        if (vo.getKeyword() == null || vo.getKeyword().trim().isEmpty()) {
-            vo.setKeyword(null);
-            vo.setType(null);
-        } else {
-            vo.setKeyword(vo.getKeyword().trim());
-        }
-        // 1) 총 개수
-        int count = vo.isSearch()
-                ? memberDao.countMemberListSearch(vo)
-                : memberDao.countMemberList();
+	    // // 2. 데이터 개수 추출 (필터링 로직이 포함된 Search 쿼리 사용)
+	    int count = memberDao.countMemberListSearch(vo);
+	    vo.setDataCount(count);
 
-        vo.setDataCount(count);
-        // 2) 페이지 데이터 (10명 단위)
-        List<MemberListVO> list = vo.isSearch()
-                ? memberDao.selectMemberListSearch(vo)
-                : memberDao.selectMemberList(vo);
+	    // // 3. 목록 추출 (필터링 로직이 포함된 Search 쿼리 사용)
+	    List<MemberListVO> list = memberDao.selectMemberListSearch(vo);
+	    vo.setList(list);
 
-        vo.setList(list);
-        return vo;
-    }
+	    return vo;
+	}
    
     //회원 포인트 증가
     @Transactional

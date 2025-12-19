@@ -20,8 +20,8 @@ public class AuctionScheduler {
 								lockAtLeastFor = "PT10S",
 								lockAtMostFor = "PT2M" ) 
 	public void processAuctionEnds() {
+		log.debug("[SCHEDULER] Auction end check executed");
 		auctionScheduleService.processExpiredAuctions();
-		log.debug("[SCHEDULER] Auction end check executed"); 
 	}
 
 	// 시작 시간이 지난 경매 시작 처리
@@ -30,8 +30,8 @@ public class AuctionScheduler {
 								lockAtLeastFor = "PT10S",
 								lockAtMostFor = "PT2M" ) 
 	public void processAuctionStarts() {
-		auctionScheduleService.processStartableAuctions();
 		log.debug("[SCHEDULER] Auction start check executed"); 
+		auctionScheduleService.processStartableAuctions();
 	}
 	
 }

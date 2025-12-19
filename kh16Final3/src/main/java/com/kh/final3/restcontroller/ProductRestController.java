@@ -27,6 +27,7 @@ import com.kh.final3.service.AttachmentService;
 import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.vo.ProductListVO;
+import com.kh.final3.vo.PurchaseListVO; // [추가됨]
 import com.kh.final3.vo.TokenVO;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -83,6 +84,16 @@ public class ProductRestController {
         return productService.getMyPaged(page, tokenVO.getMemberNo());
     }
 
+//구매관리
+    @GetMapping("/purchase")
+    public List<PurchaseListVO> purchaseList(@RequestHeader(value="Authorization", required=false) String authorization) {
+        // 1. 토큰 검증 및 회원 번호 추출
+        TokenVO tokenVO = requireToken(authorization);
+        
+        // 2. 서비스 호출 (내 입찰/낙찰 내역 가져오기)
+        return productService.getPurchaseList(tokenVO.getMemberNo());
+    }
+
     // ==========================================================
     // [핵심] 경매 리스트 (검색, 정렬, 필터 파라미터 수신)
     // ==========================================================
@@ -92,8 +103,8 @@ public class ProductRestController {
         @RequestParam(required = false) String q,
         @RequestParam(required = false) Long category,
         @RequestParam(required = false) String sort,
-        @RequestParam(required = false) Integer minPrice,
-        @RequestParam(required = false) Integer maxPrice
+        @RequestParam(required = false) Long minPrice,
+        @RequestParam(required = false) Long maxPrice
     ) {
         // 모든 검색 조건을 서비스로 전달
         return productService.getAuctionPaged(page, q, category, sort, minPrice, maxPrice);
@@ -107,7 +118,7 @@ public class ProductRestController {
     @DeleteMapping("/{productNo}")
     public void delete(@PathVariable long productNo, @RequestHeader(value="Authorization", required=false) String authorization) {
         requireOwner(productNo, authorization);
-        attachmentService.deleteByParent(CAT_PRODUCT, (int)productNo);
+        attachmentService.deleteByParent(CAT_PRODUCT, productNo);
         productService.delete(productNo);
     }
 
@@ -125,7 +136,7 @@ public class ProductRestController {
 
     @GetMapping("/{productNo}/attachments")
     public List<AttachmentDto> attachmentList(@PathVariable long productNo) {
-        return attachmentService.listByParent(CAT_PRODUCT, (int)productNo);
+        return attachmentService.listByParent(CAT_PRODUCT, productNo);
     }
 
     @PostMapping(value="/{productNo}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -150,7 +161,7 @@ public class ProductRestController {
         @RequestHeader(value="Authorization", required=false) String authorization
     ) throws Exception {
         requireOwner(productNo, authorization);
-        attachmentService.deleteByParent(CAT_PRODUCT, (int)productNo);
+        attachmentService.deleteByParent(CAT_PRODUCT, productNo);
         List<AttachmentDto> result = new ArrayList<>();
         for (MultipartFile f : files) {
             if (f == null || f.isEmpty()) continue;
@@ -158,10 +169,15 @@ public class ProductRestController {
         }
         return result;
     }
-
+    
     @DeleteMapping("/{productNo}/attachments/{attachmentNo}")
-    public void deleteAttachment(@PathVariable long productNo, @PathVariable int attachmentNo, @RequestHeader(value="Authorization", required=false) String authorization) {
+    public void deleteAttachment(@PathVariable long productNo, @PathVariable long attachmentNo, @RequestHeader(value="Authorization", required=false) String authorization) {
         requireOwner(productNo, authorization);
         attachmentService.delete(attachmentNo);
+    }
+    
+    @GetMapping("/{productNo}/image")
+    public Long productThumbnail(@PathVariable long productNo) {
+        return attachmentService.findProductThumbnailAttachmentNo(productNo);
     }
 }

@@ -5,7 +5,7 @@
 
 <mapper namespace="attachment">
 
-  <select id="sequence" resultType="int">
+  <select id="sequence" resultType="long">
     select attachment_seq.nextval
     from dual
   </select>
@@ -79,5 +79,12 @@
     where category = #{category}
       and parent_pk_no = #{parentPkNo}
   </delete>
+  
+  	<select id="findFirstAttachmentNoByProduct" resultType="Long">
+	  select attachment_no
+	  from attachment
+	  where category = 'PRODUCT'
+	    and parent_pk_no = #{productNo}
+	</select>
 
 </mapper>
