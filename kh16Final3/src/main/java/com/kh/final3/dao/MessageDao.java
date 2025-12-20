@@ -110,4 +110,5 @@ public class MessageDao {
 	public void updateAllReadTime(long receiverNo) {
 	    sqlSession.update(NAMESPACE + ".updateAllReadTime", receiverNo); 
 	}
+
 }

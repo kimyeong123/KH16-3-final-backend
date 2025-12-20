@@ -9,7 +9,7 @@ public class PageVO<T> {
 
 	// 필드에 페이징에 필요한 데이터들을 배치
 	private Integer page = 1; // 현재 페이지 번호
-	private Integer size = 3; // 한 페이지에 표시할 데이터 수
+	private Integer size = 10; // 한 페이지에 표시할 데이터 수
 	private String column, keyword;// 검색항목, 검색어
 	private Integer dataCount; // 총 데이터 수
 	private Integer blockSize = 10;// 표시할 블록 개수(10개)

@@ -2,29 +2,30 @@ package com.kh.final3.event;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import com.kh.final3.dto.BidDto;
+import com.kh.final3.service.MessageService; // MessageService 추가
 import com.kh.final3.vo.BidUpdateMessageVO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RequiredArgsConstructor // 필수 필드만 받은 생성자 생성
+@RequiredArgsConstructor
 @Component
 public class BidEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final MessageService messageService; // Service로 변경
 
-    // 매개변수 타입으로 이벤트 실행을 구분
-    // 트랜잭션 커밋이 완전히 일어났을 경우에 대한 콜백 메소드 실행 어노테이션
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBidPlaced(BidPlacedEvent event) {
 
         BidDto bidDto = event.getBidDto();
 
+        // 1. 실시간 가격 갱신 (STOMP 전송)
         BidUpdateMessageVO message =
             BidUpdateMessageVO.builder()
                 .productNo(bidDto.getProductNo())
@@ -37,8 +38,25 @@ public class BidEventListener {
             message
         );
         
-        log.warn("STOMP SEND productNo={}, price={}",
+        // 2. 상위 입찰 발생 시 이전 입찰자에게 알림 저장
+        if (event.getPreviousBidderNo() != null) {
+            String content = "회원님이 입찰하신 상품에 상위 입찰이 발생했습니다.";
+            // 알림 클릭 시 이동할 상세 페이지 경로
+            String url = "/product/auction/detail/" + bidDto.getProductNo(); 
+            
+            // 서비스의 sendNotification 호출 (내부에서 senderNo=0, sequence 처리 수행)
+            messageService.sendNotification(
+                event.getPreviousBidderNo(), 
+                content, 
+                url,
+                bidDto.getProductNo()
+            );
+        }
+
+        // 3. 로그 출력
+        log.warn("STOMP SEND productNo={}, price={}, targetUser={}",
                 bidDto.getProductNo(),
-                bidDto.getAmount());
+                bidDto.getAmount(),
+                event.getPreviousBidderNo());
     }
 }

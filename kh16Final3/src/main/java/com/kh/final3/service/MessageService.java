@@ -81,13 +81,14 @@ public class MessageService {
 	 * 1-3. 시스템 알림 전송 (type: SYSTEM_ALERT)
 	 */
 	@Transactional
-	public void sendNotification(long receiverNo, String content, String url) {
+	public void sendNotification(long receiverNo, String content, String url, Long productNo) {
 		MessageDto messageDto = MessageDto.builder()
 				.receiverNo(receiverNo)
 				.senderNo(SYSTEM_SENDER_NO)
 				.content(content)
-				.type("SYSTEM_ALERT") // // "ALERT"에서 "SYSTEM_ALERT"로 수정
+				.type("SYSTEM_ALERT") //
 				.url(url)
+				.productNo(productNo)
 				.build();
 
 		// 2. 시퀀스 번호 발급
