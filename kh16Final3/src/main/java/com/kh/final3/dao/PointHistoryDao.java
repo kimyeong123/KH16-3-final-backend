@@ -1,11 +1,12 @@
 package com.kh.final3.dao;
-import java.util.List;
 
+import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.kh.final3.dto.PointHistoryDto;
+import com.kh.final3.dto.PointWithdrawDto;
 import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.member.MemberBidHistoryVO;
 
@@ -60,6 +61,19 @@ public class PointHistoryDao {
             memberNo
         );
     }
+    public void insertWithdrawDeduct(PointWithdrawDto dto) {
+        sqlSession.insert(NAMESPACE + "insertWithdrawDeduct", dto);
+    }
+
+    public void insertWithdrawRefund(PointWithdrawDto dto) {
+        sqlSession.insert(NAMESPACE + "insertWithdrawRefund", dto);
+    }
+
+
+
+
+
+
 
     	
 }

@@ -260,6 +260,19 @@
       )
       where rn between #{begin} and #{end}
     </select>
+    <select id="selectGetProductList" resultType="MemberGetProductVO">
+  select
+    product_no,
+    name,
+    final_price,
+    end_time,
+    status
+  from product
+  where buyer_no = #{memberNo}
+    and status = 'ENDED'
+  order by end_time desc
+</select>
+
 
     <delete id="deleteEscrow"> delete from escrow_ledger where product_no = #{productNo} </delete>
     <delete id="deleteBid"> delete from bid where product_no = #{productNo} </delete>

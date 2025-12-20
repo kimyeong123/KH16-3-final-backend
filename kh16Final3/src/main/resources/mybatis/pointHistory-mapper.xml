@@ -109,6 +109,35 @@
   order by x.created_time desc
 </select>
 
+<!-- 환전 요청 시 차감 -->
+<insert id="insertWithdrawDeduct" parameterType="PointWithdrawDto">
+  insert into point_history(
+    point_history_no, member_no, type, amount, reason, related_no
+  ) values (
+    point_history_seq.nextval,
+    #{memberNo},
+    'DEDUCT',
+    #{amount},
+    'WITHDRAWN',
+    #{withdrawNo}
+  )
+</insert>
+
+<!-- 환전 반려 시 복구 -->
+<insert id="insertWithdrawRefund" parameterType="PointWithdrawDto">
+  insert into point_history(
+    point_history_no, member_no, type, amount, reason, related_no
+  ) values (
+    point_history_seq.nextval,
+    #{memberNo},
+    'ADD',
+    #{amount},
+    'WITHDRAWN',
+    #{withdrawNo}
+  )
+</insert>
+
+
 	
 	<delete id="deleteByProductNo">
     DELETE FROM point_history WHERE product_no = #{productNo}

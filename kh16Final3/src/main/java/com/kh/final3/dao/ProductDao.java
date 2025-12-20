@@ -12,6 +12,7 @@ import com.kh.final3.domain.enums.ProductStatus;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
+import com.kh.final3.vo.member.MemberGetProductVO;
 import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO import
 
 @Repository
