@@ -49,7 +49,7 @@ public class CommentRestController {
 	        throw new UnauthorizationException("로그인 후 댓글 작성이 가능합니다.");
 		}
 		
-		return commentService.insert(commentDto, memberNo, loginLevel);
+		return commentService.insert(commentDto, memberNo, loginLevel, commentDto.getProductNo());
 	}	
 	
 	/**

@@ -30,7 +30,7 @@ public class CommentService {
      * - 시퀀스 발급, DTO 설정, DB 삽입을 처리합니다.
      */
     @Transactional
-    public CommentDto insert(CommentDto commentDto, long memberNo, String loginLevel) { 
+    public CommentDto insert(CommentDto commentDto, long memberNo, String loginLevel, long productNo) { 
 
         long commentNo = commentDao.sequence();
         commentDto.setCommentNo(commentNo);
@@ -55,7 +55,8 @@ public class CommentService {
             messageService.sendNotification(
                 qnaWriterNo,
                 "작성하신 문의에 답변이 등록되었습니다.",
-                "/qna/detail/" + parentBoardNo // 알림 클릭 시 이동할 URL
+                "/qna/detail/" + parentBoardNo, // 알림 클릭 시 이동할 URL
+                productNo
             );
         }
         

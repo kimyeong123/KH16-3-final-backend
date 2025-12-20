@@ -71,7 +71,7 @@ public class SanctionService {
         String alertContent = String.format("[운영알림] 귀하의 계정이 활동 정지 처리되었습니다.\n사유: %s\n종료 예정일: %s",
                                             reason, type, endDateString);
         
-        messageService.sendNotification(memberNo, alertContent, null);
+        messageService.sendNotification(memberNo, alertContent, null, null);
         
         return true;
     }
@@ -104,7 +104,7 @@ public class SanctionService {
         memberDao.updateMemberStatus(detail.getMemberNo(), "DEFAULT");
         
         String alertContent = "[운영알림] 귀하의 활동 정지 처분이 해제되었습니다. 이제 정상적으로 서비스를 이용하실 수 있습니다.";
-        messageService.sendNotification(detail.getMemberNo(), alertContent, null);
+        messageService.sendNotification(detail.getMemberNo(), alertContent, null, null);
         
         return true;
     }

@@ -22,4 +22,5 @@ public class CommentDto {
 	private String status; 		        // commentStatus -> status ('Y'/'N')
 	
     private String writerNickname;      // 작성자 닉네임 (DB 컬럼 아님)
+    private Long productNo;
 }

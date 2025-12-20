@@ -81,7 +81,9 @@ public class AuctionService {
         log.info("[AUCTION-START] Auction started. productNo={}", productNo);
     }
     
+    @Transactional
 	public void closeAuction(BidDto winningBid) {
+    	
 		AuctionEndRequestVO endRequestVO = 
 					AuctionEndRequestVO
 					.builder()
@@ -104,6 +106,7 @@ public class AuctionService {
 		    );
 	}
     
+    @Transactional
 	public void noBidAuction(long productNo) {
     	productDao.updateStatus(productNo, ProductStatus.ENDED);
     	

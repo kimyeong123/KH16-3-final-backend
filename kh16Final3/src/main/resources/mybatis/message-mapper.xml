@@ -15,7 +15,7 @@
 		message_no, sender_no, receiver_no, content, type, url, product_no
 		)
 		values (
-		#{messageNo}, #{senderNo}, #{receiverNo}, #{content}, #{type},
+		messages_seq.nextval, #{senderNo}, #{receiverNo}, #{content}, #{type},
 		#{url}, #{productNo}
 		)
 	</insert>

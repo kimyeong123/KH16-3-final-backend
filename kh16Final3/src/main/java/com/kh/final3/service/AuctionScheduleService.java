@@ -3,7 +3,8 @@ package com.kh.final3.service;
 import java.util.ArrayList; 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired; 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.kh.final3.dao.ProductDao;
@@ -21,6 +22,7 @@ public class AuctionScheduleService {
 	private AuctionService auctionService;
 
 	// 트랜젝션을 붙이지 않는 이유는 내부의 반복문 때문(내부사용 메소드에 transaction 걸어서 상품단위로 트랜젝션 일어나게 유도)
+	@Scheduled(cron = "0 * * * * *") // 매 분 0초마다 실행
 	public void processExpiredAuctions() { 
 		List<Long> expiredProductNos = productDao.findExpiredProductNos();
 
@@ -44,7 +46,7 @@ public class AuctionScheduleService {
 		} 
 	}
 
-
+	@Scheduled(cron = "30 * * * * *") // 매 분 30초마다 실행 (시작 로직)
 	public void processStartableAuctions() { 
 		List<Long> startableProductNos = productDao.findStartableProductNos();
 
