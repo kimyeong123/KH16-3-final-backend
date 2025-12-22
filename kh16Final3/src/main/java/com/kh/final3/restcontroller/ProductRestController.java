@@ -71,7 +71,7 @@ public class ProductRestController {
         }
     }
 
-    // 1. 마감 임박 상품 4개
+    // 1. 마감 임박 상품 4개123
     @GetMapping("/main/closing-soon")
     public List<ProductDto> closingSoon() {
         return productService.getClosingSoon();

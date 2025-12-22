@@ -150,7 +150,7 @@ public class ProductService {
 	public List<PurchaseListVO> getPurchaseList(long memberNo) {
 		return productDao.selectPurchaseList(memberNo);
 	}
-	
+	//1
 	@Transactional(readOnly = true)
 	public List<ProductDto> getClosingSoon() {
 	    return productDao.selectClosingSoon();

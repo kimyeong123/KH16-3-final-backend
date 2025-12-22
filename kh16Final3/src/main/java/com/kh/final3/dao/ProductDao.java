@@ -62,6 +62,7 @@ public class ProductDao {
 	public boolean updateUnit(ProductDto productDto) { return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0; }
 	public int count() { return sqlSession.selectOne(NAMESPACE + "countByPaging"); }
 
+	//1
 	public List<ProductDto> selectList(PageVO pageVO) {
 		Map<String, Integer> params = new HashMap<>();
 		params.put("begin", pageVO.getBegin());
