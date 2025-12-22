@@ -22,14 +22,16 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 
         registry.addInterceptor(memberInterceptor)
             .addPathPatterns(
-//                "/product/**",
                 "/member/joinfinish",
                 "/member/logout",
-                "/member/mypage"
+                "/member/mypage",
+                "/product/**",
+                "/prodcuts/**",
+                "/pay/**"
             )
             .excludePathPatterns(
-                "/product",
-                "/product/"
+                "/product/list",
+                "/product/detail/**"
             );
 
 //        registry.addInterceptor(tokenRenewalInterceptor)

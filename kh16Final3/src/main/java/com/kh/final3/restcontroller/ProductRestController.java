@@ -2,6 +2,7 @@ package com.kh.final3.restcontroller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +28,10 @@ import com.kh.final3.dto.ProductDto;
 import com.kh.final3.service.AttachmentService;
 import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
 import com.kh.final3.vo.PurchaseListVO; // [추가됨]
+import com.kh.final3.vo.SalesListVO;
 import com.kh.final3.vo.TokenVO;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -54,8 +58,7 @@ public class ProductRestController {
         }
         try {
             return tokenService.parse(authorization);
-        }
-        catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED");
         }
     }
@@ -78,36 +81,40 @@ public class ProductRestController {
         return productService.create(productDto, tokenVO.getMemberNo());
     }
 
-    @GetMapping("/my/page/{page}")
-    public ProductListVO myListByPaging(@PathVariable int page, @RequestHeader(value="Authorization", required=false) String authorization) {
-        TokenVO tokenVO = requireToken(authorization);
-        return productService.getMyPaged(page, tokenVO.getMemberNo());
-    }
-
-//구매관리
+    //구매관리
     @GetMapping("/purchase")
-    public List<PurchaseListVO> purchaseList(@RequestHeader(value="Authorization", required=false) String authorization) {
-        // 1. 토큰 검증 및 회원 번호 추출
+    public PageVO<PurchaseListVO> purchaseList(
+            @RequestHeader(value="Authorization", required=false) String authorization,
+            PageVO<PurchaseListVO> pageVO) {
+
         TokenVO tokenVO = requireToken(authorization);
-        
-        // 2. 서비스 호출 (내 입찰/낙찰 내역 가져오기)
-        return productService.getPurchaseList(tokenVO.getMemberNo());
+        pageVO.setLoginNo(tokenVO.getMemberNo());
+
+        return productService.getPurchaseList(pageVO);
+    }
+    
+    @GetMapping("/sales")
+    public PageVO<SalesListVO> salesList(
+            @RequestHeader(value="Authorization", required=false) String authorization,
+            PageVO<SalesListVO> pageVO) {
+    	
+    	TokenVO tokenVO = requireToken(authorization);
+    	 pageVO.setLoginNo(tokenVO.getMemberNo());
+
+         return productService.getSalesList(pageVO);
     }
 
-    // ==========================================================
-    // [핵심] 경매 리스트 (검색, 정렬, 필터 파라미터 수신)
-    // ==========================================================
+   //20개씩받기
+    @GetMapping("/auction/list")
+    public Map<String, Object> list(@ModelAttribute PageVO vo) {
+        return productService.getAuctionList(vo);
+    }
+    
+    // (혹시 모를 구버전 호환용 - page 경로도 살려둠)
     @GetMapping("/auction/page/{page}")
-    public ProductListVO auctionListByPaging(
-        @PathVariable int page,
-        @RequestParam(required = false) String q,
-        @RequestParam(required = false) Long category,
-        @RequestParam(required = false) String sort,
-        @RequestParam(required = false) Long minPrice,
-        @RequestParam(required = false) Long maxPrice
-    ) {
-        // 모든 검색 조건을 서비스로 전달
-        return productService.getAuctionPaged(page, q, category, sort, minPrice, maxPrice);
+    public Map<String, Object> listByPagePath(@PathVariable int page, @ModelAttribute PageVO vo) {
+    	vo.setPage(page);
+    	return productService.getAuctionList(vo);
     }
 
     @GetMapping("/{productNo}")
