@@ -70,23 +70,30 @@
   </select>
 
   <!-- 마이페이지: 내 환전 내역 -->
-  <select id="listByMember" resultType="PointWithdrawDto">
-    select
-      withdraw_no    as withdrawNo,
-      member_no      as memberNo,
-      amount         as amount,
-      bank_name      as bankName,
-      account_number as accountNumber,
-      account_holder as accountHolder,
-      status         as status,
-      created_time   as createdTime,
-      processed_time as processedTime,
-      processed_by   as processedBy,
-      reject_reason  as rejectReason
-    from point_withdraw
-    where member_no = #{memberNo}
-    order by created_time desc
-  </select>
+ <select id="listByMember" resultType="PointWithdrawDto">
+  select
+    withdraw_no    as withdrawNo,
+    member_no      as memberNo,
+    amount         as amount,
+    bank_name      as bankName,
+    account_number as accountNumber,
+    account_holder as accountHolder,
+    status         as status,
+    created_time   as createdTime,
+    processed_time as processedTime,
+    processed_by   as processedBy,
+    reject_reason  as rejectReason
+  from point_withdraw
+  where member_no = #{memberNo}
+    and (
+      status = 'REQUEST'
+      or (
+        status in ('DONE','REJECT')
+        and processed_time >= add_months(systimestamp, -6)
+      )
+    )
+  order by created_time desc
+</select>
 
 <!-- 관리자 승인 -->
 <update id="approve" parameterType="PointWithdrawDto">
@@ -110,33 +117,41 @@
 </update>
   <!-- 관리자: 상태별 개수 -->
   <select id="countByStatus" resultType="int">
-    select count(*)
-    from point_withdraw
-    where status = #{status}
-  </select>
+  select count(*)
+  from point_withdraw
+  where status = #{status}
+  <if test="status != null and (status.equals('DONE') or status.equals('REJECT'))">
+    and processed_time >= add_months(systimestamp, -6)
+  </if>
+</select>
+
 
   <!-- 관리자: 상태별 페이징 목록 -->
-  <select id="listByStatusPaging" resultType="PointWithdrawDto">
-    select *
-    from (
-      select
-        withdraw_no    as withdrawNo,
-        member_no      as memberNo,
-        amount         as amount,
-        bank_name      as bankName,
-        account_number as accountNumber,
-        account_holder as accountHolder,
-        status         as status,
-        created_time   as createdTime,
-        processed_time as processedTime,
-        processed_by   as processedBy,
-        reject_reason  as rejectReason,
-        row_number() over (order by created_time desc) rn
-      from point_withdraw
-      where status = #{status}
-    )
-    where rn between #{vo.begin} and #{vo.end}
-  </select>
+<select id="listByStatusPaging" resultType="PointWithdrawDto">
+  select *
+  from (
+    select
+      withdraw_no    as withdrawNo,
+      member_no      as memberNo,
+      amount         as amount,
+      bank_name      as bankName,
+      account_number as accountNumber,
+      account_holder as accountHolder,
+      status         as status,
+      created_time   as createdTime,
+      processed_time as processedTime,
+      processed_by   as processedBy,
+      reject_reason  as rejectReason,
+      row_number() over (order by created_time desc) rn
+    from point_withdraw
+    where status = #{status}
+    <if test="status != null and (status.equals('DONE') or status.equals('REJECT'))">
+      and processed_time >= add_months(systimestamp, -6)
+    </if>
+  )
+  where rn between #{vo.begin} and #{vo.end}
+</select>
+
 
 
 
