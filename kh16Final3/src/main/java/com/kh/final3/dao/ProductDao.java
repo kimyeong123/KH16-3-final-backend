@@ -132,12 +132,12 @@ public class ProductDao {
 	    return sqlSession.selectOne("product.countAuction");
 	}
 
-	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO) {
-	    Map<String, Integer> params = new HashMap<>();
-	    params.put("begin", pageVO.getBegin());
-	    params.put("end", pageVO.getEnd());
-	    return sqlSession.selectList("product.listAuctionByPaging", params);
-	}
+//	public List<ProductDto> selectAuctionListByPaging(PageVO pageVO) {
+//	    Map<String, Integer> params = new HashMap<>();
+//	    params.put("begin", pageVO.getBegin());
+//	    params.put("end", pageVO.getEnd());
+//	    return sqlSession.selectList("product.listAuctionByPaging", params);
+//	}
 
 	// ========================================================
 	// [추가됨] 내 구매/입찰 내역 조회 (React 구매관리용)

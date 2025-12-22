@@ -22,6 +22,7 @@ import com.kh.final3.service.MemberService;
 import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.service.WithdrawService;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.PurchaseListVO;
 import com.kh.final3.vo.TokenVO;
@@ -347,11 +348,13 @@ public class MemberRestController {
 	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
 	}
 	@GetMapping("/win-products/history")
-	public List<PurchaseListVO> myWinProductList(
-	        @RequestHeader("Authorization") String bearerToken
+	public PageVO<PurchaseListVO> myWinProductList(
+	        @RequestHeader("Authorization") String bearerToken,
+	        PageVO<PurchaseListVO> pageVO
 	) {
 	    TokenVO tokenVO = tokenService.parse(bearerToken);
-	    return productService.getPurchaseList(tokenVO.getMemberNo());
+	    pageVO.setLoginNo(tokenVO.getMemberNo());
+	    return productService.getPurchaseList(pageVO);
 	}
 
 

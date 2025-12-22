@@ -72,19 +72,6 @@ public class ProductRestController {
         }
     }
 
-    // 1. 마감 임박 상품 4개
-    @GetMapping("/main/closing-soon")
-    public List<ProductDto> closingSoon() {
-        return productService.getClosingSoon();
-    }
-
-    // 2. 구매관리
-    @GetMapping("/purchase")
-    public List<PurchaseListVO> purchaseList(@RequestHeader(value="Authorization", required=false) String authorization) {
-        TokenVO tokenVO = requireToken(authorization);
-        return productService.getPurchaseList(tokenVO.getMemberNo());
-    }
-
     @PostMapping("/")
     public ProductDto insert(@RequestBody ProductDto productDto, @RequestHeader(value="Authorization", required=false) String authorization) {
     	if (productDto.getCurrentPrice() == null) 
@@ -110,6 +97,12 @@ public class ProductRestController {
     public PageVO<SalesListVO> salesList(
             @RequestHeader(value="Authorization", required=false) String authorization,
             PageVO<SalesListVO> pageVO) {
+    	
+    	TokenVO tokenVO = requireToken(authorization);
+    	 pageVO.setLoginNo(tokenVO.getMemberNo());
+
+         return productService.getSalesList(pageVO);
+    }
 
    //20개씩받기
     @GetMapping("/auction/list")
