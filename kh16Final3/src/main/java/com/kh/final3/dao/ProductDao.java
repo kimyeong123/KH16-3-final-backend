@@ -104,10 +104,10 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "closeAuction", productNo) > 0;
 	}
 	
-	// ========================================================
-	// 🔥🔥🔥 [최종 수정] 복잡한 파라미터 다 없애고 PageVO 하나만 받습니다! 🔥🔥🔥
-	// ========================================================
+
 	
+
+	//20개씩받기
 	// 1. 검색 조건에 맞는 개수 조회 (vo 통째로 넘김 -> XML에서 #{q}, #{category} 등 꺼내 씀)
 	public int countAuction(PageVO vo) {
 	    return sqlSession.selectOne(NAMESPACE + "countAuction", vo);
