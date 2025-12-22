@@ -13,7 +13,8 @@ import com.kh.final3.dao.ProductDao;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
-import com.kh.final3.vo.PurchaseListVO;
+import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO
+import com.kh.final3.vo.SalesListVO;
 
 @Service
 public class ProductService {
@@ -145,14 +146,54 @@ public class ProductService {
 
 		return map;
 	}
-	
-	@Transactional(readOnly = true)
-	public List<PurchaseListVO> getPurchaseList(long memberNo) {
-		return productDao.selectPurchaseList(memberNo);
+
+	public PageVO<PurchaseListVO> getPurchaseList(PageVO<PurchaseListVO> pageVO) {
+
+	    // 1️ 로그인 사용자 번호
+	    long loginNo = pageVO.getLoginNo();
+
+	    // 2️ 전체 데이터 개수 조회 (구매내역 수)
+	    int count = productDao.countPurchase(loginNo);
+	    pageVO.setDataCount(count);
+
+	    // 데이터 없으면 바로 반환
+	    if (count == 0) {
+	        pageVO.setList(List.of());
+	        return pageVO;
+	    }
+
+	    // 3️ 구매내역 조회
+	    List<PurchaseListVO> list = productDao.selectPurchaseList(pageVO);
+
+	    // 4️ null 방어
+	    pageVO.setList(list != null ? list : List.of());
+
+	    return pageVO;
 	}
+  
+  public PageVO<SalesListVO> getSalesList(PageVO<SalesListVO> pageVO) {
+		
+		long loginNo = pageVO.getLoginNo();
+		
+	    int count = productDao.countSales(loginNo);
+	    pageVO.setDataCount(count);
+
+	    if (count == 0) {
+	        pageVO.setList(List.of());
+	        return pageVO;
+	    }
+
+	    List<SalesListVO> list = productDao.selectSalesList(pageVO);
+	    
+	    pageVO.setList(list != null ? list : List.of());
+
+	    return pageVO;
+	}
+  
 	//1
 	@Transactional(readOnly = true)
 	public List<ProductDto> getClosingSoon() {
 	    return productDao.selectClosingSoon();
-	}
+  }
+  
 }

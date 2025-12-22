@@ -59,7 +59,6 @@
         set 
         	courier = #{courier},
         	tracking_number = #{trackingNumber},
-            status = 'SHIPPING',
             updated_time = systimestamp
         where order_no = #{orderNo}
     </update>
@@ -82,7 +81,7 @@
         	and status = 'DELIVERED'
     </update>
     
-    <update id="updateShippingInfo">
+    <update id="updateShippingAddress">
 	    update orders
 	    set
 	        receiver_name = #{receiverName},

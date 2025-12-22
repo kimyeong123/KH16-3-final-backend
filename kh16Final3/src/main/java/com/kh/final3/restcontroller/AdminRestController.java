@@ -93,15 +93,27 @@ public class AdminRestController {
 
 		return memberService.getMemberList(vo).getList();
 	}
-	// 환전 요청 목록 (기본 REQUEST)
+	// 환전 요청 목록 (페이지네이션)
 	@GetMapping("/withdraw")
-	public List<PointWithdrawDto> withdrawList(
+	public PageVO<PointWithdrawDto> withdrawList(
 	        @RequestHeader("Authorization") String bearerToken,
+	        @ModelAttribute PageVO<PointWithdrawDto> vo,
 	        @RequestParam(required = false, defaultValue = "REQUEST") String status
 	) {
 	    adminOnly(bearerToken);
-	    return withdrawDao.listByStatus(status);
+
+	    if (vo.getSize() == 0) vo.setSize(10);
+
+	    int count = withdrawDao.countByStatus(status);
+	    vo.setDataCount(count);
+
+	    List<PointWithdrawDto> list = withdrawDao.listByStatusPaging(vo, status);
+	    vo.setList(list);
+
+	    return vo;
 	}
+
+
 
 	// 환전 승인
 	@PostMapping("/withdraw/{withdrawNo}/approve")

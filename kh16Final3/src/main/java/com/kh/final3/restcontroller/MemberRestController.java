@@ -22,13 +22,14 @@ import com.kh.final3.service.MemberService;
 import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.service.WithdrawService;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.PointChargeHistoryVO;
+import com.kh.final3.vo.PurchaseListVO;
 import com.kh.final3.vo.TokenVO;
 import com.kh.final3.vo.member.MemberBidHistoryVO;
 import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
 import com.kh.final3.vo.member.MemberFindIdVO;
-import com.kh.final3.vo.member.MemberGetProductVO;
 import com.kh.final3.vo.member.MemberLoginResponseVO;
 import com.kh.final3.vo.member.MemberRefreshVO;
 import com.kh.final3.vo.member.MemberRequestVO;
@@ -338,22 +339,24 @@ public class MemberRestController {
 	    long memberNo = tokenVO.getMemberNo();
 	    return pointHistoryDao.listChargeHistoryByMember(memberNo);
 	}
-	/*
-	 * //입찰 내역 //@GetMapping("/bid/history") public List<MemberBidHistoryVO>
-	 * memberBidHistory(
-	 * 
-	 * @RequestHeader("Authorization") String bearerToken ) { TokenVO tokenVO =
-	 * tokenService.parse(bearerToken); return
-	 * pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo()); }
-	 * 
-	 * @GetMapping("/win-products/history") public List<MemberGetProductVO>
-	 * myWinProductList(
-	 * 
-	 * @RequestHeader("Authorization") String bearerToken ) { bearerToken =
-	 * bearerToken.trim().replace("\n", "").replace("\r", ""); TokenVO tokenVO =
-	 * tokenService.parse(bearerToken); long memberNo = tokenVO.getMemberNo();
-	 * return productService.getMyEndedProducts((int) memberNo); }
-	 */
+	//입찰 내역
+	@GetMapping("/bid/history")
+	public List<MemberBidHistoryVO> memberBidHistory(
+	        @RequestHeader("Authorization") String bearerToken
+	) {
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
+	}
+	@GetMapping("/win-products/history")
+	public PageVO<PurchaseListVO> myWinProductList(
+	        @RequestHeader("Authorization") String bearerToken,
+	        PageVO<PurchaseListVO> pageVO
+	) {
+	    TokenVO tokenVO = tokenService.parse(bearerToken);
+	    pageVO.setLoginNo(tokenVO.getMemberNo());
+	    return productService.getPurchaseList(pageVO);
+	}
+
 
     // 환전 요청
     @PostMapping("/withdraw")
