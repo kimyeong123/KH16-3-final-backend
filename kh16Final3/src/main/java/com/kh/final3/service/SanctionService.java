@@ -69,7 +69,7 @@ public class SanctionService {
         // 4. MessageService를 이용해 제재 알림 전송
         String endDateString = (endTime != null) ? endTime.toString() : "영구 정지";
         String alertContent = String.format("[운영알림] 귀하의 계정이 활동 정지 처리되었습니다.\n사유: %s\n종료 예정일: %s",
-                                            reason, type, endDateString);
+                                            type, reason, endDateString);
         
         messageService.sendNotification(memberNo, alertContent, null, null);
         
