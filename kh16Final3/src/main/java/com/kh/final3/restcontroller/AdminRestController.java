@@ -3,20 +3,24 @@ package com.kh.final3.restcontroller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.jaxb.SpringDataJaxb.OrderDto;
 import org.springframework.web.bind.annotation.*;
 
 import com.kh.final3.dao.MemberDao;
 import com.kh.final3.dao.PointHistoryDao;
 import com.kh.final3.dao.WithdrawDao;
 import com.kh.final3.dto.MemberDto;
+import com.kh.final3.dto.OrdersDto;
 import com.kh.final3.dto.PointWithdrawDto;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.error.UnauthorizationException;
 import com.kh.final3.service.MemberService;
+import com.kh.final3.service.OrderService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.service.WithdrawService;
 import com.kh.final3.vo.TokenVO;
 import com.kh.final3.vo.WithdrawRejectRequestVO;
+import com.kh.final3.vo.AdminOrderListVO;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.PointChargeHistoryVO;
 import com.kh.final3.vo.member.MemberBidHistoryVO;
@@ -38,6 +42,8 @@ public class AdminRestController {
 	private WithdrawDao withdrawDao;
 	@Autowired
 	private WithdrawService withdrawService;
+	@Autowired
+	private OrderService orderService;
 
 
 	private void adminOnly(String bearerToken) {
@@ -142,5 +148,11 @@ public class AdminRestController {
 	    );
 	}
 
+	// 주문 처리
+	@GetMapping("/orders")
+	public PageVO<AdminOrderListVO> adminOrders(PageVO<AdminOrderListVO> pageVO) {
+	    return orderService.getAdminOrderList(pageVO);
+	}
+	
 
 }

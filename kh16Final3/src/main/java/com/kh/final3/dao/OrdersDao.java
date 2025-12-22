@@ -10,8 +10,10 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.final3.domain.enums.OrderStatus;
 import com.kh.final3.dto.OrdersDto;
+import com.kh.final3.vo.AdminOrderListVO;
 import com.kh.final3.vo.OrderShippingRequestVO;
 import com.kh.final3.vo.OrderTrackingUpdateVO;
+import com.kh.final3.vo.PageVO;
 
 @Repository
 public class OrdersDao {
@@ -61,7 +63,12 @@ public class OrdersDao {
         params.put("changeStatus", changeStatus);
         return sqlSession.update(NAMESPACE + "updateStatus", params);
     }
-
+    
+    // DELIVERED 상태 처리 및 배송시간 설정
+    public int markDelivered(long orderNo) {
+        return sqlSession.update(NAMESPACE + "markDelivered", orderNo);
+    }
+    
     // COMPLETED로 완료 처리
     public int completeOrder(long orderNo) {
         return sqlSession.update(NAMESPACE + "completeOrder", orderNo);
@@ -75,6 +82,14 @@ public class OrdersDao {
     // 정산 대상 찾기(pk 리스트 반환)
     public List<Long> findSettlementTargets(int days){
     	return sqlSession.selectList(NAMESPACE + "findSettlementTargets", days);
+    }
+    
+    public List<AdminOrderListVO> selectAdminOrderList(PageVO pageVO) {
+    	return sqlSession.selectList(NAMESPACE + "selectAdminOrderList", pageVO);
+    }
+    
+    public int countAdminOrders() {
+    	return sqlSession.selectOne(NAMESPACE + "countAdminOrders");
     }
     
 }

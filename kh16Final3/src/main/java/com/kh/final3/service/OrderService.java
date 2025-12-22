@@ -1,5 +1,7 @@
 package com.kh.final3.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +12,8 @@ import com.kh.final3.dto.BidDto;
 import com.kh.final3.dto.OrdersDto;
 import com.kh.final3.error.TargetNotfoundException;
 import com.kh.final3.helper.AuctionHelper;
+import com.kh.final3.vo.AdminOrderListVO;
+import com.kh.final3.vo.PageVO;
 
 @Service
 public class OrderService {
@@ -40,5 +44,16 @@ public class OrderService {
         return ordersDto;
     }
 
+    public PageVO<AdminOrderListVO> getAdminOrderList(PageVO<AdminOrderListVO> pageVO) {
+
+        int count = ordersDao.countAdminOrders();
+        pageVO.setDataCount(count);
+
+        pageVO.setList(
+            ordersDao.selectAdminOrderList(pageVO)
+        );
+
+        return pageVO;
+    }
 
 }

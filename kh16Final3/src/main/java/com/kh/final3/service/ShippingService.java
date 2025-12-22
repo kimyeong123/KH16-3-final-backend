@@ -122,7 +122,7 @@ public class ShippingService {
             throw new InvalidOrderStateException("배송 중인 주문만 배송 완료 처리할 수 있습니다.");
 
         // 4. 주문 정보 업데이트
-        ordersDao.updateStatus(orderNo, OrderStatus.DELIVERED);
+        ordersDao.markDelivered(orderNo);
     }
 
 }

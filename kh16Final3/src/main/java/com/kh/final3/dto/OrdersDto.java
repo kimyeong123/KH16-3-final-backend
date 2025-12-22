@@ -28,5 +28,6 @@ public class OrdersDto {
     // 시간 정보
     private Timestamp createdTime;
     private Timestamp updatedTime;
+    private Timestamp deliveredTime;
     private Timestamp completedTime;
 }
