@@ -23,12 +23,12 @@ import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
 import com.kh.final3.service.WithdrawService;
 import com.kh.final3.vo.PointChargeHistoryVO;
+import com.kh.final3.vo.PurchaseListVO;
 import com.kh.final3.vo.TokenVO;
 import com.kh.final3.vo.member.MemberBidHistoryVO;
 import com.kh.final3.vo.member.MemberChangePwVO;
 import com.kh.final3.vo.member.MemberComplexSearchVO;
 import com.kh.final3.vo.member.MemberFindIdVO;
-import com.kh.final3.vo.member.MemberGetProductVO;
 import com.kh.final3.vo.member.MemberLoginResponseVO;
 import com.kh.final3.vo.member.MemberRefreshVO;
 import com.kh.final3.vo.member.MemberRequestVO;
@@ -347,14 +347,13 @@ public class MemberRestController {
 	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
 	}
 	@GetMapping("/win-products/history")
-	public List<MemberGetProductVO> myWinProductList(
+	public List<PurchaseListVO> myWinProductList(
 	        @RequestHeader("Authorization") String bearerToken
 	) {
-		bearerToken = bearerToken.trim().replace("\n", "").replace("\r", "");
 	    TokenVO tokenVO = tokenService.parse(bearerToken);
-	    long memberNo = tokenVO.getMemberNo();
-	    return productService.getMyEndedProducts((int) memberNo);
+	    return productService.getPurchaseList(tokenVO.getMemberNo());
 	}
+
 
     // 환전 요청
     @PostMapping("/withdraw")
