@@ -338,23 +338,22 @@ public class MemberRestController {
 	    long memberNo = tokenVO.getMemberNo();
 	    return pointHistoryDao.listChargeHistoryByMember(memberNo);
 	}
-	//입찰 내역
-	@GetMapping("/bid/history")
-	public List<MemberBidHistoryVO> memberBidHistory(
-	        @RequestHeader("Authorization") String bearerToken
-	) {
-	    TokenVO tokenVO = tokenService.parse(bearerToken);
-	    return pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo());
-	}
-	@GetMapping("/win-products/history")
-	public List<MemberGetProductVO> myWinProductList(
-	        @RequestHeader("Authorization") String bearerToken
-	) {
-		bearerToken = bearerToken.trim().replace("\n", "").replace("\r", "");
-	    TokenVO tokenVO = tokenService.parse(bearerToken);
-	    long memberNo = tokenVO.getMemberNo();
-	    return productService.getMyEndedProducts((int) memberNo);
-	}
+	/*
+	 * //입찰 내역 //@GetMapping("/bid/history") public List<MemberBidHistoryVO>
+	 * memberBidHistory(
+	 * 
+	 * @RequestHeader("Authorization") String bearerToken ) { TokenVO tokenVO =
+	 * tokenService.parse(bearerToken); return
+	 * pointHistoryDao.listMemberBidHistory(tokenVO.getMemberNo()); }
+	 * 
+	 * @GetMapping("/win-products/history") public List<MemberGetProductVO>
+	 * myWinProductList(
+	 * 
+	 * @RequestHeader("Authorization") String bearerToken ) { bearerToken =
+	 * bearerToken.trim().replace("\n", "").replace("\r", ""); TokenVO tokenVO =
+	 * tokenService.parse(bearerToken); long memberNo = tokenVO.getMemberNo();
+	 * return productService.getMyEndedProducts((int) memberNo); }
+	 */
 
     // 환전 요청
     @PostMapping("/withdraw")

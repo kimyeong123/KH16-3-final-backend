@@ -24,25 +24,11 @@ public class ProductDao {
 
 	private static final String NAMESPACE = "product.";
 
-	public long sequence() {
-		return sqlSession.selectOne(NAMESPACE + "sequence");
-	}
-
-	public int insert(ProductDto productDto) {
-		return sqlSession.insert(NAMESPACE + "add", productDto);
-	}
-
-	public List<ProductDto> selectList() {
-		return sqlSession.selectList(NAMESPACE + "list");
-	}
-
-	public ProductDto selectOne(long productNo) {
-		return sqlSession.selectOne(NAMESPACE + "detail", productNo);
-	}
-
-	public int delete(long productNo) {
-		return sqlSession.delete(NAMESPACE + "delete", productNo);
-	}
+	public long sequence() { return sqlSession.selectOne(NAMESPACE + "sequence"); }
+	public int insert(ProductDto productDto) { return sqlSession.insert(NAMESPACE + "add", productDto); }
+	public List<ProductDto> selectList() { return sqlSession.selectList(NAMESPACE + "list"); }
+	public ProductDto selectOne(long productNo) { return sqlSession.selectOne(NAMESPACE + "detail", productNo); }
+	public int delete(long productNo) { return sqlSession.delete(NAMESPACE + "delete", productNo); }
 
 	public int updateStatus(long productNo, ProductStatus changeStatus) {
 		Map<String, Object> params = new HashMap<>();
@@ -61,28 +47,13 @@ public class ProductDao {
 		return sqlSession.selectOne(NAMESPACE + "selectOneForUpdate", params);
 	}
 
-	public List<Long> findExpiredProductNos() {
-		return sqlSession.selectList(NAMESPACE + "findExpiredProductNos");
-	}
-
-	public List<Long> findStartableProductNos(){
-		return sqlSession.selectList(NAMESPACE + "findStartableProductNos");
-	}
-  
-	public Long findSellerByRegProductNo(long productNo) {
-		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
-	}
+	public List<Long> findExpiredProductNos() { return sqlSession.selectList(NAMESPACE + "findExpiredProductNos"); }
+	public List<Long> findStartableProductNos(){ return sqlSession.selectList(NAMESPACE + "findStartableProductNos"); }
+	public Long findSellerByRegProductNo(long productNo) { return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo); }
+	public Long findSellerNoByProductNo(long productNo) { return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo); }
 	
-	public Long findSellerNoByProductNo(long productNo) {
-		return sqlSession.selectOne(NAMESPACE + "findSellerNoByProductNo", productNo);
-	}
+	public boolean update(ProductDto productDto) { return sqlSession.update(NAMESPACE + "update", productDto) > 0; }
 	
-	/** 상품 정보 수정 */
-	public boolean update(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "update", productDto) > 0;
-	}
-	
-	// 상품 현재가 업데이트
 	public int updateCurrentPrice(long productNo, long currentPrice) {
 		Map<String, Long> params = new HashMap<>();
 		params.put("productNo", productNo);
@@ -90,14 +61,8 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "updateCurrentPrice", params);
 	}
 
-	/** 상품 단위 가격 수정 */
-	public boolean updateUnit(ProductDto productDto) {
-		return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0;
-	}
-
-	public int count() {
-		return sqlSession.selectOne(NAMESPACE + "countByPaging");
-	}
+	public boolean updateUnit(ProductDto productDto) { return sqlSession.update(NAMESPACE + "updateUnit", productDto) > 0; }
+	public int count() { return sqlSession.selectOne(NAMESPACE + "countByPaging"); }
 
 	public List<ProductDto> selectList(PageVO pageVO) {
 		Map<String, Integer> params = new HashMap<>();
@@ -120,9 +85,7 @@ public class ProductDao {
 		return sqlSession.selectList(NAMESPACE + "listBySellerPaging", params);
 	}
 
-	public int countByBidding() {
-		return sqlSession.selectOne(NAMESPACE + "countByBidding");
-	}
+	public int countByBidding() { return sqlSession.selectOne(NAMESPACE + "countByBidding"); }
 
 	public List<ProductDto> selectListByBidding(PageVO pageVO) {
 		Map<String, Integer> params = new HashMap<>();
@@ -143,31 +106,18 @@ public class ProductDao {
 		return sqlSession.update(NAMESPACE + "closeAuction", productNo) > 0;
 	}
 	
-	// ========================================================
-	// [핵심] 검색 조건이 추가된 카운트 및 목록 조회
-	// ========================================================
-	public int countAuction(String q, Long category, Long minPrice, Long maxPrice) {
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("q", q);
-	    params.put("category", category);
-	    params.put("minPrice", minPrice);
-	    params.put("maxPrice", maxPrice);
-	    return sqlSession.selectOne(NAMESPACE + "countAuction", params);
+
+	
+
+	//20개씩받기
+	// 1. 검색 조건에 맞는 개수 조회 (vo 통째로 넘김 -> XML에서 #{q}, #{category} 등 꺼내 씀)
+	public int countAuction(PageVO vo) {
+	    return sqlSession.selectOne(NAMESPACE + "countAuction", vo);
 	}
 
-	public List<ProductDto> selectAuctionListByPaging(
-			PageVO pageVO, String q, Long category, String sort, Long minPrice, Long maxPrice) {
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("begin", pageVO.getBegin());
-	    params.put("end", pageVO.getEnd());
-	    
-	    params.put("q", q);
-	    params.put("category", category);
-	    params.put("sort", sort);
-	    params.put("minPrice", minPrice);
-	    params.put("maxPrice", maxPrice);
-	    
-	    return sqlSession.selectList(NAMESPACE + "listAuctionByPaging", params);
+	// 2. 리스트 조회 (vo 통째로 넘김 -> XML에서 #{begin}, #{end}, #{sort} 등 꺼내 씀)
+	public List<ProductDto> selectAuctionListByPaging(PageVO vo) {
+	    return sqlSession.selectList(NAMESPACE + "listAuctionByPaging", vo);
 	}
 
     // 자식 테이블 삭제 메소드들

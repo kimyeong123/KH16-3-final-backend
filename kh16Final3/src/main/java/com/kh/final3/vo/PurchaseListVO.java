@@ -17,8 +17,8 @@ public class PurchaseListVO {
     
     private String sellerNickname; // 판매자 닉네임
     
-    private long myBidPrice;       // 내가 입찰한 금액 중 최고가
-    private long finalPrice;       // 현재 상품의 현재가(최고가)
+    private long myBidPrice;
+    private long finalPrice;
     
     private String status;         // BIDDING(진행중)
     private LocalDateTime endTime;          // 마감 시간

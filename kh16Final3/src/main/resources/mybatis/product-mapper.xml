@@ -220,19 +220,24 @@
       )
       where rn between #{begin} and #{end}
     </select>
-    <select id="selectGetProductList" resultType="MemberGetProductVO">
-  select
-    product_no,
-    name,
-    final_price,
-    end_time,
-    status
-  from product
-  where buyer_no = #{memberNo}
-    and status = 'ENDED'
-  order by end_time desc
-</select>
+    
+ 
+    <select id="selectClosingSoon" resultType="ProductDto">
+        SELECT * FROM (
+            SELECT 
+                P.*, 
+                (SELECT MIN(ATTACHMENT_NO) 
+                 FROM ATTACHMENT 
+                 WHERE PARENT_PK_NO = P.PRODUCT_NO AND CATEGORY = 'PRODUCT') AS ATTACHMENT_NO
+            FROM PRODUCT P
+            WHERE P.STATUS = 'BIDDING' 
+              AND P.END_TIME > SYSTIMESTAMP
+            ORDER BY P.END_TIME ASC
+        ) WHERE ROWNUM &lt;= 4
+    </select>
 
+    
+    
 
     <delete id="deleteEscrow"> delete from escrow_ledger where product_no = #{productNo} </delete>
     <delete id="deleteBid"> delete from bid where product_no = #{productNo} </delete>
