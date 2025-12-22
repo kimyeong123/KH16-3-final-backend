@@ -26,8 +26,10 @@ import com.kh.final3.dto.ProductDto;
 import com.kh.final3.service.AttachmentService;
 import com.kh.final3.service.ProductService;
 import com.kh.final3.service.TokenService;
+import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
 import com.kh.final3.vo.PurchaseListVO; // [추가됨]
+import com.kh.final3.vo.SalesListVO;
 import com.kh.final3.vo.TokenVO;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -78,20 +80,27 @@ public class ProductRestController {
         return productService.create(productDto, tokenVO.getMemberNo());
     }
 
-    @GetMapping("/my/page/{page}")
-    public ProductListVO myListByPaging(@PathVariable int page, @RequestHeader(value="Authorization", required=false) String authorization) {
-        TokenVO tokenVO = requireToken(authorization);
-        return productService.getMyPaged(page, tokenVO.getMemberNo());
-    }
-
-//구매관리
+    //구매관리
     @GetMapping("/purchase")
-    public List<PurchaseListVO> purchaseList(@RequestHeader(value="Authorization", required=false) String authorization) {
-        // 1. 토큰 검증 및 회원 번호 추출
+    public PageVO<PurchaseListVO> purchaseList(
+            @RequestHeader(value="Authorization", required=false) String authorization,
+            PageVO<PurchaseListVO> pageVO) {
+
         TokenVO tokenVO = requireToken(authorization);
-        
-        // 2. 서비스 호출 (내 입찰/낙찰 내역 가져오기)
-        return productService.getPurchaseList(tokenVO.getMemberNo());
+        pageVO.setLoginNo(tokenVO.getMemberNo());
+
+        return productService.getPurchaseList(pageVO);
+    }
+    
+    @GetMapping("/sales")
+    public PageVO<SalesListVO> salesList(
+            @RequestHeader(value="Authorization", required=false) String authorization,
+            PageVO<SalesListVO> pageVO) {
+
+        TokenVO tokenVO = requireToken(authorization);
+        pageVO.setLoginNo(tokenVO.getMemberNo());
+
+        return productService.getSalesList(pageVO);
     }
 
     // ==========================================================

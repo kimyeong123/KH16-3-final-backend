@@ -14,6 +14,7 @@ import com.kh.final3.vo.AuctionEndRequestVO;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.member.MemberGetProductVO;
 import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO import
+import com.kh.final3.vo.SalesListVO;
 
 @Repository
 public class ProductDao {
@@ -191,7 +192,20 @@ public class ProductDao {
 	// ========================================================
 	// [추가됨] 내 구매/입찰 내역 조회 (React 구매관리용)
 	// ========================================================
-	public List<PurchaseListVO> selectPurchaseList(long memberNo) {
-		return sqlSession.selectList(NAMESPACE + "selectPurchaseList", memberNo);
+	public List<PurchaseListVO> selectPurchaseList(PageVO pageVO) {
+		return sqlSession.selectList(NAMESPACE + "selectPurchaseList", pageVO);
 	}
+	
+	public int countPurchase(long memberNo) {
+		return sqlSession.selectOne(NAMESPACE + "countPurchase", memberNo);
+	}
+	
+	public List<SalesListVO> selectSalesList(PageVO pageVO) {
+		return sqlSession.selectList(NAMESPACE + "selectSalesList", pageVO);
+	}
+	
+	public int countSales(long memberNo) {
+		return sqlSession.selectOne(NAMESPACE + "countSales", memberNo);
+	}
+	
 }
