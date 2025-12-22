@@ -1,42 +1,48 @@
 package com.kh.final3.vo;
 
-import java.util.List; // List를 사용하기 위해 import 추가
+import java.util.List;
 import lombok.Data;
 
-// 1. 클래스 선언부에 제네릭 타입 <T>를 추가합니다.
 @Data
 public class PageVO<T> {
 
 	// 필드에 페이징에 필요한 데이터들을 배치
 	private Integer page = 1; // 현재 페이지 번호
-	private Integer size = 10; // 한 페이지에 표시할 데이터 수
-	private String column, keyword;// 검색항목, 검색어
+	
+	// 🔥 핵심: 기본값 10. 프론트에서 size=30 보내면 30으로 바뀜!
+	private Integer size = 10; 
+	
+	private String column, keyword; // 기존 검색항목
 	private Integer dataCount; // 총 데이터 수
-	private Integer blockSize = 10;// 표시할 블록 개수(10개)
+	private Integer blockSize = 10; // 표시할 블록 개수
 
 	private String type;
 	private long loginNo;
 	private String loginLevel;
 	private String role; 
 
-	// 2. 조회된 데이터를 담을 필드를 추가합니다.
-	private List<T> list; // 조회된 데이터 리스트 (BoardDto 등)
+	// ==========================================
+	// 👇 [여기만 추가하세요] 경매 검색용 필드들 👇
+	// ==========================================
+	private String q;           // 경매 검색어
+	private Long category;      // 카테고리 코드
+	private Integer minPrice;   // 최소 가격
+	private Integer maxPrice;   // 최대 가격
+	private String sort;        // 정렬 기준 (PRICE_DESC 등)
+	// ==========================================
 
-	// 계산이 가능하도록 Getter 메소드 추가 생성
+	// 2. 조회된 데이터를 담을 필드
+	private List<T> list; 
+
+	// --- 아래는 기존 메소드 그대로 유지 ---
 
 	public boolean isSearch() {
-		// 기존 검색(column)
 		boolean columnSearch = column != null && keyword != null && !keyword.trim().isEmpty();
-
-		// 관리자 검색(type)
 		boolean typeSearch = type != null && keyword != null && !keyword.trim().isEmpty();
-
 		return columnSearch || typeSearch;
 	}
 
-	public boolean isList() {
-		return !isSearch();
-	}
+	public boolean isList() { return !isSearch(); }
 
 	public String getSearchParams() {
 		if (type != null && keyword != null && !keyword.trim().isEmpty()) {
@@ -48,46 +54,29 @@ public class PageVO<T> {
 		}
 	}
 
-	public Integer getBlockStart() {// 블록 시작번호
-		return (page - 1) / blockSize * blockSize + 1;
-	}
+	public Integer getBlockStart() { return (page - 1) / blockSize * blockSize + 1; }
 
-	public Integer getBlockFinish() {// 블록 종료번호
+	public Integer getBlockFinish() {
 		int number = (page - 1) / blockSize * blockSize + blockSize;
-		// 총 페이지 수를 넘지 않도록 Math.min을 사용
 		return Math.min(getTotalPage(), number);
 	}
 
-	public Integer getTotalPage() {// 총 페이지 수
-		// dataCount가 0일 때를 대비해 null 체크 및 1 이상인지 확인하는 로직 추가 가능
-		if (dataCount == null || dataCount == 0)
-			return 1;
+	public Integer getTotalPage() {
+		if (dataCount == null || dataCount == 0) return 1;
 		return (dataCount - 1) / size + 1;
 	}
 
+	// 오라클 ROWNUM 계산 (size가 30이면 알아서 1~30 계산됨)
 	public Integer getBegin() {
-		return page * size - (size - 1); // Oracle ROWNUM 기반 (1부터 시작)
+		return page * size - (size - 1); 
 	}
 
 	public Integer getEnd() {
 		return page * size;
 	}
 
-	// 꼭 필요하지 않더라도 가독성을 올릴 수 있는 메소드들을 추가
-	public boolean isFirstBlock() {
-		return getBlockStart() == 1;
-	}
-
-	public Integer getPrevPage() {
-		return getBlockStart() - 1;
-	}
-
-	public boolean isLastBlock() {
-		return getBlockFinish() == getTotalPage();
-	}
-
-	public Integer getNextPage() {
-		return getBlockFinish() + 1;
-	}
-
+	public boolean isFirstBlock() { return getBlockStart() == 1; }
+	public Integer getPrevPage() { return getBlockStart() - 1; }
+	public boolean isLastBlock() { return getBlockFinish() == getTotalPage(); }
+	public Integer getNextPage() { return getBlockFinish() + 1; }
 }

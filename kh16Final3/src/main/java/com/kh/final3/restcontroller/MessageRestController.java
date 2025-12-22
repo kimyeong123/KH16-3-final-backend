@@ -135,16 +135,21 @@ public class MessageRestController {
 	/**
 	 * 6. 수신함에서 쪽지 삭제 (POST /message/delete/receiver/{messageNo})
 	 */
-	@DeleteMapping("delete/receiver/{messageNo}")
-	public ResponseEntity<String> deleteMessageForReceiver(@PathVariable long messageNo) {
-		messageService.deleteMessageByReceiver(messageNo);
-		return ResponseEntity.ok("수신함 쪽지 삭제 성공");
+	@DeleteMapping("delete/receiver")
+	public ResponseEntity<String> deleteMessagesForReceiver(@RequestBody List<Long> messageNos) {
+	    for (long no : messageNos) {
+	        messageService.deleteMessageByReceiver(no);
+	    }
+	    return ResponseEntity.ok("선택한 수신함 쪽지 삭제 성공");
 	}
-	
-	@DeleteMapping("delete/sender/{messageNo}") 
-	public ResponseEntity<String> deleteMessageForSender(@PathVariable long messageNo) {
-	    messageService.deleteMessageBySender(messageNo);
-	    return ResponseEntity.ok("발신함 쪽지 삭제 성공");
+
+	// 발신함 다중 삭제
+	@DeleteMapping("delete/sender")
+	public ResponseEntity<String> deleteMessagesForSender(@RequestBody List<Long> messageNos) {
+	    for (long no : messageNos) {
+	        messageService.deleteMessageBySender(no);
+	    }
+	    return ResponseEntity.ok("선택한 발신함 쪽지 삭제 성공");
 	}
 	
 	/**
