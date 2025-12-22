@@ -30,7 +30,7 @@ public class CommentService {
      * - 시퀀스 발급, DTO 설정, DB 삽입을 처리합니다.
      */
     @Transactional
-    public CommentDto insert(CommentDto commentDto, long memberNo, String loginLevel, long productNo) { 
+    public CommentDto insert(CommentDto commentDto, long memberNo, String loginLevel, Long productNo) { 
 
         long commentNo = commentDao.sequence();
         commentDto.setCommentNo(commentNo);
