@@ -102,5 +102,62 @@
 	      delivered_time <= SYSTIMESTAMP - #{days}
 			]]>
 	</select>
+	
+	<update id="markDelivered">
+	    update orders
+	    set status = 'DELIVERED',
+	        delivered_time = SYSTIMESTAMP,
+	        updated_time = SYSTIMESTAMP
+	    where order_no = #{orderNo}
+	      and status = 'SHIPPED'
+	</update>
+	
+	<select id="countAdminOrders" resultType="int">
+	    SELECT COUNT(*)
+	    FROM orders o
+	    JOIN product p ON o.product_no = p.product_no
+	    JOIN member m ON o.buyer_no = m.member_no
+	</select>
+
+	<select id="selectAdminOrderList" resultType="AdminOrderListVO">
+			    SELECT *
+		FROM (
+		    SELECT
+		        o.order_no              AS orderNo,
+		        o.product_no            AS productNo,
+		
+		        p.name                  AS productName,
+		
+		        buyer.nickname          AS buyerNickname,
+		        seller.nickname         AS sellerNickname,   
+		
+		        o.final_price           AS finalPrice,
+		
+		        o.status                AS orderStatus,
+		        p.status                AS productStatus,
+		
+		        CASE
+		            WHEN o.courier IS NOT NULL
+		             AND o.tracking_number IS NOT NULL
+		            THEN 1
+		            ELSE 0
+		        END                     AS invoiceRegistered,
+		
+		        o.created_time          AS createdTime,
+		        p.end_time              AS endTime,
+		
+		        ROW_NUMBER() OVER (
+		            ORDER BY o.order_no DESC
+		        ) rn
+		    FROM orders o
+		    JOIN product p 
+		        ON o.product_no = p.product_no
+		    JOIN member buyer 
+		        ON o.buyer_no = buyer.member_no
+		    JOIN member seller
+		        ON o.seller_no = seller.member_no 
+		)
+		WHERE rn BETWEEN #{begin} AND #{end}
+	</select>
 
 </mapper>

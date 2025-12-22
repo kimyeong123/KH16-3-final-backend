@@ -51,7 +51,7 @@ public class ShippingRestController {
     }
 	
     // 관리자: 배송 완료 처리
-    @PostMapping("/delivered")
+    @PutMapping("/delivered")
     public void markDelivered(
             @PathVariable long orderNo,
             @RequestAttribute TokenVO tokenVO
