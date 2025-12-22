@@ -159,4 +159,7 @@ public class ProductDao {
 		return sqlSession.selectOne(NAMESPACE + "countSales", memberNo);
 	}
 	
+	public List<ProductDto> selectClosingSoon() {
+        return sqlSession.selectList("product.selectClosingSoon");
+    }
 }
