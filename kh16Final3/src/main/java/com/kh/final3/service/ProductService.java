@@ -1,7 +1,9 @@
 package com.kh.final3.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import com.kh.final3.dao.ProductDao;
 import com.kh.final3.dto.ProductDto;
 import com.kh.final3.vo.PageVO;
 import com.kh.final3.vo.ProductListVO;
-import com.kh.final3.vo.PurchaseListVO; // [추가] 구매내역 VO
+import com.kh.final3.vo.PurchaseListVO;
 
 @Service
 public class ProductService {
@@ -19,25 +21,19 @@ public class ProductService {
 	@Autowired
 	private ProductDao productDao;
 
-	// [수정] 상품 등록 (날짜 유효성 검사 추가됨)
 	@Transactional
 	public ProductDto create(ProductDto productDto, Long loginMemberNo) {
-		// 날짜 유효성 검사 로직
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime start = productDto.getStartTime();
 		LocalDateTime end = productDto.getEndTime();
 
-		// 1. 시작 시간이 현재 시간보다 너무 과거인 경우 (네트워크 지연 감안 1분 여유)
 		if (start.isBefore(now.minusMinutes(1))) {
 			throw new RuntimeException("시작 시간은 과거일 수 없습니다.");
 		}
-
-		// 2. 마감 시간이 시작 시간보다 빠른 경우
 		if (end.isBefore(start)) {
 			throw new RuntimeException("마감 시간은 시작 시간보다 이후여야 합니다.");
 		}
 		
-		// 기존 등록 로직 유지
 		long productNo = productDao.sequence();
 		productDto.setProductNo(productNo);
 		productDto.setSellerNo(loginMemberNo);
@@ -124,35 +120,39 @@ public class ProductService {
 				.build();
 	}
 
+	//20개씩받기
 	@Transactional(readOnly = true)
-	public ProductListVO getAuctionPaged(int page, String q, Long category, String sort, Long minPrice, Long maxPrice) {
-		// 검색 조건에 맞는 개수 조회
-		int count = productDao.countAuction(q, category, minPrice, maxPrice);
+	public Map<String, Object> getAuctionList(PageVO vo) {
+		// 1. 검색 조건 + 카테고리 + 가격 필터에 맞는 전체 개수 조회
+		int count = productDao.countAuction(vo);
 
-		PageVO pageVO = new PageVO();
-		pageVO.setPage(page);
-		pageVO.setDataCount(count);
+		// 2. PageVO에 개수 세팅 (여기서 전체 페이지 수 계산됨)
+		vo.setDataCount(count);
 
-		List<ProductDto> list = productDao.selectAuctionListByPaging(pageVO, q, category, sort, minPrice, maxPrice);
+		// 3. 실제 리스트 조회 (limit, offset 등이 PageVO 안의 size=30에 맞춰 계산됨)
+		List<ProductDto> list = productDao.selectAuctionListByPaging(vo);
 
-		boolean last = pageVO.getPage() >= pageVO.getTotalPage();
+		// 4. 결과 맵핑 (Controller가 Map을 원함)
+		Map<String, Object> map = new HashMap<>();
+		map.put("list", list);
+		map.put("count", count);
+		map.put("page", vo.getPage());
+		map.put("size", vo.getSize()); // 30개 요청했으면 30이 나감
+		map.put("totalPage", vo.getTotalPage());
+		
+		boolean last = vo.getPage() >= vo.getTotalPage();
+		map.put("last", last);
 
-		return ProductListVO.builder()
-				.page(pageVO.getPage())
-				.count(count)
-				.size(pageVO.getSize())
-				.begin(pageVO.getBegin())
-				.end(pageVO.getEnd())
-				.last(last)
-				.list(list)
-				.build();
+		return map;
 	}
 	
-	// ========================================================
-	// [추가됨] 내 구매/입찰 내역 조회 (React 구매관리 페이지용)
-	// ========================================================
 	@Transactional(readOnly = true)
 	public List<PurchaseListVO> getPurchaseList(long memberNo) {
 		return productDao.selectPurchaseList(memberNo);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<ProductDto> getClosingSoon() {
+	    return productDao.selectClosingSoon();
 	}
 }
