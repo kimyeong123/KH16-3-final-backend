@@ -72,6 +72,12 @@ public class ProductRestController {
         }
     }
 
+    // 1. 마감 임박 상품 4개123
+    @GetMapping("/main/closing-soon")
+    public List<ProductDto> closingSoon() {
+        return productService.getClosingSoon();
+    }
+
     @PostMapping("/")
     public ProductDto insert(@RequestBody ProductDto productDto, @RequestHeader(value="Authorization", required=false) String authorization) {
     	if (productDto.getCurrentPrice() == null) 

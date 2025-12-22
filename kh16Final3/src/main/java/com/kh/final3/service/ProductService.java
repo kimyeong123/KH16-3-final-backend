@@ -147,7 +147,6 @@ public class ProductService {
 		return map;
 	}
 
-	@Transactional(readOnly = true)
 	public PageVO<PurchaseListVO> getPurchaseList(PageVO<PurchaseListVO> pageVO) {
 
 	    // 1️ 로그인 사용자 번호
@@ -171,8 +170,8 @@ public class ProductService {
 
 	    return pageVO;
 	}
-	
-	public PageVO<SalesListVO> getSalesList(PageVO<SalesListVO> pageVO) {
+  
+  public PageVO<SalesListVO> getSalesList(PageVO<SalesListVO> pageVO) {
 		
 		long loginNo = pageVO.getLoginNo();
 		
@@ -190,5 +189,11 @@ public class ProductService {
 
 	    return pageVO;
 	}
-	
+  
+	//1
+	@Transactional(readOnly = true)
+	public List<ProductDto> getClosingSoon() {
+	    return productDao.selectClosingSoon();
+  }
+  
 }
