@@ -108,6 +108,36 @@
   where withdraw_no = #{withdrawNo}
     and status = 'REQUEST'
 </update>
+  <!-- 관리자: 상태별 개수 -->
+  <select id="countByStatus" resultType="int">
+    select count(*)
+    from point_withdraw
+    where status = #{status}
+  </select>
+
+  <!-- 관리자: 상태별 페이징 목록 -->
+  <select id="listByStatusPaging" resultType="PointWithdrawDto">
+    select *
+    from (
+      select
+        withdraw_no    as withdrawNo,
+        member_no      as memberNo,
+        amount         as amount,
+        bank_name      as bankName,
+        account_number as accountNumber,
+        account_holder as accountHolder,
+        status         as status,
+        created_time   as createdTime,
+        processed_time as processedTime,
+        processed_by   as processedBy,
+        reject_reason  as rejectReason,
+        row_number() over (order by created_time desc) rn
+      from point_withdraw
+      where status = #{status}
+    )
+    where rn between #{vo.begin} and #{vo.end}
+  </select>
+
 
 
 </mapper>

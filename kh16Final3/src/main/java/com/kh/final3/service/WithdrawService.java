@@ -59,10 +59,8 @@ public class WithdrawService {
             throw new TargetNotfoundException("처리할 환전 요청이 없거나 이미 처리되었습니다.");
         }
 
-        // 1) member 포인트 복구
-        memberDao.addMemberPoint(dto.getMemberNo(), dto.getAmount());
 
-        // 2) 원장 복구 기록
+        memberDao.addMemberPoint(dto.getMemberNo(), dto.getAmount());
         pointHistoryDao.insertWithdrawRefund(dto);
     }
 }
