@@ -68,8 +68,8 @@ public class OrdersDao {
     }
     
     // 수령자 정보 입력(업데이트)
-    public int updateShippingInfo(OrderShippingRequestVO shippingRequestVO) {
-    	return sqlSession.update(NAMESPACE + "updateShippingInfo", shippingRequestVO);
+    public int updateShippingAddress(OrderShippingRequestVO shippingRequestVO) {
+    	return sqlSession.update(NAMESPACE + "updateShippingAddress", shippingRequestVO);
     }
     
     // 정산 대상 찾기(pk 리스트 반환)
