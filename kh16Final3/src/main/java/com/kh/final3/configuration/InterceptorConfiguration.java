@@ -34,14 +34,14 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                 "/product/detail/**"
             );
 
-//        registry.addInterceptor(tokenRenewalInterceptor)
-//            .addPathPatterns("/**")
-//            .excludePathPatterns(
-//                "/member/refresh",
-//                "/member/join",
-//                "/member/login",
-//                "/member/logout",
-//                "/member/memberId"
-//            );
+        registry.addInterceptor(tokenRenewalInterceptor)
+            .addPathPatterns("/**")
+            .excludePathPatterns(
+                "/member/refresh",
+                "/member/join",
+                "/member/login",
+                "/member/logout",
+                "/member/memberId"
+            );
     }
 }

@@ -24,6 +24,7 @@ public class SettlementScheduler {
 	    lockAtMostFor  = "PT5M"
 	)
 	public void runSettlement() {
+		log.debug("[SCHEDULER] settlement check");
 	    settlementScheduleService.processSettlementTargets();
 	}
 }

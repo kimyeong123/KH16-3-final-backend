@@ -33,8 +33,8 @@ public class SettlementScheduleService {
             return;
         }
 
-        log.info("[SETTLEMENT-SCHEDULE] Settlement targets found. count={}",
-                 orderNos.size());
+        log.info("[SETTLEMENT-SCHEDULE] Settlement targets found. orderNos={}",
+                orderNos);
 
         List<Long> failedNos = new ArrayList<>();
 
