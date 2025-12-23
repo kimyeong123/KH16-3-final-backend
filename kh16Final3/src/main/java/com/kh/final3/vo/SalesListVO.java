@@ -25,7 +25,7 @@ public class SalesListVO {
     private String buyerNickname;   // 구매자 닉네임 (낙찰자)
 
     /* ===== 가격 ===== */
-    private long finalPrice;         // 낙찰가
+    private long finalPrice;         // 낙찰가 
 
     /* ===== 상태 ===== */
     private String productStatus;    // REGISTRATION / BIDDING / ENDED

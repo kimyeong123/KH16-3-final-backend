@@ -117,12 +117,7 @@ public class BidService {
 		// BidPlacedEvent 타입의 이벤트를 발행
 		// 실제 처리는 AFTER_COMMIT 리스너에서 수행됨
 		// ‘입찰이 발생했다’는 사건을 객체로 표현하여 이벤트 생성(표현 객체)
-		
-		// 이전 최고 입찰자 번호 추출 (없으면 null)
-		Long previousNo = (previousHighestBid != null) ? previousHighestBid.getBidderNo() : null;
-		
-		// 이벤트 발행 (두 개의 인자를 넘김)
-		eventPublisher.publishEvent(new BidPlacedEvent(incomingBid, previousNo));	
+		eventPublisher.publishEvent(new BidPlacedEvent(incomingBid));
 	}
 
 	// private 메소드에서는 Transactional이 작동하지않음

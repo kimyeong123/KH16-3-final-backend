@@ -259,7 +259,7 @@
 	            p.name          AS productName,
 	            p.status        AS status,
 	            p.end_time      AS endTime,
-	            p.final_price   AS finalPrice,
+	            p.current_price   AS finalPrice,
 	
 	            m.nickname      AS sellerNickname,
 	            a.attachment_no AS attachmentNo,
@@ -319,70 +319,72 @@
 	
 	<select id="selectSalesList"
         resultType="SalesListVO">
-	SELECT *
-	FROM (
-	    SELECT
-	        t.*,
-	        ROWNUM rn
+	    SELECT *
 	    FROM (
 	        SELECT
-	            /* ===== 식별 ===== */
-	            p.product_no        AS productNo,
-	            o.order_no          AS orderNo,
+	            t.*,
+	            ROWNUM rn
+	        FROM (
+	            SELECT
+	                /* ===== 식별 ===== */
+	                p.product_no        AS productNo,
+	                o.order_no          AS orderNo,
 	
-	            /* ===== 상품 ===== */
-	            p.name              AS productName,
-	            a.attachment_no     AS attachmentNo,
+	                /* ===== 상품 ===== */
+	                p.name              AS productName,
+	                a.attachment_no     AS attachmentNo,
 	
-	            /* ===== 구매자 ===== */
-	            bm.nickname         AS buyerNickname,
+	                /* ===== 구매자 ===== */
+	                bm.nickname         AS buyerNickname,
 	
-	            /* ===== 가격 ===== */
-	            o.final_price       AS finalPrice,
+	                /* ===== 가격 (핵심) ===== */
+	                p.current_price     AS finalPrice,
 	
-	            /* ===== 상태 ===== */
-	            p.status            AS productStatus,
-	            o.status            AS orderStatus,
+	                /* ===== 상태 ===== */
+	                p.status            AS productStatus,
+	                o.status            AS orderStatus,
 	
-	            p.end_time          AS endTime,
+	                /* ===== 시간 ===== */
+	                p.end_time          AS endTime,
 	
-	            /* ===== 송장 입력 여부 ===== */
-	            CASE
-	                WHEN o.courier IS NOT NULL
-	                 AND o.tracking_number IS NOT NULL
-	                THEN 1
-	                ELSE 0
-	            END AS invoiceRegistered
+	                /* ===== 송장 입력 여부 ===== */
+	                CASE
+	                    WHEN o.courier IS NOT NULL
+	                     AND o.tracking_number IS NOT NULL
+	                    THEN 1
+	                    ELSE 0
+	                END AS invoiceRegistered
 	
-	        FROM product p
+	            FROM product p
 	
-	        /* 주문 (낙찰 후에만 존재) */
-	        LEFT JOIN orders o
-	               ON o.product_no = p.product_no
-	              AND o.seller_no = #{loginNo}
+	            /* 주문 (낙찰 후에만 존재) */
+	            LEFT JOIN orders o
+	                   ON o.product_no = p.product_no
+	                  AND o.seller_no = #{loginNo}
 	
-	        /* 구매자 */
-	        LEFT JOIN member bm
-	               ON o.buyer_no = bm.member_no
+	            /* 구매자 (낙찰자) */
+	            LEFT JOIN member bm
+	                   ON o.buyer_no = bm.member_no
 	
-	        /* 썸네일 (1개만) */
-	        LEFT JOIN attachment a
-	               ON a.parent_pk_no = p.product_no
-	              AND a.category = 'PRODUCT'
+	            /* 썸네일 (1개만) */
+	            LEFT JOIN attachment a
+	                   ON a.parent_pk_no = p.product_no
+	                  AND a.category = 'PRODUCT'
 	
-	        /* 판매자 기준 */
-	        WHERE p.seller_no = #{loginNo}
+	            /* 판매자 기준 */
+	            WHERE p.seller_no = #{loginNo}
 	
-	        ORDER BY p.end_time DESC
-	    ) t
+	            ORDER BY p.end_time DESC
+	        ) t
+	        WHERE <![CDATA[
+	            ROWNUM <= #{end}
+	        ]]>
+	    )
 	    WHERE <![CDATA[
-    		ROWNUM <= #{end}
-		]]>
-	)
-	WHERE <![CDATA[
-    		rn >= #{begin}
-		]]>
+	        rn >= #{begin}
+	    ]]>
 	</select>
+
 
 	<select id="countSales"
         resultType="int">
