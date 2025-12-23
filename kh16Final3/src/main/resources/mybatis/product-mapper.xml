@@ -392,5 +392,4 @@
 		FROM product p
 		WHERE p.seller_no = #{loginNo}
 	</select>
-
 </mapper>

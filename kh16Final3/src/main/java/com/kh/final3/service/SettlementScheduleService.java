@@ -25,6 +25,7 @@ public class SettlementScheduleService {
 	private SettlementProperties settlementProperties;
 	
 	public void processSettlementTargets() {
+		log.debug("[SETTLEMENT-SCHEDULE] start");
         List<Long> orderNos =
             ordersDao.findSettlementTargets(settlementProperties.getDelayDays());
 

@@ -20,11 +20,11 @@ public class SettlementScheduler {
 	@Scheduled(cron = "0 * * * * *")
 	@SchedulerLock(
 	    name = "settlementScheduler",
-	    lockAtLeastFor = "PT30S",
+	    lockAtLeastFor = "PT2S",
 	    lockAtMostFor  = "PT5M"
 	)
 	public void runSettlement() {
-		log.debug("[SCHEDULER] settlement check");
+		log.info("[SCHEDULER] settlement check");
 	    settlementScheduleService.processSettlementTargets();
 	}
 }
